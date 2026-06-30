@@ -14,3 +14,4 @@ All notable changes to this project will be documented in this file.
 - First architectural decision record
 - GitHub Project board
 - Initial issues for M0 Foundation
+- Local development environment validation document
