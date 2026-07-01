@@ -81,13 +81,13 @@ Future stack:
 - MLflow
 - Cloud AI platforms
 
-## Current Phase
-
-M1 — AI API Base
-
 ## Roadmap
 
 See [ROADMAP.md](./ROADMAP.md).
+
+### Current Phase
+
+M1 — AI API Base
 
 ## Repository Structure
 
