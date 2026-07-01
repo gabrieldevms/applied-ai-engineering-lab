@@ -83,7 +83,7 @@ Future stack:
 
 ## Current Phase
 
-M0 — Foundation
+M1 — AI API Base
 
 ## Roadmap
 
