@@ -4,27 +4,27 @@
 
 Goal: prepare the repository, workflow, documentation and initial architecture.
 
-- [ ] Repository structure
-- [ ] GitHub Project board
-- [ ] Issue templates
-- [ ] Pull request template
-- [ ] Initial README
-- [ ] Initial roadmap
-- [ ] Initial architecture document
-- [ ] ADR template
-- [ ] First architecture decision record
-- [ ] Local development environment validation
+- [x] Repository structure
+- [x] GitHub Project board
+- [x] Issue templates
+- [x] Pull request template
+- [x] Initial README
+- [x] Initial roadmap
+- [x] Initial architecture document
+- [x] ADR template
+- [x] First architecture decision record
+- [x] Local development environment validation
 
 ## M1 — AI API Base
 
 Goal: create the first production-oriented API foundation.
 
-- [ ] FastAPI project setup
-- [ ] Health check endpoint
-- [ ] Analyze text endpoint
-- [ ] Pydantic schemas
-- [ ] Unit tests with pytest
-- [ ] Dockerfile
+- [x] FastAPI project setup
+- [x] Health check endpoint
+- [x] Analyze text endpoint
+- [x] Pydantic schemas
+- [x] Unit tests with pytest
+- [x] Dockerfile
 - [ ] GitHub Actions CI pipeline
 - [ ] Basic logging
 - [ ] Basic error handling
