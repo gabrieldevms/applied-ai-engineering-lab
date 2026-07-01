@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: applied-ai-engineering-api
+    ports:
+      - "8000:8000"
+    environment:
+      PYTHONPATH: /app/apps/api/src
+    command: uv run uvicorn ai_api.main:app --host 0.0.0.0 --port 8000 --reload --app-dir apps/api/src
+    volumes:
+      - ./apps/api/src:/app/apps/api/src

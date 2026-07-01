@@ -15,3 +15,6 @@ All notable changes to this project will be documented in this file.
 - GitHub Project board
 - Initial issues for M0 Foundation
 - Local development environment validation document
+- Docker support for the API
+- Docker Compose configuration for local API execution
+- Docker ignore file
