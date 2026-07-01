@@ -116,6 +116,50 @@ applied-ai-engineering-lab/
     evals/
 ```
 
+## Running the API Locally
+
+Run the API directly with uv:
+
+```
+uv run uvicorn ai_api.main:app --reload --app-dir apps/api/src
+```
+
+Open:
+
+```
+http://127.0.0.1:8000/health
+http://127.0.0.1:8000/docs
+```
+
+## Running Tests
+
+Run the test suite:
+
+```
+uv run pytest
+```
+
+## Running with Docker
+
+Build and start the API container:
+
+```
+docker compose up --build
+```
+
+Open:
+
+```
+http://127.0.0.1:8000/health
+http://127.0.0.1:8000/docs
+```
+
+Stop the containers:
+
+```
+docker compose down
+```
+
 ## Learning Approach
 
 Each module follows a practical engineering cycle:
