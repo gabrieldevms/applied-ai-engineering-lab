@@ -19,3 +19,6 @@ All notable changes to this project will be documented in this file.
 - Docker Compose configuration for local API execution
 - Docker ignore file
 - GitHub Actions CI pipeline for API tests
+- Basic API request logging
+- Basic API error handling
+- README updates for M1 completion and M2 start
