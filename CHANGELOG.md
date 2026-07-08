@@ -18,3 +18,4 @@ All notable changes to this project will be documented in this file.
 - Docker support for the API
 - Docker Compose configuration for local API execution
 - Docker ignore file
+- GitHub Actions CI pipeline for API tests
