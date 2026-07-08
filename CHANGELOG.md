@@ -27,3 +27,6 @@ All notable changes to this project will be documented in this file.
 - LLM message, response and usage models
 - Requirement analysis prompt template
 - Unit tests for requirement analysis prompt generation
+- Structured requirement analysis schemas
+- Requirement risk schema with severity validation
+- Unit tests for requirement analysis schemas
