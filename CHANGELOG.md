@@ -30,3 +30,4 @@ All notable changes to this project will be documented in this file.
 - Structured requirement analysis schemas
 - Requirement risk schema with severity validation
 - Unit tests for requirement analysis schemas
+- Portuguese-first requirement analysis defaults
