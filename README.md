@@ -160,6 +160,16 @@ Stop the containers:
 docker compose down
 ```
 
+## Continuous Integration
+
+This project uses GitHub Actions to run automated tests on pull requests and pushes to the main branch.
+
+The CI pipeline currently validates:
+
+- Python setup
+- uv dependency installation
+- pytest test execution
+
 ## Learning Approach
 
 Each module follows a practical engineering cycle:
