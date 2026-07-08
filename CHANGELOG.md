@@ -25,3 +25,5 @@ All notable changes to this project will be documented in this file.
 - LLM provider abstraction
 - Fake LLM provider for local tests
 - LLM message, response and usage models
+- Requirement analysis prompt template
+- Unit tests for requirement analysis prompt generation

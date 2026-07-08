@@ -33,8 +33,8 @@ Goal: create the first production-oriented API foundation.
 
 Goal: integrate LLMs in a structured and reliable way.
 
-- [ ] LLM provider abstraction
-- [ ] Prompt templates
+- [x] LLM provider abstraction
+- [x] Prompt templates
 - [ ] Structured outputs
 - [ ] JSON schema validation
 - [ ] Retry strategy
