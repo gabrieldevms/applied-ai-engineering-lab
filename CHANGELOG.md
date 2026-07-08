@@ -22,3 +22,6 @@ All notable changes to this project will be documented in this file.
 - Basic API request logging
 - Basic API error handling
 - README updates for M1 completion and M2 start
+- LLM provider abstraction
+- Fake LLM provider for local tests
+- LLM message, response and usage models
