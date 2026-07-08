@@ -31,3 +31,6 @@ All notable changes to this project will be documented in this file.
 - Requirement risk schema with severity validation
 - Unit tests for requirement analysis schemas
 - Portuguese-first requirement analysis defaults
+- Requirement analyzer service
+- Requirement analysis error handling
+- Unit tests for requirement analyzer service

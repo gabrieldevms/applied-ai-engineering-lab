@@ -8,12 +8,19 @@ from ai_api.requirements.schemas import (
     RequirementRisk,
     RiskSeverity,
 )
+from ai_api.requirements.services import (
+    RequirementAnalysisError,
+    RequirementAnalyzerService,
+)
 
 __all__ = [
     "REQUIREMENT_ANALYSIS_SYSTEM_PROMPT",
+    "RequirementAnalysisError",
     "RequirementAnalysisRequest",
     "RequirementAnalysisResponse",
+    "RequirementAnalyzerService",
     "RequirementRisk",
     "RiskSeverity",
     "build_requirement_analysis_messages",
 ]
+
