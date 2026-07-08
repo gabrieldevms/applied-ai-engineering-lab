@@ -25,9 +25,9 @@ Goal: create the first production-oriented API foundation.
 - [x] Pydantic schemas
 - [x] Unit tests with pytest
 - [x] Dockerfile
-- [ ] GitHub Actions CI pipeline
-- [ ] Basic logging
-- [ ] Basic error handling
+- [x] GitHub Actions CI pipeline
+- [x] Basic logging
+- [x] Basic error handling
 
 ## M2 — LLM Engineering
 

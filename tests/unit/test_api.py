@@ -40,3 +40,9 @@ def test_analyze_should_validate_empty_text() -> None:
     response = client.post("/analyze", json=payload)
 
     assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."
+    assert "details" in body["error"]
