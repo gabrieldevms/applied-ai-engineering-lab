@@ -35,8 +35,8 @@ Goal: integrate LLMs in a structured and reliable way.
 
 - [x] LLM provider abstraction
 - [x] Prompt templates
-- [ ] Structured outputs
-- [ ] JSON schema validation
+- [x] Structured outputs
+- [x] JSON schema validation
 - [ ] Retry strategy
 - [ ] Fallback strategy
 - [ ] Requirement analyzer
