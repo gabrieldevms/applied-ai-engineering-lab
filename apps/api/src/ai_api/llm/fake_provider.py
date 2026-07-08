@@ -7,6 +7,9 @@ class FakeLLMProvider:
     provider_name = "fake"
     model_name = "fake-llm-v1"
 
+    def __init__(self, response_content: str | None = None) -> None:
+        self.response_content = response_content
+
     def generate(self, messages: Sequence[LLMMessage]) -> LLMResponse:
         user_messages = [
             message.content
@@ -16,7 +19,11 @@ class FakeLLMProvider:
 
         latest_user_message = user_messages[-1] if user_messages else ""
 
-        content = f"Fake LLM response for: {latest_user_message}"
+        content = (
+            self.response_content
+            if self.response_content is not None
+            else f"Fake LLM response for: {latest_user_message}"
+        )
 
         estimated_input_tokens = sum(
             len(message.content.split())
