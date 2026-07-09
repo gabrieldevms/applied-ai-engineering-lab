@@ -75,3 +75,7 @@ All notable changes to this project will be documented in this file.
 - Stable document identifiers based on content hash
 - Metadata support for ingested documents and chunks
 - Unit and API tests for document ingestion
+- RAG text extraction service
+- Text extraction API endpoint for uploaded files
+- Support for `.txt`, `.md` and `.markdown` files
+- Unit and API tests for text extraction

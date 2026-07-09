@@ -272,3 +272,45 @@ def test_rag_ingest_endpoint_should_validate_blank_document_text() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_rag_extract_text_endpoint_should_return_extracted_text() -> None:
+    response = client.post(
+        "/rag/extract-text",
+        files={
+            "file": (
+                "requirement.txt",
+                b"Como cliente, quero renegociar minha divida.",
+                "text/plain",
+            )
+        },
+    )
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["filename"] == "requirement.txt"
+    assert body["source"] == "requirement.txt"
+    assert body["text"] == "Como cliente, quero renegociar minha divida."
+    assert body["metadata"]["extension"] == ".txt"
+
+
+def test_rag_extract_text_endpoint_should_reject_unsupported_file_type() -> None:
+    response = client.post(
+        "/rag/extract-text",
+        files={
+            "file": (
+                "document.pdf",
+                b"fake pdf content",
+                "application/pdf",
+            )
+        },
+    )
+
+    assert response.status_code == 400
+
+    body = response.json()
+
+    assert body["error"]["type"] == "text_extraction_error"
+    assert body["error"]["message"] == "Unsupported file type: .pdf"

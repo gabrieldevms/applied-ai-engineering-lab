@@ -148,3 +148,14 @@ class DocumentIngestionResponse(BaseModel):
     document: IngestedDocument
     total_chunks: int
     chunks: list[DocumentChunk]
+
+
+class TextExtractionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    source: str
+    filename: str
+    content_type: str | None = None
+    character_count: int
+    text: str
+    metadata: dict[str, Any] = Field(default_factory=dict)

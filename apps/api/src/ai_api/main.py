@@ -1,19 +1,11 @@
 import logging
 import time
-from typing import Annotated, Any
 from collections.abc import Awaitable, Callable
-from fastapi import FastAPI, Request, Depends
+from typing import Annotated, Any
+from fastapi import Depends, FastAPI, File, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
-from ai_api.schemas import AnalyzeRequest, AnalyzeResponse
-from ai_api.requirements.dependencies import get_requirement_analyzer_service
-from ai_api.requirements.exceptions import RequirementAnalysisError
-from ai_api.requirements.schemas import (
-    RequirementAnalysisRequest,
-    RequirementAnalysisResponse,
-)
-from ai_api.requirements.services import RequirementAnalyzerService
 from ai_api.config import Settings, get_settings
 from ai_api.llm import (
     LLMHealthResponse,
@@ -24,16 +16,22 @@ from ai_api.llm import (
 from ai_api.rag import (
     DocumentChunkingRequest,
     DocumentChunkingResponse,
-    TextChunker,
-)
-from ai_api.rag import (
-    DocumentChunkingRequest,
-    DocumentChunkingResponse,
     DocumentIngestionRequest,
     DocumentIngestionResponse,
     DocumentIngestionService,
     TextChunker,
+    TextExtractionError,
+    TextExtractionResponse,
+    TextExtractionService,
 )
+from ai_api.requirements.dependencies import get_requirement_analyzer_service
+from ai_api.requirements.exceptions import RequirementAnalysisError
+from ai_api.requirements.schemas import (
+    RequirementAnalysisRequest,
+    RequirementAnalysisResponse,
+)
+from ai_api.requirements.services import RequirementAnalyzerService
+from ai_api.schemas import AnalyzeRequest, AnalyzeResponse
 
 
 logging.basicConfig(
@@ -71,6 +69,29 @@ async def log_requests(
     )
 
     return response
+
+
+@app.exception_handler(TextExtractionError)
+async def text_extraction_exception_handler(
+    request: Request,
+    exc: TextExtractionError,
+) -> JSONResponse:
+    logger.warning(
+        "Text extraction error on %s %s: %s",
+        request.method,
+        request.url.path,
+        str(exc),
+    )
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": {
+                "type": "text_extraction_error",
+                "message": str(exc),
+            }
+        },
+    )
 
 
 @app.exception_handler(RequirementAnalysisError)
@@ -240,4 +261,18 @@ def ingest_document(
         metadata=payload.metadata,
         chunk_size=payload.chunk_size,
         chunk_overlap=payload.chunk_overlap,
+    )
+
+@app.post("/rag/extract-text", response_model=TextExtractionResponse)
+async def extract_text_from_file(
+    file: UploadFile = File(...),
+) -> TextExtractionResponse:
+    file_content = await file.read()
+
+    extraction_service = TextExtractionService()
+
+    return extraction_service.extract_from_bytes(
+        file_content=file_content,
+        filename=file.filename or "uploaded-file",
+        content_type=file.content_type,
     )

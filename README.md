@@ -435,6 +435,30 @@ Current behavior:
 
 This is part of the RAG foundation and prepares the project for embeddings, vector storage and semantic retrieval.
 
+## RAG Text Extraction
+
+The API includes a basic text extraction endpoint.
+
+    POST /rag/extract-text
+
+It receives an uploaded text-based file and extracts normalized text.
+
+Current supported formats:
+
+- `.txt`
+- `.md`
+- `.markdown`
+
+Current behavior:
+
+- UTF-8 text extraction
+- Line break normalization
+- Empty text validation
+- Unsupported file type handling
+- Structured extraction response
+
+Future steps will include PDF, DOCX and other document formats.
+
 ## Status
 
 This project is currently in the foundation phase.

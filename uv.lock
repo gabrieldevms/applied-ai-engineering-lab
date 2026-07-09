@@ -47,6 +47,7 @@ dependencies = [
     { name = "httpx" },
     { name = "openai" },
     { name = "pydantic-settings" },
+    { name = "python-multipart" },
 ]
 
 [package.dev-dependencies]
@@ -61,6 +62,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "openai", specifier = ">=2.44.0" },
     { name = "pydantic-settings", specifier = ">=2.14.2" },
+    { name = "python-multipart", specifier = ">=0.0.32" },
 ]
 
 [package.metadata.requires-dev]
