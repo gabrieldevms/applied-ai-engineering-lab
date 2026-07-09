@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 from typing import Protocol
-
 from ai_api.llm.models import LLMMessage, LLMResponse
 
 

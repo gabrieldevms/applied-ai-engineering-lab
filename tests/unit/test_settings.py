@@ -1,6 +1,5 @@
 import pytest
 from pydantic import ValidationError
-
 from ai_api.config import Settings
 
 

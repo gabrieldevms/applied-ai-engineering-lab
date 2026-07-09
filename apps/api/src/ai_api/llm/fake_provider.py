@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-
 from ai_api.llm.models import LLMMessage, LLMResponse, LLMUsage
 
 

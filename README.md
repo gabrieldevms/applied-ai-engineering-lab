@@ -317,6 +317,32 @@ Automate it
 Improve the architecture
 ```
 
+## Real LLM Provider
+
+The API supports environment-based LLM provider selection.
+
+The default provider is:
+
+    LLM_PROVIDER=fake
+
+To use OpenAI locally, create a `.env` file based on `.env.example`:
+
+    LLM_PROVIDER=openai
+    OPENAI_API_KEY=your-api-key
+    OPENAI_MODEL=your-model
+
+Do not commit the `.env` file.
+
+When using the OpenAI provider, the requirement analysis flow remains the same:
+
+    request
+      -> prompt builder
+      -> OpenAI provider
+      -> JSON parser
+      -> Pydantic validation
+      -> retry/fallback handling
+      -> structured API response
+
 ## Status
 
 This project is currently in the foundation phase.
