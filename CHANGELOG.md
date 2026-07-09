@@ -66,3 +66,7 @@ All notable changes to this project will be documented in this file.
 - LLM output normalization for JSON responses
 - JSON object extraction from Markdown or mixed text responses
 - Unit tests for normalized LLM outputs
+- RAG document chunking service
+- Document chunking API endpoint
+- Document chunking schemas and metadata
+- Unit and API tests for document chunking

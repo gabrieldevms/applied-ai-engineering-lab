@@ -180,3 +180,46 @@ def test_llm_health_endpoint_should_return_provider_status() -> None:
         assert body["missing_settings"] == ["OPENAI_API_KEY", "OPENAI_MODEL"]
     finally:
         app.dependency_overrides.clear()
+
+
+def test_rag_chunk_endpoint_should_return_document_chunks() -> None:
+    payload = {
+        "document_text": " ".join(
+            [
+                "Como cliente, quero renegociar minha dívida para gerar um boleto atualizado."
+                for _ in range(20)
+            ]
+        ),
+        "source": "requirement-001",
+        "chunk_size": 200,
+        "chunk_overlap": 40,
+    }
+
+    response = client.post("/rag/chunk", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["source"] == "requirement-001"
+    assert body["total_chunks"] > 1
+    assert len(body["chunks"]) == body["total_chunks"]
+    assert body["chunks"][0]["chunk_id"] == "requirement-001-0"
+
+
+def test_rag_chunk_endpoint_should_validate_blank_document_text() -> None:
+    payload = {
+        "document_text": "   ",
+        "source": "requirement-001",
+        "chunk_size": 200,
+        "chunk_overlap": 40,
+    }
+
+    response = client.post("/rag/chunk", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."
