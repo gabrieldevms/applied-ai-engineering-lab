@@ -34,3 +34,6 @@ All notable changes to this project will be documented in this file.
 - Requirement analyzer service
 - Requirement analysis error handling
 - Unit tests for requirement analyzer service
+- LLM response parser for requirement analysis
+- LLM response validation tests
+- Strict schema validation for requirement analysis responses

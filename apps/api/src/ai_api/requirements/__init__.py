@@ -1,3 +1,5 @@
+from ai_api.requirements.exceptions import RequirementAnalysisError
+from ai_api.requirements.parsers import parse_requirement_analysis_response
 from ai_api.requirements.prompts import (
     REQUIREMENT_ANALYSIS_SYSTEM_PROMPT,
     build_requirement_analysis_messages,
@@ -8,10 +10,7 @@ from ai_api.requirements.schemas import (
     RequirementRisk,
     RiskSeverity,
 )
-from ai_api.requirements.services import (
-    RequirementAnalysisError,
-    RequirementAnalyzerService,
-)
+from ai_api.requirements.services import RequirementAnalyzerService
 
 __all__ = [
     "REQUIREMENT_ANALYSIS_SYSTEM_PROMPT",
@@ -22,5 +21,5 @@ __all__ = [
     "RequirementRisk",
     "RiskSeverity",
     "build_requirement_analysis_messages",
+    "parse_requirement_analysis_response",
 ]
-
