@@ -21,6 +21,11 @@ from ai_api.llm import (
     get_llm_health_status,
     get_llm_providers_status,
 )
+from ai_api.rag import (
+    DocumentChunkingRequest,
+    DocumentChunkingResponse,
+    TextChunker,
+)
 
 
 logging.basicConfig(
@@ -196,4 +201,17 @@ def analyze_requirement(
     return service.analyze(
         requirement_text=payload.requirement_text,
         language=payload.language,
+    )
+
+@app.post("/rag/chunk", response_model=DocumentChunkingResponse)
+def chunk_document(
+    payload: DocumentChunkingRequest,
+) -> DocumentChunkingResponse:
+    chunker = TextChunker()
+
+    return chunker.chunk(
+        document_text=payload.document_text,
+        source=payload.source,
+        chunk_size=payload.chunk_size,
+        chunk_overlap=payload.chunk_overlap,
     )

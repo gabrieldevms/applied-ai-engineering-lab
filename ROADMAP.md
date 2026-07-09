@@ -54,13 +54,23 @@ Goal: build a document-based AI assistant.
 
 - [ ] Document ingestion
 - [ ] Text extraction
-- [ ] Chunking strategy
+- [x] Chunking strategy
 - [ ] Embeddings
 - [ ] Vector database
 - [ ] Semantic search
 - [ ] RAG answer generation
 - [ ] Source citation
 - [ ] RAG evaluation
+
+### Technical breakdown
+
+- [x] Basic text chunking service
+- [x] Chunking API endpoint
+- [ ] Embedding provider abstraction
+- [ ] Fake embedding provider
+- [ ] Vector store abstraction
+- [ ] In-memory vector store
+- [ ] Retrieval service
 
 ## M4 — AI Agents
 
