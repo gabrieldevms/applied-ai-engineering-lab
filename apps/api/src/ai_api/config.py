@@ -4,7 +4,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-LLMProviderName = Literal["fake", "openai"]
+LLMProviderName = Literal["fake", "openai", "ollama"]
 
 
 class Settings(BaseSettings):
@@ -21,6 +21,10 @@ class Settings(BaseSettings):
 
     openai_api_key: str | None = Field(default=None)
     openai_model: str | None = Field(default=None)
+
+    ollama_base_url: str = Field(default="http://localhost:11434")
+    ollama_model: str = Field(default="llama3.1")
+    ollama_timeout_seconds: float = Field(default=120, ge=1)
 
 
 @lru_cache
