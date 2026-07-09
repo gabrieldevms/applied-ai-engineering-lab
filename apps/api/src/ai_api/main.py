@@ -1,13 +1,19 @@
 import logging
 import time
+from typing import Annotated, Any
 from collections.abc import Awaitable, Callable
-
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
-
 from ai_api.schemas import AnalyzeRequest, AnalyzeResponse
+from ai_api.requirements.dependencies import get_requirement_analyzer_service
+from ai_api.requirements.exceptions import RequirementAnalysisError
+from ai_api.requirements.schemas import (
+    RequirementAnalysisRequest,
+    RequirementAnalysisResponse,
+)
+from ai_api.requirements.services import RequirementAnalyzerService
 
 
 logging.basicConfig(
@@ -47,16 +53,63 @@ async def log_requests(
     return response
 
 
+@app.exception_handler(RequirementAnalysisError)
+async def requirement_analysis_exception_handler(
+    request: Request,
+    exc: RequirementAnalysisError,
+) -> JSONResponse:
+    logger.warning(
+        "Requirement analysis error on %s %s: %s",
+        request.method,
+        request.url.path,
+        str(exc),
+    )
+
+    return JSONResponse(
+        status_code=502,
+        content={
+            "error": {
+                "type": "requirement_analysis_error",
+                "message": "Requirement analysis failed.",
+            }
+        },
+    )
+
+
+
+def sanitize_validation_errors(
+    errors: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    sanitized_errors = []
+
+    for error in errors:
+        sanitized_error = dict(error)
+
+        ctx = sanitized_error.get("ctx")
+
+        if isinstance(ctx, dict):
+            sanitized_error["ctx"] = {
+                key: str(value)
+                for key, value in ctx.items()
+            }
+
+        sanitized_errors.append(sanitized_error)
+
+    return sanitized_errors
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
 ) -> JSONResponse:
+    details = sanitize_validation_errors(exc.errors())
+
     logger.warning(
         "Validation error on %s %s: %s",
         request.method,
         request.url.path,
-        exc.errors(),
+        details,
     )
 
     return JSONResponse(
@@ -65,7 +118,7 @@ async def validation_exception_handler(
             "error": {
                 "type": "validation_error",
                 "message": "Invalid request payload.",
-                "details": exc.errors(),
+                "details": details,
             }
         },
     )
@@ -108,5 +161,18 @@ def analyze_text(payload: AnalyzeRequest) -> AnalyzeResponse:
         summary="Initial deterministic analysis. LLM integration will be added in a future module.",
         word_count=word_count,
         character_count=character_count,
+        language=payload.language,
+    )
+
+@app.post("/requirements/analyze", response_model=RequirementAnalysisResponse)
+def analyze_requirement(
+    payload: RequirementAnalysisRequest,
+    service: Annotated[
+        RequirementAnalyzerService,
+        Depends(get_requirement_analyzer_service),
+    ],
+) -> RequirementAnalysisResponse:
+    return service.analyze(
+        requirement_text=payload.requirement_text,
         language=payload.language,
     )

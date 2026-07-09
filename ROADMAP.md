@@ -38,9 +38,10 @@ Goal: integrate LLMs in a structured and reliable way.
 - [x] Structured outputs
 - [x] JSON schema validation
 - [x] Retry strategy
-- [ ] Fallback strategy
+- [x] Fallback strategy
 - [x] Requirement analyzer
 - [x] LLM response tests
+- [x] Requirement analysis API endpoint
 
 ## M3 — RAG Knowledge Assistant
 

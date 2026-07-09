@@ -197,6 +197,33 @@ Validation errors return a structured response with:
 * Error message
 * Error details
 
+### Requirement Analysis
+
+    POST /requirements/analyze
+
+Receives a software requirement and returns a structured quality-oriented analysis.
+
+Current behavior:
+
+- Uses the requirement analyzer service
+- Builds LLM-ready prompt messages
+- Uses a fake LLM provider for now
+- Parses the provider response as JSON
+- Validates the response with Pydantic schemas
+- Returns a structured analysis in Portuguese
+
+The response includes:
+
+- Summary
+- Business rules
+- Acceptance criteria
+- Risks
+- Open questions
+- Positive test scenarios
+- Negative test scenarios
+- Edge cases
+- Automation opportunities
+
 ## Running the API Locally
 
 Run the API directly with uv:
