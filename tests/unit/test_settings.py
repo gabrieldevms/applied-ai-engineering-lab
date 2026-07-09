@@ -3,8 +3,26 @@ from pydantic import ValidationError
 from ai_api.config import Settings
 
 
+SETTINGS_ENV_VARS = [
+    "APP_ENV",
+    "LLM_PROVIDER",
+    "REQUIREMENT_ANALYSIS_RETRY_ATTEMPTS",
+    "OPENAI_API_KEY",
+    "OPENAI_MODEL",
+    "OLLAMA_BASE_URL",
+    "OLLAMA_MODEL",
+    "OLLAMA_TIMEOUT_SECONDS",
+]
+
+
+@pytest.fixture(autouse=True)
+def clear_settings_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    for env_var in SETTINGS_ENV_VARS:
+        monkeypatch.delenv(env_var, raising=False)
+
+
 def test_settings_should_use_fake_provider_by_default() -> None:
-    settings = Settings()
+    settings = Settings(_env_file=None)
 
     assert settings.app_env == "local"
     assert settings.llm_provider == "fake"
@@ -13,6 +31,7 @@ def test_settings_should_use_fake_provider_by_default() -> None:
 
 def test_settings_should_accept_openai_provider() -> None:
     settings = Settings(
+        _env_file=None,
         llm_provider="openai",
         openai_api_key="fake-key",
         openai_model="fake-model",
@@ -23,11 +42,26 @@ def test_settings_should_accept_openai_provider() -> None:
     assert settings.openai_model == "fake-model"
 
 
+def test_settings_should_accept_ollama_provider() -> None:
+    settings = Settings(
+        _env_file=None,
+        llm_provider="ollama",
+        ollama_base_url="http://localhost:11434",
+        ollama_model="llama3.1",
+        ollama_timeout_seconds=120,
+    )
+
+    assert settings.llm_provider == "ollama"
+    assert settings.ollama_base_url == "http://localhost:11434"
+    assert settings.ollama_model == "llama3.1"
+    assert settings.ollama_timeout_seconds == 120
+
+
 def test_settings_should_reject_invalid_provider() -> None:
     with pytest.raises(ValidationError):
-        Settings(llm_provider="invalid-provider")
+        Settings(_env_file=None, llm_provider="invalid-provider")
 
 
 def test_settings_should_reject_invalid_retry_attempts() -> None:
     with pytest.raises(ValidationError):
-        Settings(requirement_analysis_retry_attempts=0)
+        Settings(_env_file=None, requirement_analysis_retry_attempts=0)

@@ -4,7 +4,9 @@ from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.retry import RetryConfig
 from ai_api.requirements.services import RequirementAnalyzerService
 from ai_api.main import app
-
+from ai_api.requirements.fake_responses import (
+    DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
+)
 
 client = TestClient(app)
 
@@ -52,23 +54,38 @@ def test_analyze_should_validate_empty_text() -> None:
 
 
 def test_requirement_analysis_endpoint_should_return_structured_response() -> None:
-    payload = {
-        "requirement_text": "Como cliente, quero renegociar minha dívida para gerar um novo boleto.",
-        "language": "pt-BR",
-    }
+    def get_fake_requirement_analyzer_service() -> RequirementAnalyzerService:
+        return RequirementAnalyzerService(
+            llm_provider=FakeLLMProvider(
+                response_content=DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
+            ),
+            retry_config=RetryConfig(max_attempts=2),
+        )
 
-    response = client.post("/requirements/analyze", json=payload)
+    app.dependency_overrides[get_requirement_analyzer_service] = (
+        get_fake_requirement_analyzer_service
+    )
 
-    assert response.status_code == 200
+    try:
+        payload = {
+            "requirement_text": "Como cliente, quero renegociar minha dívida para gerar um novo boleto.",
+            "language": "pt-BR",
+        }
 
-    body = response.json()
+        response = client.post("/requirements/analyze", json=payload)
 
-    assert body["summary"].startswith("O cliente deseja renegociar")
-    assert len(body["business_rules"]) == 2
-    assert len(body["acceptance_criteria"]) == 2
-    assert len(body["risks"]) == 1
-    assert body["risks"][0]["severity"] == "high"
-    assert len(body["automation_opportunities"]) == 2
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["summary"].startswith("O cliente deseja renegociar")
+        assert len(body["business_rules"]) == 2
+        assert len(body["acceptance_criteria"]) == 2
+        assert len(body["risks"]) == 1
+        assert body["risks"][0]["severity"] == "high"
+        assert len(body["automation_opportunities"]) == 2
+    finally:
+        app.dependency_overrides.clear()
 
 
 def test_requirement_analysis_endpoint_should_validate_blank_requirement() -> None:

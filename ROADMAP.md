@@ -44,6 +44,7 @@ Goal: integrate LLMs in a structured and reliable way.
 - [x] Requirement analysis API endpoint
 - [x] Environment-based provider settings
 - [x] OpenAI provider
+- [x] Ollama provider
 
 ## M3 — RAG Knowledge Assistant
 

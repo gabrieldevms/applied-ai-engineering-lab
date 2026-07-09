@@ -317,6 +317,33 @@ Automate it
 Improve the architecture
 ```
 
+## Local LLM Provider with Ollama
+
+The API also supports Ollama as a local/self-hosted LLM provider.
+
+Example `.env` configuration:
+
+    LLM_PROVIDER=ollama
+    OLLAMA_BASE_URL=http://localhost:11434
+    OLLAMA_MODEL=llama3.1
+    OLLAMA_TIMEOUT_SECONDS=120
+
+Before running the API, make sure Ollama is installed, running, and the selected model is available locally:
+
+    ollama --version
+    ollama list
+    ollama pull llama3.1
+
+When using Ollama, the requirement analysis flow remains the same:
+
+    request
+      -> prompt builder
+      -> Ollama provider
+      -> JSON parser
+      -> Pydantic validation
+      -> retry/fallback handling
+      -> structured API response
+
 ## Real LLM Provider
 
 The API supports environment-based LLM provider selection.

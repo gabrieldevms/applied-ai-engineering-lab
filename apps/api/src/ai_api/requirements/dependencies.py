@@ -1,5 +1,5 @@
 from ai_api.config import get_settings
-from ai_api.llm import FakeLLMProvider, OpenAIProvider
+from ai_api.llm import FakeLLMProvider, OllamaProvider, OpenAIProvider
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
 )
@@ -24,6 +24,12 @@ def get_requirement_analyzer_service() -> RequirementAnalyzerService:
         provider = OpenAIProvider(
             api_key=settings.openai_api_key,
             model=settings.openai_model,
+        )
+    elif settings.llm_provider == "ollama":
+        provider = OllamaProvider(
+            base_url=settings.ollama_base_url,
+            model=settings.ollama_model,
+            timeout_seconds=settings.ollama_timeout_seconds,
         )
     else:
         raise ValueError(

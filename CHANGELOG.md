@@ -56,3 +56,7 @@ All notable changes to this project will be documented in this file.
 - Requirement analyzer support for provider-level failures
 - Unit tests for OpenAI provider behavior
 - Unit tests for provider error retry and fallback handling
+- Ollama LLM provider implementation
+- Environment settings for Ollama provider configuration
+- Unit tests for Ollama provider behavior
+- Documentation for local Ollama usage
