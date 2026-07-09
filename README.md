@@ -397,6 +397,25 @@ The parser accepts:
 After extraction, the response is still validated by Pydantic schemas.
 Invalid schemas are rejected.
 
+## RAG Document Chunking
+
+The API includes a basic document chunking endpoint.
+
+    POST /rag/chunk
+
+It receives raw document text and splits it into smaller chunks.
+
+Current behavior:
+
+- Character-based chunking
+- Configurable chunk size
+- Configurable chunk overlap
+- Source tracking
+- Chunk metadata
+
+This is the first step toward the RAG pipeline.
+Future steps will include embeddings, vector storage and retrieval.
+
 ## Status
 
 This project is currently in the foundation phase.
