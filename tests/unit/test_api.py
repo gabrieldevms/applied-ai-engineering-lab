@@ -4,6 +4,7 @@ from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.retry import RetryConfig
 from ai_api.requirements.services import RequirementAnalyzerService
 from ai_api.main import app
+from ai_api.config import Settings, get_settings
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
 )
@@ -129,5 +130,53 @@ def test_requirement_analysis_endpoint_should_handle_analysis_error() -> None:
 
         assert body["error"]["type"] == "requirement_analysis_error"
         assert body["error"]["message"] == "Requirement analysis failed."
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_llm_providers_endpoint_should_return_active_provider() -> None:
+    def get_test_settings() -> Settings:
+        return Settings(
+            _env_file=None,
+            llm_provider="ollama",
+            ollama_model="llama3.1",
+        )
+
+    app.dependency_overrides[get_settings] = get_test_settings
+
+    try:
+        response = client.get("/llm/providers")
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["active_provider"] == "ollama"
+        assert body["supported_providers"] == ["fake", "openai", "ollama"]
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_llm_health_endpoint_should_return_provider_status() -> None:
+    def get_test_settings() -> Settings:
+        return Settings(
+            _env_file=None,
+            llm_provider="openai",
+            openai_api_key=None,
+            openai_model=None,
+        )
+
+    app.dependency_overrides[get_settings] = get_test_settings
+
+    try:
+        response = client.get("/llm/health")
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["provider"] == "openai"
+        assert body["status"] == "missing_configuration"
+        assert body["missing_settings"] == ["OPENAI_API_KEY", "OPENAI_MODEL"]
     finally:
         app.dependency_overrides.clear()

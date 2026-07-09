@@ -14,6 +14,13 @@ from ai_api.requirements.schemas import (
     RequirementAnalysisResponse,
 )
 from ai_api.requirements.services import RequirementAnalyzerService
+from ai_api.config import Settings, get_settings
+from ai_api.llm import (
+    LLMHealthResponse,
+    LLMProvidersResponse,
+    get_llm_health_status,
+    get_llm_providers_status,
+)
 
 
 logging.basicConfig(
@@ -149,6 +156,20 @@ async def unhandled_exception_handler(
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/llm/providers", response_model=LLMProvidersResponse)
+def list_llm_providers(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> LLMProvidersResponse:
+    return get_llm_providers_status(settings)
+
+
+@app.get("/llm/health", response_model=LLMHealthResponse)
+def get_llm_health(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> LLMHealthResponse:
+    return get_llm_health_status(settings)
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)
