@@ -60,3 +60,9 @@ All notable changes to this project will be documented in this file.
 - Environment settings for Ollama provider configuration
 - Unit tests for Ollama provider behavior
 - Documentation for local Ollama usage
+- LLM provider diagnostics endpoints
+- LLM provider configuration health status
+- Unit and API tests for provider diagnostics
+- LLM output normalization for JSON responses
+- JSON object extraction from Markdown or mixed text responses
+- Unit tests for normalized LLM outputs

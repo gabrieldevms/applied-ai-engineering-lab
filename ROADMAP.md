@@ -46,6 +46,7 @@ Goal: integrate LLMs in a structured and reliable way.
 - [x] OpenAI provider
 - [x] Ollama provider
 - [x] LLM provider diagnostics endpoints
+- [x] LLM output normalization
 
 ## M3 — RAG Knowledge Assistant
 
