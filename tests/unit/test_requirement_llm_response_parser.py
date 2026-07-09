@@ -1,5 +1,4 @@
 import pytest
-
 from ai_api.requirements import (
     RequirementAnalysisError,
     parse_requirement_analysis_response,

@@ -1,5 +1,5 @@
 from ai_api.config import get_settings
-from ai_api.llm import FakeLLMProvider
+from ai_api.llm import FakeLLMProvider, OpenAIProvider
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
 )
@@ -13,6 +13,17 @@ def get_requirement_analyzer_service() -> RequirementAnalyzerService:
     if settings.llm_provider == "fake":
         provider = FakeLLMProvider(
             response_content=DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
+        )
+    elif settings.llm_provider == "openai":
+        if settings.openai_api_key is None:
+            raise ValueError("OPENAI_API_KEY must be configured.")
+
+        if settings.openai_model is None:
+            raise ValueError("OPENAI_MODEL must be configured.")
+
+        provider = OpenAIProvider(
+            api_key=settings.openai_api_key,
+            model=settings.openai_model,
         )
     else:
         raise ValueError(

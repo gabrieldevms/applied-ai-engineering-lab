@@ -51,3 +51,8 @@ All notable changes to this project will be documented in this file.
 - Environment-based settings for LLM provider selection
 - `.env.example` file
 - Settings tests for provider and retry configuration
+- OpenAI LLM provider implementation
+- LLM provider error handling
+- Requirement analyzer support for provider-level failures
+- Unit tests for OpenAI provider behavior
+- Unit tests for provider error retry and fallback handling

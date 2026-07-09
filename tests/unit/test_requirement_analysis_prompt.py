@@ -1,5 +1,4 @@
 import pytest
-
 from ai_api.requirements import build_requirement_analysis_messages
 
 

@@ -1,5 +1,4 @@
 import pytest
-
 from ai_api.llm import FakeLLMProvider
 from ai_api.requirements import (
     RequirementAnalysisError,

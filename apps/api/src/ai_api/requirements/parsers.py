@@ -1,7 +1,5 @@
 import json
-
 from pydantic import ValidationError
-
 from ai_api.requirements.exceptions import RequirementAnalysisError
 from ai_api.requirements.schemas import RequirementAnalysisResponse
 
