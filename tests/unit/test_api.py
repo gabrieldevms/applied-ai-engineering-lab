@@ -223,3 +223,52 @@ def test_rag_chunk_endpoint_should_validate_blank_document_text() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+def test_rag_ingest_endpoint_should_return_document_and_chunks() -> None:
+    payload = {
+        "document_text": " ".join(
+            [
+                "Como cliente, quero renegociar minha dívida para gerar um boleto atualizado."
+                for _ in range(20)
+            ]
+        ),
+        "source": "requirement-001",
+        "title": "Renegociação de dívida",
+        "metadata": {
+            "domain": "billing",
+            "team": "qa",
+        },
+        "chunk_size": 200,
+        "chunk_overlap": 40,
+    }
+
+    response = client.post("/rag/ingest", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["document"]["source"] == "requirement-001"
+    assert body["document"]["title"] == "Renegociação de dívida"
+    assert body["document"]["metadata"]["domain"] == "billing"
+    assert body["total_chunks"] > 1
+    assert len(body["chunks"]) == body["total_chunks"]
+    assert body["chunks"][0]["metadata"]["document_id"] == body["document"]["document_id"]
+
+
+def test_rag_ingest_endpoint_should_validate_blank_document_text() -> None:
+    payload = {
+        "document_text": "   ",
+        "source": "requirement-001",
+        "chunk_size": 200,
+        "chunk_overlap": 40,
+    }
+
+    response = client.post("/rag/ingest", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."

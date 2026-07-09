@@ -52,7 +52,7 @@ Goal: integrate LLMs in a structured and reliable way.
 
 Goal: build a document-based AI assistant.
 
-- [ ] Document ingestion
+- [x] Document ingestion
 - [ ] Text extraction
 - [x] Chunking strategy
 - [ ] Embeddings
@@ -66,6 +66,8 @@ Goal: build a document-based AI assistant.
 
 - [x] Basic text chunking service
 - [x] Chunking API endpoint
+- [x] Document ingestion service
+- [x] Document ingestion API endpoint
 - [ ] Embedding provider abstraction
 - [ ] Fake embedding provider
 - [ ] Vector store abstraction

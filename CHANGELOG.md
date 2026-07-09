@@ -70,3 +70,8 @@ All notable changes to this project will be documented in this file.
 - Document chunking API endpoint
 - Document chunking schemas and metadata
 - Unit and API tests for document chunking
+- RAG document ingestion service
+- Document ingestion API endpoint
+- Stable document identifiers based on content hash
+- Metadata support for ingested documents and chunks
+- Unit and API tests for document ingestion

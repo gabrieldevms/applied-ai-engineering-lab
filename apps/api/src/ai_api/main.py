@@ -26,6 +26,14 @@ from ai_api.rag import (
     DocumentChunkingResponse,
     TextChunker,
 )
+from ai_api.rag import (
+    DocumentChunkingRequest,
+    DocumentChunkingResponse,
+    DocumentIngestionRequest,
+    DocumentIngestionResponse,
+    DocumentIngestionService,
+    TextChunker,
+)
 
 
 logging.basicConfig(
@@ -190,6 +198,7 @@ def analyze_text(payload: AnalyzeRequest) -> AnalyzeResponse:
         language=payload.language,
     )
 
+
 @app.post("/requirements/analyze", response_model=RequirementAnalysisResponse)
 def analyze_requirement(
     payload: RequirementAnalysisRequest,
@@ -203,6 +212,7 @@ def analyze_requirement(
         language=payload.language,
     )
 
+
 @app.post("/rag/chunk", response_model=DocumentChunkingResponse)
 def chunk_document(
     payload: DocumentChunkingRequest,
@@ -212,6 +222,22 @@ def chunk_document(
     return chunker.chunk(
         document_text=payload.document_text,
         source=payload.source,
+        chunk_size=payload.chunk_size,
+        chunk_overlap=payload.chunk_overlap,
+    )
+
+
+@app.post("/rag/ingest", response_model=DocumentIngestionResponse)
+def ingest_document(
+    payload: DocumentIngestionRequest,
+) -> DocumentIngestionResponse:
+    ingestion_service = DocumentIngestionService()
+
+    return ingestion_service.ingest(
+        document_text=payload.document_text,
+        source=payload.source,
+        title=payload.title,
+        metadata=payload.metadata,
         chunk_size=payload.chunk_size,
         chunk_overlap=payload.chunk_overlap,
     )
