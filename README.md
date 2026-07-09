@@ -416,6 +416,25 @@ Current behavior:
 This is the first step toward the RAG pipeline.
 Future steps will include embeddings, vector storage and retrieval.
 
+## RAG Document Ingestion
+
+The API includes a document ingestion endpoint.
+
+    POST /rag/ingest
+
+It receives raw document text, creates a stable document identifier, generates chunks and returns document metadata.
+
+Current behavior:
+
+- Raw text ingestion
+- Stable document ID based on source and content hash
+- Metadata support
+- Chunk generation
+- Chunk metadata enrichment
+- Source tracking
+
+This is part of the RAG foundation and prepares the project for embeddings, vector storage and semantic retrieval.
+
 ## Status
 
 This project is currently in the foundation phase.
