@@ -224,6 +224,22 @@ The response includes:
 - Edge cases
 - Automation opportunities
 
+## Environment Configuration
+
+The project uses environment variables to configure runtime behavior.
+
+Create a local `.env` file based on `.env.example` when needed.
+
+Current variables:
+
+    APP_ENV=local
+    LLM_PROVIDER=fake
+    REQUIREMENT_ANALYSIS_RETRY_ATTEMPTS=2
+    OPENAI_API_KEY=
+    OPENAI_MODEL=
+
+The default provider is currently `fake`, which allows local execution without API keys.
+
 ## Running the API Locally
 
 Run the API directly with uv:

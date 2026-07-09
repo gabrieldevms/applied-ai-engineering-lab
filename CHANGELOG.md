@@ -48,3 +48,6 @@ All notable changes to this project will be documented in this file.
 - Dependency provider for requirement analyzer service
 - Fake structured response for local requirement analysis
 - API tests for requirement analysis endpoint
+- Environment-based settings for LLM provider selection
+- `.env.example` file
+- Settings tests for provider and retry configuration
