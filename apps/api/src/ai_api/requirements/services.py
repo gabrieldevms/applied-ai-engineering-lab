@@ -16,9 +16,11 @@ class RequirementAnalyzerService:
         self,
         llm_provider: LLMProvider,
         retry_config: RetryConfig | None = None,
+        fallback_provider: LLMProvider | None = None,
     ) -> None:
         self.llm_provider = llm_provider
         self.retry_config = retry_config or RetryConfig()
+        self.fallback_provider = fallback_provider
 
     def analyze(
         self,
@@ -30,8 +32,25 @@ class RequirementAnalyzerService:
             language=language,
         )
 
+        try:
+            return self._analyze_with_provider(self.llm_provider, messages)
+        except RequirementAnalysisError:
+            logger.warning("Primary LLM provider failed.")
+
+            if self.fallback_provider is None:
+                raise
+
+            logger.info("Trying fallback LLM provider.")
+
+            return self._analyze_with_provider(self.fallback_provider, messages)
+
+    def _analyze_with_provider(
+        self,
+        provider: LLMProvider,
+        messages: list,
+    ) -> RequirementAnalysisResponse:
         for attempt in range(1, self.retry_config.max_attempts + 1):
-            llm_response = self.llm_provider.generate(messages)
+            llm_response = provider.generate(messages)
 
             try:
                 return parse_requirement_analysis_response(llm_response.content)
