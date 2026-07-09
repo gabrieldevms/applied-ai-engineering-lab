@@ -128,3 +128,46 @@ def test_parse_requirement_analysis_response_should_reject_unexpected_fields() -
         match="LLM response does not match the requirement analysis schema.",
     ):
         parse_requirement_analysis_response(invalid_response)
+
+def test_parse_requirement_analysis_response_should_accept_json_inside_markdown_block() -> None:
+    llm_response = f"""
+    ```json
+    {VALID_LLM_RESPONSE}
+    ```
+    """
+
+    response = parse_requirement_analysis_response(llm_response)
+
+    assert response.summary.startswith("O cliente deseja renegociar")
+    assert response.risks[0].severity == "high"
+
+
+def test_parse_requirement_analysis_response_should_accept_text_around_json() -> None:
+    llm_response = f"""
+    Claro, aqui está a análise estruturada:
+
+    {VALID_LLM_RESPONSE}
+
+    Fim da análise.
+    """
+
+    response = parse_requirement_analysis_response(llm_response)
+
+    assert response.summary.startswith("O cliente deseja renegociar")
+    assert len(response.automation_opportunities) == 1
+
+
+def test_parse_requirement_analysis_response_should_reject_empty_response() -> None:
+    with pytest.raises(
+        RequirementAnalysisError,
+        match="LLM response is empty.",
+    ):
+        parse_requirement_analysis_response("   ")
+
+
+def test_parse_requirement_analysis_response_should_reject_json_array() -> None:
+    with pytest.raises(
+        RequirementAnalysisError,
+        match="LLM response is not a valid JSON object.",
+    ):
+        parse_requirement_analysis_response('[{"summary": "ok"}]')

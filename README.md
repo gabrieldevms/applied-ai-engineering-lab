@@ -370,6 +370,33 @@ When using the OpenAI provider, the requirement analysis flow remains the same:
       -> retry/fallback handling
       -> structured API response
 
+## LLM Provider Diagnostics
+
+The API exposes diagnostic endpoints for LLM provider configuration.
+
+    GET /llm/providers
+
+Returns the active provider and the list of supported providers.
+
+    GET /llm/health
+
+Returns configuration health for the active provider.
+
+This endpoint does not call the model. It only checks environment-based configuration and avoids exposing secrets such as API keys.
+
+## LLM Output Normalization
+
+LLM responses are normalized before schema validation.
+
+The parser accepts:
+
+- Pure JSON objects
+- JSON objects inside Markdown code blocks
+- JSON objects surrounded by explanatory text
+
+After extraction, the response is still validated by Pydantic schemas.
+Invalid schemas are rejected.
+
 ## Status
 
 This project is currently in the foundation phase.
