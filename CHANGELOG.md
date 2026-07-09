@@ -44,3 +44,7 @@ All notable changes to this project will be documented in this file.
 - Fallback provider support for requirement analysis
 - Fallback strategy for failed LLM responses
 - Unit tests for requirement analysis fallback behavior
+- Requirement analysis API endpoint
+- Dependency provider for requirement analyzer service
+- Fake structured response for local requirement analysis
+- API tests for requirement analysis endpoint
