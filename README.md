@@ -435,6 +435,32 @@ Current behavior:
 
 This is part of the RAG foundation and prepares the project for embeddings, vector storage and semantic retrieval.
 
+## RAG File Ingestion
+
+The API includes a file ingestion endpoint.
+
+    POST /rag/ingest-file
+
+It receives an uploaded text-based file, extracts text, creates a stable document identifier, generates chunks and returns document metadata.
+
+Current supported formats:
+
+- `.txt`
+- `.md`
+- `.markdown`
+
+Current behavior:
+
+- File upload
+- Text extraction
+- Metadata parsing from JSON form field
+- Stable document ID generation
+- Chunk generation
+- Chunk metadata enrichment
+- Extraction metadata tracking
+
+This endpoint connects text extraction and document ingestion into a single RAG pipeline step.
+
 ## RAG Text Extraction
 
 The API includes a basic text extraction endpoint.

@@ -2,7 +2,7 @@ import logging
 import time
 from collections.abc import Awaitable, Callable
 from typing import Annotated, Any
-from fastapi import Depends, FastAPI, File, Request, UploadFile
+from fastapi import FastAPI, Request, UploadFile, Depends, File, Form
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
@@ -19,10 +19,14 @@ from ai_api.rag import (
     DocumentIngestionRequest,
     DocumentIngestionResponse,
     DocumentIngestionService,
+    DocumentFileIngestionResponse,
+    DocumentFileIngestionService,
     TextChunker,
     TextExtractionError,
     TextExtractionResponse,
     TextExtractionService,
+    RAGRequestError,
+    parse_metadata_json,
 )
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.exceptions import RequirementAnalysisError
@@ -69,6 +73,29 @@ async def log_requests(
     )
 
     return response
+
+
+@app.exception_handler(RAGRequestError)
+async def rag_request_exception_handler(
+    request: Request,
+    exc: RAGRequestError,
+) -> JSONResponse:
+    logger.warning(
+        "RAG request error on %s %s: %s",
+        request.method,
+        request.url.path,
+        str(exc),
+    )
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": {
+                "type": "rag_request_error",
+                "message": str(exc),
+            }
+        },
+    )
 
 
 @app.exception_handler(TextExtractionError)
@@ -262,6 +289,33 @@ def ingest_document(
         chunk_size=payload.chunk_size,
         chunk_overlap=payload.chunk_overlap,
     )
+
+
+@app.post("/rag/ingest-file", response_model=DocumentFileIngestionResponse)
+async def ingest_file(
+    file: UploadFile = File(...),
+    source: str | None = Form(default=None),
+    title: str | None = Form(default=None),
+    metadata: str | None = Form(default=None),
+    chunk_size: int = Form(default=800),
+    chunk_overlap: int = Form(default=120),
+) -> DocumentFileIngestionResponse:
+    parsed_metadata = parse_metadata_json(metadata)
+    file_content = await file.read()
+
+    file_ingestion_service = DocumentFileIngestionService()
+
+    return file_ingestion_service.ingest_file(
+        file_content=file_content,
+        filename=file.filename or "uploaded-file",
+        content_type=file.content_type,
+        source=source,
+        title=title,
+        metadata=parsed_metadata,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+    )
+
 
 @app.post("/rag/extract-text", response_model=TextExtractionResponse)
 async def extract_text_from_file(

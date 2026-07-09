@@ -70,6 +70,8 @@ Goal: build a document-based AI assistant.
 - [x] Document ingestion API endpoint
 - [x] Text extraction service
 - [x] Text extraction API endpoint
+- [x] File ingestion pipeline
+- [x] File ingestion API endpoint
 - [ ] Embedding provider abstraction
 - [ ] Fake embedding provider
 - [ ] Vector store abstraction

@@ -79,3 +79,8 @@ All notable changes to this project will be documented in this file.
 - Text extraction API endpoint for uploaded files
 - Support for `.txt`, `.md` and `.markdown` files
 - Unit and API tests for text extraction
+- RAG file ingestion pipeline
+- File ingestion API endpoint
+- Metadata parsing for multipart form requests
+- Combined text extraction, document ingestion and chunking flow
+- Unit and API tests for file ingestion

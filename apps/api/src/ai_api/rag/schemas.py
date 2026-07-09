@@ -159,3 +159,12 @@ class TextExtractionResponse(BaseModel):
     character_count: int
     text: str
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DocumentFileIngestionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    document: IngestedDocument
+    total_chunks: int
+    chunks: list[DocumentChunk]
+    extraction_metadata: dict[str, Any] = Field(default_factory=dict)
