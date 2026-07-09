@@ -314,3 +314,77 @@ def test_rag_extract_text_endpoint_should_reject_unsupported_file_type() -> None
 
     assert body["error"]["type"] == "text_extraction_error"
     assert body["error"]["message"] == "Unsupported file type: .pdf"
+
+
+def test_rag_ingest_file_endpoint_should_extract_and_ingest_file() -> None:
+    response = client.post(
+        "/rag/ingest-file",
+        data={
+            "source": "requirement-001",
+            "title": "Renegociação de dívida",
+            "metadata": '{"domain": "billing", "team": "qa"}',
+            "chunk_size": "200",
+            "chunk_overlap": "40",
+        },
+        files={
+            "file": (
+                "requirement.txt",
+                b"Como cliente, quero renegociar minha divida para gerar um boleto atualizado.",
+                "text/plain",
+            )
+        },
+    )
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["document"]["source"] == "requirement-001"
+    assert body["document"]["title"] == "Renegociação de dívida"
+    assert body["document"]["metadata"]["domain"] == "billing"
+    assert body["document"]["metadata"]["filename"] == "requirement.txt"
+    assert body["total_chunks"] >= 1
+    assert body["extraction_metadata"]["extension"] == ".txt"
+
+
+def test_rag_ingest_file_endpoint_should_reject_invalid_metadata() -> None:
+    response = client.post(
+        "/rag/ingest-file",
+        data={
+            "metadata": "{invalid-json}",
+        },
+        files={
+            "file": (
+                "requirement.txt",
+                b"Texto valido.",
+                "text/plain",
+            )
+        },
+    )
+
+    assert response.status_code == 400
+
+    body = response.json()
+
+    assert body["error"]["type"] == "rag_request_error"
+    assert body["error"]["message"] == "metadata must be a valid JSON object."
+
+
+def test_rag_ingest_file_endpoint_should_reject_unsupported_file_type() -> None:
+    response = client.post(
+        "/rag/ingest-file",
+        files={
+            "file": (
+                "document.pdf",
+                b"fake pdf content",
+                "application/pdf",
+            )
+        },
+    )
+
+    assert response.status_code == 400
+
+    body = response.json()
+
+    assert body["error"]["type"] == "text_extraction_error"
+    assert body["error"]["message"] == "Unsupported file type: .pdf"
