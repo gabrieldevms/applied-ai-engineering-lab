@@ -4,6 +4,7 @@ from ai_api.requirements.prompts import (
     REQUIREMENT_ANALYSIS_SYSTEM_PROMPT,
     build_requirement_analysis_messages,
 )
+from ai_api.requirements.retry import RetryConfig
 from ai_api.requirements.schemas import (
     RequirementAnalysisRequest,
     RequirementAnalysisResponse,
@@ -19,6 +20,7 @@ __all__ = [
     "RequirementAnalysisResponse",
     "RequirementAnalyzerService",
     "RequirementRisk",
+    "RetryConfig",
     "RiskSeverity",
     "build_requirement_analysis_messages",
     "parse_requirement_analysis_response",
