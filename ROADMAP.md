@@ -40,7 +40,7 @@ Goal: integrate LLMs in a structured and reliable way.
 - [ ] Retry strategy
 - [ ] Fallback strategy
 - [x] Requirement analyzer
-- [ ] LLM response tests
+- [x] LLM response tests
 
 ## M3 — RAG Knowledge Assistant
 

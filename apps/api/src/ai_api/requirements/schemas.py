@@ -1,18 +1,22 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 RiskSeverity = Literal["low", "medium", "high"]
 
 
 class RequirementRisk(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     title: str = Field(min_length=1)
     description: str = Field(min_length=1)
     severity: RiskSeverity
 
 
 class RequirementAnalysisRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     requirement_text: str = Field(
         min_length=1,
         description="Software requirement to be analyzed.",
@@ -36,6 +40,8 @@ class RequirementAnalysisRequest(BaseModel):
 
 
 class RequirementAnalysisResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     summary: str = Field(min_length=1)
     business_rules: list[str] = Field(default_factory=list)
     acceptance_criteria: list[str] = Field(default_factory=list)
