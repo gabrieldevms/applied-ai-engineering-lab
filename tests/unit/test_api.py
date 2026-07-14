@@ -809,3 +809,86 @@ def test_agents_tools_execute_endpoint_should_return_error_for_unknown_tool() ->
 
     assert body["error"]["type"] == "tool_execution_error"
     assert body["error"]["message"] == "Tool is not registered: unknown.tool"
+
+
+def test_agents_run_endpoint_should_execute_tool_call() -> None:
+    payload = {
+        "objective": "Recuperar contexto relevante sobre boleto.",
+        "max_steps": 4,
+        "tool_calls": [
+            {
+                "tool_name": "rag.retrieve",
+                "arguments": {
+                    "query": "boleto cobrança",
+                    "documents": [
+                        {
+                            "source": "billing-doc",
+                            "title": "Cobrança",
+                            "document_text": (
+                                "boleto cobrança vencimento pagamento dívida"
+                            ),
+                            "metadata": {
+                                "domain": "billing"
+                            },
+                        },
+                        {
+                            "source": "auth-doc",
+                            "title": "Autenticação",
+                            "document_text": (
+                                "login senha autenticação usuário sessão"
+                            ),
+                            "metadata": {
+                                "domain": "auth"
+                            },
+                        },
+                    ],
+                    "top_k": 1,
+                    "chunk_size": 200,
+                    "chunk_overlap": 40,
+                },
+            }
+        ],
+    }
+
+    response = client.post("/agents/run", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "completed"
+    assert body["metadata"]["requested_tool_calls"] == 1
+    assert body["steps"][2]["name"] == "tool_call:rag.retrieve"
+    assert body["steps"][2]["status"] == "completed"
+    assert body["steps"][2]["output"]["tool_name"] == "rag.retrieve"
+    assert (
+        body["steps"][2]["output"]["output"]["total_retrieved_chunks"]
+        == 1
+    )
+
+
+def test_agents_run_endpoint_should_return_failed_status_for_invalid_tool_call() -> None:
+    payload = {
+        "objective": "Executar ferramenta inexistente.",
+        "max_steps": 4,
+        "tool_calls": [
+            {
+                "tool_name": "unknown.tool",
+                "arguments": {},
+            }
+        ],
+    }
+
+    response = client.post("/agents/run", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "failed"
+    assert body["steps"][2]["name"] == "tool_call:unknown.tool"
+    assert body["steps"][2]["status"] == "failed"
+    assert (
+        body["steps"][2]["output"]["error"]
+        == "Tool is not registered: unknown.tool"
+    )

@@ -1,11 +1,33 @@
 from typing import Any, Literal
-
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 AgentRunStatus = Literal["completed", "failed"]
 AgentStepStatus = Literal["completed", "failed", "skipped"]
 ToolExecutionStatus = Literal["completed", "failed"]
+
+class AgentToolCall(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    tool_name: str = Field(
+        min_length=1,
+        description="Name of the tool the agent should call.",
+    )
+    arguments: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Arguments passed to the tool.",
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("tool_name")
+    @classmethod
+    def tool_name_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("tool_name cannot be blank")
+
+        return cleaned_value
 
 
 class AgentRunRequest(BaseModel):
@@ -26,6 +48,11 @@ class AgentRunRequest(BaseModel):
         description="Maximum number of execution steps.",
     )
     metadata: dict[str, Any] = Field(default_factory=dict)
+    tool_calls: list[AgentToolCall] = Field(
+        default_factory=list,
+        max_length=5,
+        description="Explicit tool calls the agent should execute.",
+    )  
 
     @field_validator("objective")
     @classmethod
@@ -51,7 +78,7 @@ class AgentRunRequest(BaseModel):
         if not cleaned_value:
             raise ValueError("context cannot be blank")
 
-        return cleaned_value
+        return cleaned_value 
 
 
 class AgentStep(BaseModel):

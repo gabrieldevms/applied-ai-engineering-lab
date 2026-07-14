@@ -1,6 +1,5 @@
 import pytest
-
-from ai_api.agents import AgentRuntime
+from ai_api.agents import AgentRuntime, AgentToolCall
 
 
 def test_agent_runtime_should_complete_run_without_context() -> None:
@@ -64,3 +63,78 @@ def test_agent_runtime_should_reject_invalid_max_steps() -> None:
             objective="Valid objective.",
             max_steps=0,
         )
+
+
+def test_agent_runtime_should_execute_tool_call() -> None:
+    runtime = AgentRuntime()
+
+    response = runtime.run(
+        objective="Recuperar contexto relevante sobre boleto.",
+        max_steps=4,
+        tool_calls=[
+            AgentToolCall(
+                tool_name="rag.retrieve",
+                arguments={
+                    "query": "boleto cobrança",
+                    "documents": [
+                        {
+                            "source": "billing-doc",
+                            "title": "Cobrança",
+                            "document_text": (
+                                "boleto cobrança vencimento pagamento dívida"
+                            ),
+                            "metadata": {
+                                "domain": "billing",
+                            },
+                        },
+                        {
+                            "source": "auth-doc",
+                            "title": "Autenticação",
+                            "document_text": (
+                                "login senha autenticação usuário sessão"
+                            ),
+                            "metadata": {
+                                "domain": "auth",
+                            },
+                        },
+                    ],
+                    "top_k": 1,
+                    "chunk_size": 200,
+                    "chunk_overlap": 40,
+                },
+            )
+        ],
+    )
+
+    assert response.status == "completed"
+    assert response.metadata["requested_tool_calls"] == 1
+    assert len(response.steps) == 4
+    assert response.steps[2].name == "tool_call:rag.retrieve"
+    assert response.steps[2].status == "completed"
+    assert response.steps[2].output["tool_name"] == "rag.retrieve"
+    assert response.steps[2].output["output"]["total_retrieved_chunks"] == 1
+    assert response.steps[3].name == "produce_final_answer"
+
+
+def test_agent_runtime_should_return_failed_status_when_tool_call_fails() -> None:
+    runtime = AgentRuntime()
+
+    response = runtime.run(
+        objective="Executar uma ferramenta inexistente.",
+        max_steps=4,
+        tool_calls=[
+            AgentToolCall(
+                tool_name="unknown.tool",
+                arguments={},
+            )
+        ],
+    )
+
+    assert response.status == "failed"
+    assert response.steps[2].name == "tool_call:unknown.tool"
+    assert response.steps[2].status == "failed"
+    assert (
+        response.steps[2].output["error"]
+        == "Tool is not registered: unknown.tool"
+    )
+    assert "failed while calling a tool" in response.final_answer

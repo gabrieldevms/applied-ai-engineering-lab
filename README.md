@@ -683,6 +683,23 @@ Initial executable tool:
 
 This service is the foundation for future agent tool calling, where agents will decide which tool to call during multi-step workflows.
 
+## Agent Tool Calling
+
+The agent runtime can execute explicit tool calls during an agent run.
+
+    POST /agents/run
+
+Current behavior:
+
+- Accepts explicit tool calls in the agent request
+- Executes tools through the controlled tool execution service
+- Adds tool execution results to the agent trace
+- Handles tool execution failures safely
+- Returns completed or failed agent run status
+- Supports the initial `rag.retrieve` tool call
+
+This is the first step toward autonomous tool usage. Future steps will add LLM-based planning and automatic tool selection.
+
 ## Status
 
 This project is currently in the M4 - AI Agents phase.

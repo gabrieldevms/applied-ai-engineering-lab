@@ -134,3 +134,8 @@ All notable changes to this project will be documented in this file.
 - Structured tool execution response
 - Error handling for unknown or unsupported tools
 - Unit and API tests for tool execution
+- Agent tool calling support
+- Tool calls in agent run requests
+- Tool execution results in agent traces
+- Failed tool call handling in agent runtime
+- Unit and API tests for agent tool calling
