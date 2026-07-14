@@ -54,7 +54,13 @@ from ai_api.requirements.schemas import (
 )
 from ai_api.requirements.services import RequirementAnalyzerService
 from ai_api.schemas import AnalyzeRequest, AnalyzeResponse
-from ai_api.agents import AgentRunRequest, AgentRunResponse, AgentRuntime
+from ai_api.agents import (
+    AgentRunRequest,
+    AgentRunResponse,
+    AgentRuntime,
+    ToolRegistry,
+    ToolRegistryResponse,
+)
 
 
 logging.basicConfig(
@@ -464,3 +470,10 @@ def run_agent(
         max_steps=payload.max_steps,
         metadata=payload.metadata,
     )
+
+
+@app.get("/agents/tools", response_model=ToolRegistryResponse)
+def list_agent_tools() -> ToolRegistryResponse:
+    tool_registry = ToolRegistry()
+
+    return tool_registry.describe()

@@ -724,3 +724,22 @@ def test_agents_run_endpoint_should_validate_blank_objective() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_agents_tools_endpoint_should_list_available_tools() -> None:
+    response = client.get("/agents/tools")
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    tool_names = [
+        tool["name"]
+        for tool in body["tools"]
+    ]
+
+    assert body["total_tools"] == 3
+    assert "rag.retrieve" in tool_names
+    assert "rag.answer" in tool_names
+    assert "requirements.analyze" in tool_names
+    assert body["metadata"]["registry"] == "agent-tool-registry-v1"

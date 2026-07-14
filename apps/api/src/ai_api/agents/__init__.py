@@ -5,7 +5,10 @@ from ai_api.agents.schemas import (
     AgentRunStatus,
     AgentStep,
     AgentStepStatus,
+    ToolDefinition,
+    ToolRegistryResponse,
 )
+from ai_api.agents.tool_registry import ToolRegistry
 
 __all__ = [
     "AgentRunRequest",
@@ -14,4 +17,7 @@ __all__ = [
     "AgentRuntime",
     "AgentStep",
     "AgentStepStatus",
+    "ToolDefinition",
+    "ToolRegistry",
+    "ToolRegistryResponse",
 ]

@@ -124,3 +124,7 @@ All notable changes to this project will be documented in this file.
 - Agent execution trace
 - Agent run API endpoint
 - Unit and API tests for agent runtime
+- Agent tool registry
+- Default tool definitions for RAG retrieval, RAG answer generation and requirement analysis
+- Agent tools listing endpoint
+- Unit and API tests for tool registry
