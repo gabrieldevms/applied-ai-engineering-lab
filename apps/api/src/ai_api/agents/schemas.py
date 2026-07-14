@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 AgentRunStatus = Literal["completed", "failed"]
 AgentStepStatus = Literal["completed", "failed", "skipped"]
+ToolExecutionStatus = Literal["completed", "failed"]
 
 
 class AgentRunRequest(BaseModel):
@@ -112,4 +113,39 @@ class ToolRegistryResponse(BaseModel):
 
     total_tools: int
     tools: list[ToolDefinition]
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolExecutionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    tool_name: str = Field(
+        min_length=1,
+        description="Name of the tool to execute.",
+    )
+    arguments: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Tool execution arguments.",
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("tool_name")
+    @classmethod
+    def tool_name_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("tool_name cannot be blank")
+
+        return cleaned_value
+
+
+class ToolExecutionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    execution_id: str
+    tool_name: str
+    status: ToolExecutionStatus
+    output: dict[str, Any] = Field(default_factory=dict)
+    error: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)

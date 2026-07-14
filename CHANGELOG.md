@@ -128,3 +128,9 @@ All notable changes to this project will be documented in this file.
 - Default tool definitions for RAG retrieval, RAG answer generation and requirement analysis
 - Agent tools listing endpoint
 - Unit and API tests for tool registry
+- Agent tool execution service
+- RAG retrieval tool handler for agents
+- Agent tool execution API endpoint
+- Structured tool execution response
+- Error handling for unknown or unsupported tools
+- Unit and API tests for tool execution
