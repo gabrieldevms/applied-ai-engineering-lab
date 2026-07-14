@@ -604,6 +604,25 @@ Current behavior:
 
 Future improvements may include LLM-as-judge evaluation, golden datasets and regression evaluation suites.
 
+## RAG Retrieval Service
+
+The project includes a dedicated retrieval service.
+
+    POST /rag/retrieve
+
+It receives a query and documents, indexes document chunks in memory and returns the most relevant chunks.
+
+Current behavior:
+
+- Document chunking
+- Fake deterministic embeddings
+- In-memory vector search
+- Top-k retrieval
+- Retrieved chunk metadata
+- Reusable retrieval layer for semantic search, RAG answers and future agents
+
+This service separates retrieval from answer generation and prepares the project for agent workflows.
+
 ## Status
 
 This project is currently in the RAG Knowledge Assistant phase.

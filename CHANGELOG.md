@@ -115,3 +115,7 @@ All notable changes to this project will be documented in this file.
 - Query alignment metric
 - Citation coverage metric
 - Unit and API tests for RAG evaluation
+- Dedicated RAG retrieval service
+- Retrieval API endpoint
+- Reusable retrieval layer for semantic search and future agent workflows
+- Unit and API tests for retrieval

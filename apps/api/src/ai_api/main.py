@@ -42,6 +42,9 @@ from ai_api.rag import (
     RAGEvaluationRequest,
     RAGEvaluationResponse,
     RAGEvaluationService,
+    RetrievalRequest,
+    RetrievalResponse,
+    RetrievalService,
 )
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.exceptions import RequirementAnalysisError
@@ -430,4 +433,19 @@ def evaluate_rag_answer(
         context_chunks=payload.context_chunks,
         citations=payload.citations,
         minimum_overall_score=payload.minimum_overall_score,
+    )
+
+
+@app.post("/rag/retrieve", response_model=RetrievalResponse)
+def retrieve_context(
+    payload: RetrievalRequest,
+) -> RetrievalResponse:
+    retrieval_service = RetrievalService()
+
+    return retrieval_service.retrieve(
+        query=payload.query,
+        documents=payload.documents,
+        top_k=payload.top_k,
+        chunk_size=payload.chunk_size,
+        chunk_overlap=payload.chunk_overlap,
     )
