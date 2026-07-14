@@ -94,3 +94,8 @@ All notable changes to this project will be documented in this file.
 - In-memory vector store implementation
 - Cosine similarity search for vector records
 - Unit tests for vector store behavior
+- Semantic search service for RAG
+- Semantic search API endpoint
+- Query embedding and document chunk indexing flow
+- Ranked vector search results with metadata
+- Unit and API tests for semantic search

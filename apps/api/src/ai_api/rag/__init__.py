@@ -22,9 +22,13 @@ from ai_api.rag.schemas import (
     TextExtractionResponse,
     VectorRecord,
     VectorSearchResult,
+    SemanticSearchDocument,
+    SemanticSearchRequest,
+    SemanticSearchResponse,
 )
 from ai_api.rag.text_extraction import TextExtractionService
 from ai_api.rag.vector_store import InMemoryVectorStore, VectorStore
+from ai_api.rag.semantic_search import SemanticSearchService
 
 
 __all__ = [
@@ -53,4 +57,8 @@ __all__ = [
     "VectorRecord",
     "VectorSearchResult",
     "VectorStore",
+    "SemanticSearchDocument",
+    "SemanticSearchRequest",
+    "SemanticSearchResponse",
+    "SemanticSearchService",
 ]
