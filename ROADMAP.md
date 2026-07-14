@@ -159,7 +159,7 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ### Specialized agent
 
-* [ ] QA Agent
+* [x] QA Agent
 
 The initial QA Agent will coordinate the existing tools through an explicit and controlled workflow. Autonomous LLM planning will be introduced in a later milestone.
 

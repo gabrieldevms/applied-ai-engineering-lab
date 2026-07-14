@@ -1,5 +1,6 @@
 from typing import Any, Literal
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from ai_api.rag.schemas import SemanticSearchDocument
 
 
 AgentRunStatus = Literal["completed", "failed"]
@@ -175,4 +176,78 @@ class ToolExecutionResponse(BaseModel):
     status: ToolExecutionStatus
     output: dict[str, Any] = Field(default_factory=dict)
     error: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class QAAgentRunRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    requirement_text: str = Field(
+        min_length=1,
+        description="Software requirement to be analyzed by the QA agent.",
+    )
+    knowledge_documents: list[SemanticSearchDocument] = Field(
+        default_factory=list,
+        max_length=20,
+        description="Optional documents used as supporting knowledge.",
+    )
+    language: str = Field(
+        default="pt-BR",
+        min_length=2,
+        max_length=10,
+        description="Expected language for the QA analysis.",
+    )
+    top_k: int = Field(
+        default=3,
+        ge=1,
+        le=20,
+        description="Maximum number of retrieved chunks when knowledge documents are provided.",
+    )
+    chunk_size: int = Field(
+        default=800,
+        ge=100,
+        le=4000,
+    )
+    chunk_overlap: int = Field(
+        default=120,
+        ge=0,
+        le=1000,
+    )
+    max_steps: int = Field(
+        default=5,
+        ge=3,
+        le=10,
+        description="Maximum number of agent execution steps.",
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("requirement_text")
+    @classmethod
+    def requirement_text_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("requirement_text cannot be blank")
+
+        return cleaned_value
+
+    @model_validator(mode="after")
+    def chunk_overlap_must_be_smaller_than_chunk_size(
+        self,
+    ) -> "QAAgentRunRequest":
+        if self.chunk_overlap >= self.chunk_size:
+            raise ValueError("chunk_overlap must be smaller than chunk_size")
+
+        return self
+
+
+class QAAgentRunResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: str
+    status: AgentRunStatus
+    final_answer: str
+    requirement_analysis: dict[str, Any] = Field(default_factory=dict)
+    retrieved_context: dict[str, Any] | None = None
+    steps: list[AgentStep]
     metadata: dict[str, Any] = Field(default_factory=dict)

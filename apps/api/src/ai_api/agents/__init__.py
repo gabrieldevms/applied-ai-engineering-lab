@@ -12,6 +12,8 @@ from ai_api.agents.schemas import (
     ToolExecutionStatus,
     ToolRegistryResponse,
     AgentToolCall,
+    QAAgentRunRequest,
+    QAAgentRunResponse,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -20,6 +22,7 @@ from ai_api.agents.tool_executor import (
     RequirementAnalysisTool,
 )
 from ai_api.agents.tool_registry import ToolRegistry
+from ai_api.agents.qa_agent import QAAgentService
 
 __all__ = [
     "AgentRunRequest",
@@ -40,4 +43,7 @@ __all__ = [
     "ToolRegistryResponse",
     "AgentToolCall",
     "RequirementAnalysisTool",
+    "QAAgentRunRequest",
+    "QAAgentRunResponse",
+    "QAAgentService",
 ]
