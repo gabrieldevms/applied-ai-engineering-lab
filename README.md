@@ -522,6 +522,25 @@ It is useful for development, tests and architecture validation.
 
 Future implementations may include persistent vector databases such as Qdrant, Chroma, pgvector or other vector search backends.
 
+## RAG Semantic Search
+
+The API includes a semantic search endpoint.
+
+    POST /rag/search
+
+It receives a query and a set of documents, then returns the most relevant chunks.
+
+Current behavior:
+
+- Document chunking
+- Fake deterministic embeddings
+- In-memory vector store
+- Cosine similarity search
+- Ranked search results
+- Source and metadata tracking
+
+This endpoint validates the full retrieval foundation before adding RAG answer generation.
+
 ## Status
 
 This project is currently in the RAG Knowledge Assistant phase.

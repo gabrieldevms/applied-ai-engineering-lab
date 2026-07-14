@@ -31,6 +31,9 @@ from ai_api.rag import (
     FakeEmbeddingProvider,
     TextEmbeddingRequest,
     TextEmbeddingResponse,
+    SemanticSearchRequest,
+    SemanticSearchResponse,
+    SemanticSearchService,
 )
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.exceptions import RequirementAnalysisError
@@ -348,4 +351,19 @@ async def extract_text_from_file(
         file_content=file_content,
         filename=file.filename or "uploaded-file",
         content_type=file.content_type,
+    )
+
+
+@app.post("/rag/search", response_model=SemanticSearchResponse)
+def semantic_search(
+    payload: SemanticSearchRequest,
+) -> SemanticSearchResponse:
+    search_service = SemanticSearchService()
+
+    return search_service.search(
+        query=payload.query,
+        documents=payload.documents,
+        top_k=payload.top_k,
+        chunk_size=payload.chunk_size,
+        chunk_overlap=payload.chunk_overlap,
     )

@@ -243,3 +243,105 @@ class VectorSearchResult(BaseModel):
     text: str
     score: float
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SemanticSearchDocument(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    source: str = Field(
+        min_length=1,
+        description="Document source identifier.",
+    )
+    document_text: str = Field(
+        min_length=1,
+        description="Raw document text to be indexed for search.",
+    )
+    title: str | None = Field(
+        default=None,
+        description="Optional document title.",
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("source", "document_text")
+    @classmethod
+    def required_fields_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("value cannot be blank")
+
+        return cleaned_value
+
+    @field_validator("title")
+    @classmethod
+    def optional_title_cannot_be_blank(
+        cls,
+        value: str | None,
+    ) -> str | None:
+        if value is None:
+            return value
+
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("title cannot be blank")
+
+        return cleaned_value
+
+
+class SemanticSearchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    query: str = Field(
+        min_length=1,
+        description="Search query.",
+    )
+    documents: list[SemanticSearchDocument] = Field(
+        min_length=1,
+        max_length=20,
+        description="Documents to index and search.",
+    )
+    top_k: int = Field(
+        default=3,
+        ge=1,
+        le=20,
+        description="Maximum number of search results.",
+    )
+    chunk_size: int = Field(
+        default=800,
+        ge=100,
+        le=4000,
+    )
+    chunk_overlap: int = Field(
+        default=120,
+        ge=0,
+        le=1000,
+    )
+
+    @field_validator("query")
+    @classmethod
+    def query_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("query cannot be blank")
+
+        return cleaned_value
+
+    @model_validator(mode="after")
+    def chunk_overlap_must_be_smaller_than_chunk_size(
+        self,
+    ) -> "SemanticSearchRequest":
+        if self.chunk_overlap >= self.chunk_size:
+            raise ValueError("chunk_overlap must be smaller than chunk_size")
+
+        return self
+
+
+class SemanticSearchResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    query: str
+    total_indexed_chunks: int
+    total_results: int
+    results: list[VectorSearchResult]
