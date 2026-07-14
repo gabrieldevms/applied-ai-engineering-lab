@@ -4,7 +4,6 @@ from ai_api.rag.embeddings import (
     EmbeddingService,
     FakeEmbeddingProvider,
 )
-from ai_api.rag.exceptions import RAGRequestError, TextExtractionError
 from ai_api.rag.file_ingestion import DocumentFileIngestionService
 from ai_api.rag.form_parsing import parse_metadata_json
 from ai_api.rag.ingestion import DocumentIngestionService
@@ -25,10 +24,23 @@ from ai_api.rag.schemas import (
     SemanticSearchDocument,
     SemanticSearchRequest,
     SemanticSearchResponse,
+    RAGAnswerRequest,
+    RAGAnswerResponse,
 )
 from ai_api.rag.text_extraction import TextExtractionService
 from ai_api.rag.vector_store import InMemoryVectorStore, VectorStore
 from ai_api.rag.semantic_search import SemanticSearchService
+from ai_api.rag.answer_generation import RAGAnswerService
+from ai_api.rag.dependencies import get_rag_answer_service
+from ai_api.rag.exceptions import (
+    RAGAnswerGenerationError,
+    RAGRequestError,
+    TextExtractionError,
+)
+from ai_api.rag.prompts import (
+    RAG_ANSWER_SYSTEM_PROMPT,
+    build_rag_answer_messages,
+)
 
 
 __all__ = [
@@ -61,4 +73,11 @@ __all__ = [
     "SemanticSearchRequest",
     "SemanticSearchResponse",
     "SemanticSearchService",
+    "RAGAnswerGenerationError",
+    "RAGAnswerRequest",
+    "RAGAnswerResponse",
+    "RAGAnswerService",
+    "RAG_ANSWER_SYSTEM_PROMPT",
+    "build_rag_answer_messages",
+    "get_rag_answer_service",
 ]

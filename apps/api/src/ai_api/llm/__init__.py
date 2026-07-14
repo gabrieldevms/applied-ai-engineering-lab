@@ -4,6 +4,7 @@ from ai_api.llm.models import LLMMessage, LLMResponse, LLMUsage
 from ai_api.llm.ollama_provider import OllamaProvider
 from ai_api.llm.openai_provider import OpenAIProvider
 from ai_api.llm.providers import LLMProvider
+from ai_api.llm.factory import build_llm_provider
 from ai_api.llm.schemas import (
     LLMHealthResponse,
     LLMProvidersResponse,
@@ -30,5 +31,6 @@ __all__ = [
     "SUPPORTED_LLM_PROVIDERS",
     "get_llm_health_status",
     "get_llm_providers_status",
+    "build_llm_provider",
 ]
 

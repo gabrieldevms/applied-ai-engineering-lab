@@ -4,3 +4,7 @@ class TextExtractionError(Exception):
 
 class RAGRequestError(Exception):
     """Raised when a RAG request payload is invalid."""
+
+
+class RAGAnswerGenerationError(Exception):
+    """Raised when a RAG answer cannot be generated."""

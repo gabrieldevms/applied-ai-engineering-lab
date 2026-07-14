@@ -345,3 +345,69 @@ class SemanticSearchResponse(BaseModel):
     total_indexed_chunks: int
     total_results: int
     results: list[VectorSearchResult]
+
+
+class RAGAnswerRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    query: str = Field(
+        min_length=1,
+        description="Question to be answered using retrieved context.",
+    )
+    documents: list[SemanticSearchDocument] = Field(
+        min_length=1,
+        max_length=20,
+        description="Documents to index and use as context.",
+    )
+    language: str = Field(
+        default="pt-BR",
+        min_length=2,
+        max_length=10,
+        description="Expected answer language.",
+    )
+    top_k: int = Field(
+        default=3,
+        ge=1,
+        le=20,
+    )
+    chunk_size: int = Field(
+        default=800,
+        ge=100,
+        le=4000,
+    )
+    chunk_overlap: int = Field(
+        default=120,
+        ge=0,
+        le=1000,
+    )
+
+    @field_validator("query")
+    @classmethod
+    def query_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("query cannot be blank")
+
+        return cleaned_value
+
+    @model_validator(mode="after")
+    def chunk_overlap_must_be_smaller_than_chunk_size(
+        self,
+    ) -> "RAGAnswerRequest":
+        if self.chunk_overlap >= self.chunk_size:
+            raise ValueError("chunk_overlap must be smaller than chunk_size")
+
+        return self
+
+
+class RAGAnswerResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    query: str
+    answer: str
+    provider: str
+    model: str
+    total_context_chunks: int
+    context_chunks: list[VectorSearchResult]
+    metadata: dict[str, Any] = Field(default_factory=dict)

@@ -8,6 +8,11 @@ from ai_api.config import Settings, get_settings
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
 )
+from ai_api.rag import (
+    RAGAnswerService,
+    SemanticSearchService,
+    get_rag_answer_service,
+)
 
 client = TestClient(app)
 
@@ -480,6 +485,71 @@ def test_rag_search_endpoint_should_validate_blank_query() -> None:
     }
 
     response = client.post("/rag/search", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_rag_answer_endpoint_should_generate_answer() -> None:
+    def get_test_rag_answer_service() -> RAGAnswerService:
+        return RAGAnswerService(
+            semantic_search_service=SemanticSearchService(),
+            llm_provider=FakeLLMProvider(
+                response_content="O cliente pode gerar boleto após a renegociação."
+            ),
+        )
+
+    app.dependency_overrides[get_rag_answer_service] = get_test_rag_answer_service
+
+    try:
+        payload = {
+            "query": "Como o cliente gera um boleto?",
+            "documents": [
+                {
+                    "source": "requirement-001",
+                    "title": "Renegociação",
+                    "document_text": "Após renegociar a dívida, o cliente pode gerar um boleto atualizado.",
+                    "metadata": {
+                        "domain": "billing"
+                    },
+                }
+            ],
+            "language": "pt-BR",
+            "top_k": 1,
+            "chunk_size": 200,
+            "chunk_overlap": 40,
+        }
+
+        response = client.post("/rag/answer", json=payload)
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["answer"] == "O cliente pode gerar boleto após a renegociação."
+        assert body["provider"] == "fake"
+        assert body["total_context_chunks"] == 1
+        assert body["context_chunks"][0]["metadata"]["source"] == "requirement-001"
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_rag_answer_endpoint_should_validate_blank_query() -> None:
+    payload = {
+        "query": "   ",
+        "documents": [
+            {
+                "source": "requirement-001",
+                "document_text": "Texto válido.",
+            }
+        ],
+    }
+
+    response = client.post("/rag/answer", json=payload)
 
     assert response.status_code == 422
 

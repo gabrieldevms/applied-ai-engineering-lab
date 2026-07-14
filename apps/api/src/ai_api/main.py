@@ -34,6 +34,11 @@ from ai_api.rag import (
     SemanticSearchRequest,
     SemanticSearchResponse,
     SemanticSearchService,
+    RAGAnswerGenerationError,
+    RAGAnswerRequest,
+    RAGAnswerResponse,
+    RAGAnswerService,
+    get_rag_answer_service,
 )
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.exceptions import RequirementAnalysisError
@@ -80,6 +85,29 @@ async def log_requests(
     )
 
     return response
+
+
+@app.exception_handler(RAGAnswerGenerationError)
+async def rag_answer_generation_exception_handler(
+    request: Request,
+    exc: RAGAnswerGenerationError,
+) -> JSONResponse:
+    logger.warning(
+        "RAG answer generation error on %s %s: %s",
+        request.method,
+        request.url.path,
+        str(exc),
+    )
+
+    return JSONResponse(
+        status_code=502,
+        content={
+            "error": {
+                "type": "rag_answer_generation_error",
+                "message": str(exc),
+            }
+        },
+    )
 
 
 @app.exception_handler(RAGRequestError)
@@ -363,6 +391,24 @@ def semantic_search(
     return search_service.search(
         query=payload.query,
         documents=payload.documents,
+        top_k=payload.top_k,
+        chunk_size=payload.chunk_size,
+        chunk_overlap=payload.chunk_overlap,
+    )
+
+
+@app.post("/rag/answer", response_model=RAGAnswerResponse)
+def generate_rag_answer(
+    payload: RAGAnswerRequest,
+    service: Annotated[
+        RAGAnswerService,
+        Depends(get_rag_answer_service),
+    ],
+) -> RAGAnswerResponse:
+    return service.answer(
+        query=payload.query,
+        documents=payload.documents,
+        language=payload.language,
         top_k=payload.top_k,
         chunk_size=payload.chunk_size,
         chunk_overlap=payload.chunk_overlap,
