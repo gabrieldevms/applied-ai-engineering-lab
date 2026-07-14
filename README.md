@@ -640,6 +640,28 @@ Current behavior:
 
 This is the first step toward tool-using agents that can plan, retrieve context, call internal services and execute multi-step workflows.
 
+## Agent Tool Registry
+
+The project includes an initial tool registry for AI agents.
+
+    GET /agents/tools
+
+Current behavior:
+
+- Lists available agent tools
+- Provides tool names and descriptions
+- Exposes input and output schemas
+- Adds tool metadata such as category, safety and LLM dependency
+- Prepares the project for controlled tool execution
+
+Initial tools:
+
+- `rag.retrieve`
+- `rag.answer`
+- `requirements.analyze`
+
+The registry does not execute tools yet. Tool execution will be added in the next M4 step.
+
 ## Status
 
 This project is currently in the M4 - AI Agents phase.

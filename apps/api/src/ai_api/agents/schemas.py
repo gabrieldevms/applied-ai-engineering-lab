@@ -73,3 +73,43 @@ class AgentRunResponse(BaseModel):
     final_answer: str
     steps: list[AgentStep]
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolDefinition(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(
+        min_length=1,
+        description="Unique tool name.",
+    )
+    description: str = Field(
+        min_length=1,
+        description="Human-readable tool description.",
+    )
+    input_schema: dict[str, Any] = Field(
+        default_factory=dict,
+        description="JSON-schema-like input contract.",
+    )
+    output_schema: dict[str, Any] = Field(
+        default_factory=dict,
+        description="JSON-schema-like output contract.",
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "description")
+    @classmethod
+    def required_tool_fields_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("value cannot be blank")
+
+        return cleaned_value
+
+
+class ToolRegistryResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    total_tools: int
+    tools: list[ToolDefinition]
+    metadata: dict[str, Any] = Field(default_factory=dict)
