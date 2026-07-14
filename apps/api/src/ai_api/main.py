@@ -27,6 +27,10 @@ from ai_api.rag import (
     TextExtractionService,
     RAGRequestError,
     parse_metadata_json,
+    EmbeddingService,
+    FakeEmbeddingProvider,
+    TextEmbeddingRequest,
+    TextEmbeddingResponse,
 )
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.exceptions import RequirementAnalysisError
@@ -315,6 +319,21 @@ async def ingest_file(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
     )
+
+
+@app.post("/rag/embed", response_model=TextEmbeddingResponse)
+def embed_texts(
+    payload: TextEmbeddingRequest,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> TextEmbeddingResponse:
+    embedding_provider = FakeEmbeddingProvider(
+        dimensions=settings.embedding_dimensions,
+    )
+    embedding_service = EmbeddingService(
+        embedding_provider=embedding_provider,
+    )
+
+    return embedding_service.embed_texts(payload.texts)
 
 
 @app.post("/rag/extract-text", response_model=TextExtractionResponse)

@@ -55,7 +55,7 @@ Goal: build a document-based AI assistant.
 - [x] Document ingestion
 - [x] Text extraction
 - [x] Chunking strategy
-- [ ] Embeddings
+- [x] Embeddings
 - [ ] Vector database
 - [ ] Semantic search
 - [ ] RAG answer generation
@@ -72,8 +72,10 @@ Goal: build a document-based AI assistant.
 - [x] Text extraction API endpoint
 - [x] File ingestion pipeline
 - [x] File ingestion API endpoint
-- [ ] Embedding provider abstraction
-- [ ] Fake embedding provider
+- [x] Embedding provider abstraction
+- [x] Fake embedding provider
+- [x] Embedding service
+- [x] Embedding API endpoint
 - [ ] Vector store abstraction
 - [ ] In-memory vector store
 - [ ] Retrieval service

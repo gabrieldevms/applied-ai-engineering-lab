@@ -84,3 +84,9 @@ All notable changes to this project will be documented in this file.
 - Metadata parsing for multipart form requests
 - Combined text extraction, document ingestion and chunking flow
 - Unit and API tests for file ingestion
+- RAG embedding provider abstraction
+- Fake deterministic embedding provider
+- Embedding service
+- Embedding API endpoint
+- Settings for embedding provider and dimensions
+- Unit and API tests for embeddings

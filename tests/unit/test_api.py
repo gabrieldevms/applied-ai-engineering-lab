@@ -388,3 +388,43 @@ def test_rag_ingest_file_endpoint_should_reject_unsupported_file_type() -> None:
 
     assert body["error"]["type"] == "text_extraction_error"
     assert body["error"]["message"] == "Unsupported file type: .pdf"
+
+
+def test_rag_embed_endpoint_should_return_embeddings() -> None:
+    payload = {
+        "texts": [
+            "Como cliente, quero renegociar minha dívida.",
+            "Como cliente, quero consultar meus boletos.",
+        ]
+    }
+
+    response = client.post("/rag/embed", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["provider"] == "fake"
+    assert body["model"] == "fake-keyword-hash-embedding-v1"
+    assert body["total_embeddings"] == 2
+    assert len(body["embeddings"]) == 2
+    assert body["embeddings"][0]["dimensions"] == 32
+    assert len(body["embeddings"][0]["vector"]) == 32
+
+
+def test_rag_embed_endpoint_should_validate_blank_text() -> None:
+    payload = {
+        "texts": [
+            "Texto válido.",
+            "   ",
+        ]
+    }
+
+    response = client.post("/rag/embed", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."
