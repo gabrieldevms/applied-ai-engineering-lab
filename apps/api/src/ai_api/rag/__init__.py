@@ -26,6 +26,7 @@ from ai_api.rag.schemas import (
     SemanticSearchResponse,
     RAGAnswerRequest,
     RAGAnswerResponse,
+    SourceCitation,
 )
 from ai_api.rag.text_extraction import TextExtractionService
 from ai_api.rag.vector_store import InMemoryVectorStore, VectorStore
@@ -41,6 +42,7 @@ from ai_api.rag.prompts import (
     RAG_ANSWER_SYSTEM_PROMPT,
     build_rag_answer_messages,
 )
+from ai_api.rag.citations import build_source_citations
 
 
 __all__ = [
@@ -80,4 +82,6 @@ __all__ = [
     "RAG_ANSWER_SYSTEM_PROMPT",
     "build_rag_answer_messages",
     "get_rag_answer_service",
+    "SourceCitation",
+    "build_source_citations"
 ]

@@ -562,6 +562,22 @@ Current behavior:
 The answer generation flow uses the same provider abstraction as the rest of the project.
 Depending on environment configuration, it can use fake, OpenAI or Ollama providers.
 
+## RAG Source Citation
+
+The RAG answer endpoint returns citations for the retrieved context chunks used to generate the answer.
+
+Current behavior:
+
+- Citation IDs such as `source-1`, `source-2`
+- Source tracking
+- Title tracking
+- Chunk ID tracking
+- Excerpt generation
+- Similarity score exposure
+- Citation metadata
+
+This improves traceability and makes generated answers easier to audit.
+
 ## Status
 
 This project is currently in the RAG Knowledge Assistant phase.

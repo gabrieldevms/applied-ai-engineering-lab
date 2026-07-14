@@ -534,6 +534,10 @@ def test_rag_answer_endpoint_should_generate_answer() -> None:
         assert body["provider"] == "fake"
         assert body["total_context_chunks"] == 1
         assert body["context_chunks"][0]["metadata"]["source"] == "requirement-001"
+        assert len(body["citations"]) == 1
+        assert body["citations"][0]["citation_id"] == "source-1"
+        assert body["citations"][0]["source"] == "requirement-001"
+        assert body["citations"][0]["excerpt"] == "Após renegociar a dívida, o cliente pode gerar um boleto atualizado."
     finally:
         app.dependency_overrides.clear()
 

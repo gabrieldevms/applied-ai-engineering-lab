@@ -46,6 +46,11 @@ def test_rag_answer_service_should_generate_answer_from_retrieved_context() -> N
     assert response.total_context_chunks == 1
     assert response.context_chunks[0].metadata["source"] == "requirement-001"
     assert response.metadata["total_indexed_chunks"] == 1
+    assert len(response.citations) == 1
+    assert response.citations[0].citation_id == "source-1"
+    assert response.citations[0].source == "requirement-001"
+    assert response.citations[0].chunk_id == "requirement-001-0"
+    assert response.citations[0].excerpt == "Após renegociar a dívida, o cliente pode gerar um boleto atualizado."
 
 
 def test_rag_answer_service_should_raise_error_when_llm_provider_fails() -> None:

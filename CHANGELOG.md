@@ -104,3 +104,7 @@ All notable changes to this project will be documented in this file.
 - RAG answer API endpoint
 - Shared LLM provider factory
 - RAG answer generation tests
+- Source citation builder for RAG context chunks
+- Citations in RAG answer responses
+- Citation-aware RAG answer prompt instructions
+- Unit tests for source citations
