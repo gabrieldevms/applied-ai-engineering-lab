@@ -1,739 +1,573 @@
 # Applied AI Engineering Lab
 
-A practical and production-oriented lab for learning and building Applied AI Engineering systems.
+A practical and production-oriented laboratory for designing, building, testing and evolving reliable AI systems for software engineering and quality assurance.
 
-## Purpose
+The project starts with a structured AI API and incrementally evolves toward RAG applications, tool-using agents, MCP servers, multi-agent workflows, evaluation pipelines, observability and production-like deployment.
 
-This project is a hands-on journey into Applied AI Engineering, focused on building reliable, testable and production-ready AI applications.
+## Project Status
 
-The lab covers:
+**Current module:** M4 — AI Agents
+**Current milestone:** Requirement Analysis Tool completed
+**Next milestone:** QA Agent
 
-- Software Engineering for AI
-- LLM Engineering
-- Retrieval-Augmented Generation
-- AI Agents
-- Model Context Protocol
-- Multi-Agent Systems
-- Evaluation and Testing for AI
-- LLMOps
-- Observability
-- Cloud Deployment
-- Security and Governance
+| Module                             | Status         | Scope                                                                              |
+| ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
+| M0 — Foundation                    | ✅ Completed    | Repository, workflow, documentation and architecture foundation                    |
+| M1 — AI API Base                   | ✅ Completed    | FastAPI, schemas, tests, Docker, CI, logging and error handling                    |
+| M2 — LLM Engineering               | ✅ Completed    | Providers, prompts, structured outputs, retries, fallback and requirement analysis |
+| M3 — RAG Knowledge Assistant       | ✅ Completed    | Ingestion, chunking, embeddings, retrieval, answers, citations and evaluation      |
+| M4 — AI Agents                     | 🚧 In progress | Runtime, tools, execution, planning, QA Agent and safety controls                  |
+| M5 — MCP QA Server                 | ⏳ Planned      | MCP tools focused on QA and software engineering                                   |
+| M6 — Multi-Agent QA Copilot        | ⏳ Planned      | Specialized QA agents and orchestration                                            |
+| M7 — Evaluation and LLMOps         | ⏳ Planned      | Evaluation pipelines, observability, cost and latency tracking                     |
+| M8 — Cloud, Security and Portfolio | ⏳ Planned      | Deployment, security, governance and portfolio presentation                        |
 
-## Main Goal
+See the complete [project roadmap](ROADMAP.md).
 
-The main goal is to evolve from a simple AI API into a complete AI Engineering platform with:
+## Why This Project Exists
 
-- LLM services
-- RAG services
-- Agent services
-- MCP servers
-- Multi-agent orchestration
-- Evaluation pipelines
-- Observability
-- CI/CD
-- Security practices
+Many AI examples stop at a prompt, notebook or direct model call.
 
-## Architecture Vision
+This laboratory explores the engineering practices required to build AI systems that are:
 
-```text
-User / Interface
-      |
-      v
-API Gateway / Backend
-      |
-      v
-AI Orchestrator
-      |
-      +--> LLM Service
-      +--> RAG Service
-      +--> Agent Service
-      +--> MCP Client
-      +--> Evaluation Service
-      +--> Observability Service
-      |
-      v
-External Tools
-GitHub | Jira | Database | Files | APIs | Playwright | Documentation
+* modular and maintainable;
+* provider-independent;
+* validated with structured schemas;
+* observable and testable;
+* grounded in retrieved information;
+* capable of using controlled tools;
+* designed with explicit execution boundaries;
+* prepared for evaluation and production-like operation.
+
+The project also connects Applied AI Engineering with practical QA use cases such as:
+
+* software requirement analysis;
+* acceptance criteria identification;
+* risk discovery;
+* test scenario generation;
+* documentation retrieval;
+* test automation support;
+* controlled QA agent workflows.
+
+## Current Capabilities
+
+### LLM Engineering
+
+The API provides a reusable LLM integration layer with:
+
+* provider abstraction;
+* Fake, OpenAI and Ollama providers;
+* environment-based provider selection;
+* prompt builders;
+* structured Pydantic outputs;
+* JSON extraction and normalization;
+* retry strategies;
+* fallback providers;
+* provider diagnostics;
+* provider-level error handling.
+
+### Requirement Analysis
+
+Software requirements can be analyzed through a structured quality-oriented workflow.
+
+The analysis may include:
+
+* requirement summary;
+* business rules;
+* acceptance criteria;
+* risks;
+* open questions;
+* positive test scenarios;
+* negative test scenarios;
+* edge cases;
+* automation opportunities.
+
+### RAG Knowledge Assistant
+
+The RAG foundation currently supports:
+
+* raw text ingestion;
+* text file ingestion;
+* `.txt`, `.md` and `.markdown` extraction;
+* configurable document chunking;
+* stable document identifiers;
+* chunk and source metadata;
+* deterministic embeddings;
+* in-memory vector storage;
+* cosine similarity search;
+* semantic search;
+* reusable context retrieval;
+* LLM-based answer generation;
+* source citations;
+* deterministic RAG evaluation.
+
+### AI Agent Foundation
+
+The project includes a controlled agent runtime with:
+
+* structured agent requests and responses;
+* deterministic execution;
+* configurable execution limits;
+* optional contextual information;
+* explicit tool calls;
+* step-by-step execution traces;
+* structured tool results;
+* safe handling of tool failures;
+* execution metadata.
+
+### Agent Tools
+
+The Tool Registry currently describes:
+
+| Tool                   | Registered | Executable | Purpose                                           |
+| ---------------------- | ---------: | ---------: | ------------------------------------------------- |
+| `rag.retrieve`         |          ✅ |          ✅ | Retrieve relevant document chunks                 |
+| `requirements.analyze` |          ✅ |          ✅ | Analyze software requirements                     |
+| `rag.answer`           |          ✅ |         🚧 | Generate a grounded answer from retrieved context |
+
+Tool execution is centralized in the `ToolExecutionService`. The service validates the requested tool against the registry and only allows tools with explicit execution handlers.
+
+## Architecture
+
+```mermaid
+flowchart TB
+    Client[Client / API Consumer] --> API[FastAPI Application]
+
+    API --> Diagnostics[Health and Provider Diagnostics]
+    API --> Requirements[Requirement Analysis]
+    API --> RAG[RAG Services]
+    API --> Agents[Agent Runtime]
+
+    Requirements --> LLM[LLM Provider Abstraction]
+    RAG --> LLM
+
+    LLM --> FakeLLM[Fake Provider]
+    LLM --> Ollama[Ollama Provider]
+    LLM --> OpenAI[OpenAI Provider]
+
+    RAG --> Ingestion[Ingestion and Text Extraction]
+    Ingestion --> Chunking[Document Chunking]
+    Chunking --> Embeddings[Embedding Service]
+    Embeddings --> VectorStore[In-Memory Vector Store]
+    VectorStore --> Retrieval[Retrieval Service]
+    Retrieval --> Answer[RAG Answer Generation]
+    Answer --> Citations[Source Citations]
+    Answer --> Evaluation[RAG Evaluation]
+
+    Agents --> Runtime[Controlled Agent Runtime]
+    Runtime --> Registry[Tool Registry]
+    Registry --> Executor[Tool Execution Service]
+    Executor --> RetrieveTool[rag.retrieve]
+    Executor --> RequirementTool[requirements.analyze]
 ```
 
-## Tech Stack
+The architecture intentionally separates:
 
-Initial stack:
+* API transport;
+* domain services;
+* model providers;
+* prompts and schemas;
+* retrieval infrastructure;
+* agent runtime;
+* tool registration;
+* tool execution.
 
-- Python
-- FastAPI
-- Pydantic
-- pytest
-- uv
-- Docker
-- PostgreSQL
-- GitHub Actions
+This separation allows individual components to be tested and replaced without coupling the entire application to one model provider or framework.
 
-Future stack:
+## API Endpoints
 
-- LangGraph
-- Model Context Protocol
-- pgvector
-- Qdrant
-- OpenTelemetry
-- Grafana
-- MLflow
-- Cloud AI platforms
+Interactive OpenAPI documentation is available at:
 
-## Roadmap
+```text
+http://127.0.0.1:8000/docs
+```
 
-See [ROADMAP.md](./ROADMAP.md).
+### Core and LLM
 
-## Module Status
+| Method | Endpoint                | Description                                 |
+| ------ | ----------------------- | ------------------------------------------- |
+| `GET`  | `/health`               | API health check                            |
+| `GET`  | `/llm/providers`        | List supported and active LLM providers     |
+| `GET`  | `/llm/health`           | Validate the active provider configuration  |
+| `POST` | `/analyze`              | Run the initial deterministic text analysis |
+| `POST` | `/requirements/analyze` | Analyze a software requirement              |
 
-### Completed
+### RAG
 
-* M0 — Foundation
-* M1 — AI API Base
+| Method | Endpoint            | Description                                        |
+| ------ | ------------------- | -------------------------------------------------- |
+| `POST` | `/rag/extract-text` | Extract normalized text from a supported file      |
+| `POST` | `/rag/chunk`        | Split document text into configurable chunks       |
+| `POST` | `/rag/ingest`       | Ingest raw text and generate document metadata     |
+| `POST` | `/rag/ingest-file`  | Extract, ingest and chunk an uploaded file         |
+| `POST` | `/rag/embed`        | Generate deterministic embedding vectors           |
+| `POST` | `/rag/search`       | Run semantic search over supplied documents        |
+| `POST` | `/rag/retrieve`     | Retrieve the most relevant document chunks         |
+| `POST` | `/rag/answer`       | Generate a grounded answer using retrieved context |
+| `POST` | `/rag/evaluate`     | Evaluate an answer, context and citations          |
 
-### In Progress
+### Agents
 
-* M2 — LLM Engineering
+| Method | Endpoint                | Description                                   |
+| ------ | ----------------------- | --------------------------------------------- |
+| `POST` | `/agents/run`           | Execute an agent run with optional tool calls |
+| `GET`  | `/agents/tools`         | Describe registered agent tools               |
+| `POST` | `/agents/tools/execute` | Execute a registered tool through its handler |
 
-### Upcoming
+## Technology Stack
 
-* M3 — RAG Knowledge Assistant
-* M4 — AI Agents
-* M5 — MCP QA Server
-* M6 — Multi-Agent QA Copilot
-* M7 — Evaluation and LLMOps
-* M8 — Cloud, Security and Portfolio
+### Current stack
 
-### Current Phase
+* Python 3.12+
+* FastAPI
+* Pydantic
+* Pydantic Settings
+* pytest
+* HTTPX
+* OpenAI Python SDK
+* Ollama
+* uv
+* Docker
+* Docker Compose
+* GitHub Actions
 
-M2 — LLM Engineering
+### Planned evolution
+
+Future modules may introduce:
+
+* persistent vector databases;
+* pgvector or Qdrant;
+* LangGraph or equivalent orchestration;
+* Model Context Protocol;
+* OpenTelemetry;
+* Grafana;
+* MLflow;
+* cloud AI services;
+* persistent agent state;
+* evaluation datasets and regression pipelines.
+
+Planned technologies are tracked in the [roadmap](ROADMAP.md) and should not be interpreted as current dependencies.
 
 ## Repository Structure
 
 ```text
 applied-ai-engineering-lab/
-  apps/
-    api/
-  packages/
-    prompts/
-    schemas/
-    evals/
-    shared/
-  docs/
-    architecture/
-    adr/
-    diagrams/
-    study-notes/
-  infra/
-    docker/
-    github-actions/
-  datasets/
-    samples/
-  tests/
-    unit/
-    integration/
-    evals/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── apps/
+│   └── api/
+│       ├── Dockerfile
+│       └── src/
+│           └── ai_api/
+│               ├── agents/
+│               ├── llm/
+│               ├── rag/
+│               ├── requirements/
+│               ├── config.py
+│               ├── main.py
+│               └── schemas.py
+├── docs/
+│   ├── adr/
+│   ├── architecture/
+│   └── study-notes/
+├── tests/
+│   └── unit/
+├── .env.example
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── ROADMAP.md
+├── docker-compose.yml
+├── pyproject.toml
+└── uv.lock
 ```
 
-## Current API Capabilities
+## Getting Started
 
-The current API provides a simple and deterministic foundation for future AI features.
+### Prerequisites
 
-Available endpoints:
+Install the following tools:
 
-### Health Check
+* Python 3.12 or newer;
+* uv;
+* Git;
+* Docker and Docker Compose, when using containers;
+* Ollama, when using a local LLM.
 
-```
-GET /health
-```
+### Clone the repository
 
-Returns the current API status.
-
-Example response:
-
-```
-{
-  "status": "ok"
-}
+```bash
+git clone https://github.com/gabrieldevms/applied-ai-engineering-lab.git
+cd applied-ai-engineering-lab
 ```
 
-### Text Analysis
+### Install dependencies
 
+```bash
+uv sync --dev
 ```
-POST /analyze
+
+### Configure the environment
+
+Create a local `.env` file based on `.env.example`.
+
+Linux or macOS:
+
+```bash
+cp .env.example .env
 ```
 
-Receives a text input and returns a structured response with basic text analysis.
+PowerShell:
 
-Current behavior:
-
-* Returns the original text
-* Counts words
-* Counts characters
-* Returns the requested language
-* Returns a deterministic summary message
-
-This endpoint does not use an LLM yet. LLM integration will be introduced in M2 — LLM Engineering.
-
-### Basic Logging
-
-The API includes basic request logging.
-
-Each request logs:
-
-* HTTP method
-* Request path
-* Response status code
-* Request duration in milliseconds
-
-### Basic Error Handling
-
-The API includes basic error handling for request validation errors and unexpected internal errors.
-
-Validation errors return a structured response with:
-
-* Error type
-* Error message
-* Error details
-
-### Requirement Analysis
-
-    POST /requirements/analyze
-
-Receives a software requirement and returns a structured quality-oriented analysis.
-
-Current behavior:
-
-- Uses the requirement analyzer service
-- Builds LLM-ready prompt messages
-- Uses a fake LLM provider for now
-- Parses the provider response as JSON
-- Validates the response with Pydantic schemas
-- Returns a structured analysis in Portuguese
-
-The response includes:
-
-- Summary
-- Business rules
-- Acceptance criteria
-- Risks
-- Open questions
-- Positive test scenarios
-- Negative test scenarios
-- Edge cases
-- Automation opportunities
-
-## Environment Configuration
-
-The project uses environment variables to configure runtime behavior.
-
-Create a local `.env` file based on `.env.example` when needed.
-
-Current variables:
-
-    APP_ENV=local
-    LLM_PROVIDER=fake
-    REQUIREMENT_ANALYSIS_RETRY_ATTEMPTS=2
-    OPENAI_API_KEY=
-    OPENAI_MODEL=
-
-The default provider is currently `fake`, which allows local execution without API keys.
-
-## Running the API Locally
-
-Run the API directly with uv:
-
+```powershell
+Copy-Item .env.example .env
 ```
+
+The project works locally with the Fake provider and does not require an external API key by default.
+
+### Run the API
+
+```bash
 uv run uvicorn ai_api.main:app --reload --app-dir apps/api/src
 ```
 
 Open:
 
-```
+```text
 http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs
 ```
 
-## Running Tests
+## Environment Configuration
 
-Run the test suite:
+| Variable                              | Default                  | Description                           |
+| ------------------------------------- | ------------------------ | ------------------------------------- |
+| `APP_ENV`                             | `local`                  | Current application environment       |
+| `LLM_PROVIDER`                        | `fake`                   | Active LLM provider                   |
+| `REQUIREMENT_ANALYSIS_RETRY_ATTEMPTS` | `2`                      | Maximum requirement-analysis attempts |
+| `OPENAI_API_KEY`                      | empty                    | OpenAI API credential                 |
+| `OPENAI_MODEL`                        | empty                    | OpenAI model identifier               |
+| `OLLAMA_BASE_URL`                     | `http://localhost:11434` | Ollama server address                 |
+| `OLLAMA_MODEL`                        | `llama3.1`               | Local Ollama model                    |
+| `OLLAMA_TIMEOUT_SECONDS`              | `120`                    | Ollama request timeout                |
+| `EMBEDDING_PROVIDER`                  | `fake`                   | Active embedding provider             |
+| `EMBEDDING_DIMENSIONS`                | `32`                     | Deterministic embedding vector size   |
 
+Never commit a local `.env` file or API credentials.
+
+## LLM Providers
+
+### Fake Provider
+
+The default provider is deterministic and requires no external service.
+
+```env
+LLM_PROVIDER=fake
 ```
-uv run pytest
+
+It is useful for:
+
+* local development;
+* automated tests;
+* schema validation;
+* retry and fallback tests;
+* deterministic agent tools.
+
+### Ollama
+
+Ollama enables local and self-hosted LLM execution.
+
+Ensure Ollama is running and the configured model is installed:
+
+```bash
+ollama --version
+ollama list
+ollama pull llama3.1
 ```
+
+Configure the environment:
+
+```env
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.1
+OLLAMA_TIMEOUT_SECONDS=120
+```
+
+Then start the API normally.
+
+### OpenAI
+
+Configure the provider using environment variables:
+
+```env
+LLM_PROVIDER=openai
+OPENAI_API_KEY=your-api-key
+OPENAI_MODEL=your-model
+```
+
+The provider implementation is isolated behind the shared LLM interface, allowing the application services to remain independent of the selected model vendor.
 
 ## Running with Docker
 
-Build and start the API container:
+Build and start the API:
 
-```
+```bash
 docker compose up --build
 ```
 
 Open:
 
-```
+```text
 http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs
 ```
 
 Stop the containers:
 
-```
+```bash
 docker compose down
 ```
 
-## Continuous Integration
+## Running Tests
 
-This project uses GitHub Actions to run automated tests on pull requests and pushes to the main branch.
+Run the complete test suite:
 
-The CI pipeline currently validates:
-
-- Python setup
-- uv dependency installation
-- pytest test execution
-
-## Learning Approach
-
-Each module follows a practical engineering cycle:
-
-```text
-Understand the concept
-      |
-      v
-Build a small implementation
-      |
-      v
-Test it
-      |
-      v
-Document it
-      |
-      v
-Automate it
-      |
-      v
-Improve the architecture
+```bash
+uv run pytest
 ```
 
-## Local LLM Provider with Ollama
-
-The API also supports Ollama as a local/self-hosted LLM provider.
-
-Example `.env` configuration:
-
-    LLM_PROVIDER=ollama
-    OLLAMA_BASE_URL=http://localhost:11434
-    OLLAMA_MODEL=llama3.1
-    OLLAMA_TIMEOUT_SECONDS=120
-
-Before running the API, make sure Ollama is installed, running, and the selected model is available locally:
-
-    ollama --version
-    ollama list
-    ollama pull llama3.1
-
-When using Ollama, the requirement analysis flow remains the same:
-
-    request
-      -> prompt builder
-      -> Ollama provider
-      -> JSON parser
-      -> Pydantic validation
-      -> retry/fallback handling
-      -> structured API response
-
-## Real LLM Provider
-
-The API supports environment-based LLM provider selection.
-
-The default provider is:
-
-    LLM_PROVIDER=fake
-
-To use OpenAI locally, create a `.env` file based on `.env.example`:
-
-    LLM_PROVIDER=openai
-    OPENAI_API_KEY=your-api-key
-    OPENAI_MODEL=your-model
-
-Do not commit the `.env` file.
-
-When using the OpenAI provider, the requirement analysis flow remains the same:
-
-    request
-      -> prompt builder
-      -> OpenAI provider
-      -> JSON parser
-      -> Pydantic validation
-      -> retry/fallback handling
-      -> structured API response
-
-## LLM Provider Diagnostics
-
-The API exposes diagnostic endpoints for LLM provider configuration.
-
-    GET /llm/providers
-
-Returns the active provider and the list of supported providers.
-
-    GET /llm/health
-
-Returns configuration health for the active provider.
-
-This endpoint does not call the model. It only checks environment-based configuration and avoids exposing secrets such as API keys.
-
-## LLM Output Normalization
-
-LLM responses are normalized before schema validation.
-
-The parser accepts:
-
-- Pure JSON objects
-- JSON objects inside Markdown code blocks
-- JSON objects surrounded by explanatory text
-
-After extraction, the response is still validated by Pydantic schemas.
-Invalid schemas are rejected.
-
-## RAG Document Chunking
-
-The API includes a basic document chunking endpoint.
-
-    POST /rag/chunk
-
-It receives raw document text and splits it into smaller chunks.
-
-Current behavior:
-
-- Character-based chunking
-- Configurable chunk size
-- Configurable chunk overlap
-- Source tracking
-- Chunk metadata
-
-This is the first step toward the RAG pipeline.
-Future steps will include embeddings, vector storage and retrieval.
-
-## RAG Document Ingestion
-
-The API includes a document ingestion endpoint.
-
-    POST /rag/ingest
-
-It receives raw document text, creates a stable document identifier, generates chunks and returns document metadata.
-
-Current behavior:
-
-- Raw text ingestion
-- Stable document ID based on source and content hash
-- Metadata support
-- Chunk generation
-- Chunk metadata enrichment
-- Source tracking
-
-This is part of the RAG foundation and prepares the project for embeddings, vector storage and semantic retrieval.
-
-## RAG File Ingestion
-
-The API includes a file ingestion endpoint.
-
-    POST /rag/ingest-file
-
-It receives an uploaded text-based file, extracts text, creates a stable document identifier, generates chunks and returns document metadata.
-
-Current supported formats:
-
-- `.txt`
-- `.md`
-- `.markdown`
-
-Current behavior:
-
-- File upload
-- Text extraction
-- Metadata parsing from JSON form field
-- Stable document ID generation
-- Chunk generation
-- Chunk metadata enrichment
-- Extraction metadata tracking
-
-This endpoint connects text extraction and document ingestion into a single RAG pipeline step.
-
-## RAG Text Extraction
-
-The API includes a basic text extraction endpoint.
-
-    POST /rag/extract-text
-
-It receives an uploaded text-based file and extracts normalized text.
-
-Current supported formats:
-
-- `.txt`
-- `.md`
-- `.markdown`
-
-Current behavior:
-
-- UTF-8 text extraction
-- Line break normalization
-- Empty text validation
-- Unsupported file type handling
-- Structured extraction response
-
-Future steps will include PDF, DOCX and other document formats.
-
-## RAG Embeddings
-
-The API includes a basic embedding endpoint.
-
-    POST /rag/embed
-
-It receives one or more texts and returns deterministic embedding vectors.
-
-Current behavior:
-
-- Embedding provider abstraction
-- Fake deterministic embedding provider
-- Keyword hashing strategy
-- Configurable embedding dimensions
-- Structured embedding response
-
-The fake provider is useful for local development and tests.
-Future providers may include Ollama, OpenAI or other embedding APIs.
-
-## RAG Vector Store
-
-The project includes a basic vector store foundation.
-
-Current behavior:
-
-- Vector store abstraction
-- In-memory vector store implementation
-- Vector record upsert
-- Vector record lookup
-- Cosine similarity search
-- Ranked search results
-
-The current implementation is local and in-memory.
-It is useful for development, tests and architecture validation.
-
-Future implementations may include persistent vector databases such as Qdrant, Chroma, pgvector or other vector search backends.
-
-## RAG Semantic Search
-
-The API includes a semantic search endpoint.
-
-    POST /rag/search
-
-It receives a query and a set of documents, then returns the most relevant chunks.
-
-Current behavior:
-
-- Document chunking
-- Fake deterministic embeddings
-- In-memory vector store
-- Cosine similarity search
-- Ranked search results
-- Source and metadata tracking
-
-This endpoint validates the full retrieval foundation before adding RAG answer generation.
-
-## RAG Answer Generation
-
-The API includes a RAG answer generation endpoint.
-
-    POST /rag/answer
-
-It receives a query and a set of documents, retrieves the most relevant chunks and generates an answer using the configured LLM provider.
-
-Current behavior:
-
-- Document chunking
-- Fake deterministic embeddings
-- In-memory vector search
-- Context assembly
-- LLM-based answer generation
-- Provider-based LLM execution
-- Retrieved context returned with the answer
-
-The answer generation flow uses the same provider abstraction as the rest of the project.
-Depending on environment configuration, it can use fake, OpenAI or Ollama providers.
-
-## RAG Source Citation
-
-The RAG answer endpoint returns citations for the retrieved context chunks used to generate the answer.
-
-Current behavior:
-
-- Citation IDs such as `source-1`, `source-2`
-- Source tracking
-- Title tracking
-- Chunk ID tracking
-- Excerpt generation
-- Similarity score exposure
-- Citation metadata
-
-This improves traceability and makes generated answers easier to audit.
-
-## RAG Evaluation
-
-The API includes a deterministic RAG evaluation endpoint.
-
-    POST /rag/evaluate
-
-It evaluates a generated answer using the query, retrieved context chunks and citations.
-
-Current metrics:
-
-- Context relevance
-- Answer groundedness
-- Query alignment
-- Citation coverage
-
-Current behavior:
-
-- Deterministic local evaluation
-- No external LLM dependency
-- Pass/fail result
-- Overall score
-- Metric-level details
-- Issue reporting
-
-Future improvements may include LLM-as-judge evaluation, golden datasets and regression evaluation suites.
-
-## RAG Retrieval Service
-
-The project includes a dedicated retrieval service.
-
-    POST /rag/retrieve
-
-It receives a query and documents, indexes document chunks in memory and returns the most relevant chunks.
-
-Current behavior:
-
-- Document chunking
-- Fake deterministic embeddings
-- In-memory vector search
-- Top-k retrieval
-- Retrieved chunk metadata
-- Reusable retrieval layer for semantic search, RAG answers and future agents
-
-This service separates retrieval from answer generation and prepares the project for agent workflows.
-
-## AI Agents
-
-The project includes the initial foundation for controlled AI agent execution.
-
-    POST /agents/run
-
-Current behavior:
-
-- Agent runtime foundation
-- Agent request and response schemas
-- Deterministic agent execution
-- Step-by-step execution trace
-- Optional context handling
-- Execution metadata
-
-This is the first step toward tool-using agents that can plan, retrieve context, call internal services and execute multi-step workflows.
-
-## Agent Tool Registry
-
-The project includes an initial tool registry for AI agents.
-
-    GET /agents/tools
-
-Current behavior:
-
-- Lists available agent tools
-- Provides tool names and descriptions
-- Exposes input and output schemas
-- Adds tool metadata such as category, safety and LLM dependency
-- Prepares the project for controlled tool execution
-
-Initial tools:
-
-- `rag.retrieve`
-- `rag.answer`
-- `requirements.analyze`
-
-The registry does not execute tools yet. Tool execution will be added in the next M4 step.
-
-## Agent Tool Execution
-
-The project includes a controlled tool execution service for AI agents.
-
-    POST /agents/tools/execute
-
-Current behavior:
-
-- Executes registered tools through explicit handlers
-- Validates tool names against the tool registry
-- Returns structured execution output
-- Returns execution metadata
-- Handles unknown or unsupported tools safely
-- Supports the initial `rag.retrieve` tool
-
-Initial executable tool:
-
-- `rag.retrieve`
-
-This service is the foundation for future agent tool calling, where agents will decide which tool to call during multi-step workflows.
-
-## Agent Tool Calling
-
-The agent runtime can execute explicit tool calls during an agent run.
-
-    POST /agents/run
-
-Current behavior:
-
-- Accepts explicit tool calls in the agent request
-- Executes tools through the controlled tool execution service
-- Adds tool execution results to the agent trace
-- Handles tool execution failures safely
-- Returns completed or failed agent run status
-- Supports the initial `rag.retrieve` tool call
-
-This is the first step toward autonomous tool usage. Future steps will add LLM-based planning and automatic tool selection.
-
-## Requirement Analysis Tool
-
-The agent tool execution service supports a requirement analysis tool.
-
-    requirements.analyze
-
-Current behavior:
-
-- Receives a software requirement
-- Validates the tool input
-- Executes the requirement analysis service
-- Returns structured analysis output
-- Can be executed directly through the tool execution endpoint
-- Can be called during an agent run
-
-This tool allows agents to analyze requirements and identify business rules, risks, acceptance criteria and test scenarios.
-
-## Status
-
-This project is currently in the M4 - AI Agents phase.
-M3 delivered a complete RAG Knowledge Assistant foundation, including ingestion, extraction, chunking, embeddings, vector search, retrieval, answer generation, citations and deterministic evaluation.
-
-## Next Phase — M4 — AI Agents
-
-The next phase will introduce AI agent capabilities on top of the LLM and RAG foundations.
-
-M4 will focus on:
-
-- Agent architecture
-- Tool usage
-- Task planning
-- Multi-step reasoning workflows
-- Integration with RAG retrieval
-- Agent execution boundaries
-- Safety and observability for agent behavior
-
-The goal of M4 is to evolve the project from a structured AI API into an agent-based system capable of using tools, retrieving knowledge and executing multi-step workflows.
+The test suite covers areas such as:
+
+* API behavior;
+* request and response schemas;
+* application settings;
+* LLM providers;
+* provider diagnostics;
+* output normalization;
+* requirement analysis;
+* retry and fallback behavior;
+* document extraction and ingestion;
+* embeddings and vector search;
+* semantic retrieval;
+* RAG answer generation;
+* citations;
+* RAG evaluation;
+* agent runtime;
+* tool registry;
+* tool execution;
+* agent tool calling.
+
+## Continuous Integration
+
+GitHub Actions runs the automated test suite on:
+
+* pull requests targeting `main`;
+* pushes to `main`.
+
+The current CI workflow:
+
+1. checks out the repository;
+2. configures Python 3.12;
+3. installs uv;
+4. synchronizes locked dependencies;
+5. runs pytest.
+
+## Current Limitations
+
+The project is intentionally evolving in small, testable increments.
+
+Current limitations include:
+
+* embeddings are deterministic and local;
+* the vector store is in memory;
+* indexed data is not persisted between application restarts;
+* file extraction is limited to text and Markdown formats;
+* tool selection is explicitly supplied in agent requests;
+* the agent does not yet autonomously plan with an LLM;
+* `rag.answer` is registered but does not yet have an agent execution handler;
+* agent memory, approval workflows and safety limits are not implemented yet;
+* the current Requirement Analysis Tool uses a deterministic provider in its default handler.
+
+These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
+
+## Next Milestone: QA Agent
+
+The next M4 milestone is the first specialized QA Agent.
+
+It will build on the existing:
+
+* agent runtime;
+* execution trace;
+* Tool Registry;
+* Tool Execution Service;
+* RAG Retrieval Tool;
+* Requirement Analysis Tool.
+
+The QA Agent will coordinate these capabilities around a quality-engineering objective instead of requiring the API consumer to manually compose each isolated tool call.
+
+Later M4 milestones will introduce:
+
+* LLM-based planning;
+* automatic tool selection;
+* multi-step execution;
+* memory and state;
+* human approval;
+* safety limits;
+* execution logs;
+* agent evaluation.
+
+## Engineering Approach
+
+Each capability follows the same development cycle:
+
+```text
+Understand the problem
+        ↓
+Define contracts and schemas
+        ↓
+Implement a small vertical slice
+        ↓
+Add deterministic tests
+        ↓
+Expose the capability through the API
+        ↓
+Document architectural decisions
+        ↓
+Integrate it into larger workflows
+```
+
+The repository favors explicit abstractions and controlled execution over hidden framework behavior.
+
+## Documentation
+
+* [Roadmap](ROADMAP.md)
+* [Changelog](CHANGELOG.md)
+* [Contributing Guide](CONTRIBUTING.md)
+* [Initial Architecture](docs/architecture/initial-architecture.md)
+* [Architecture Decision Records](docs/adr/)
+* [Study Notes](docs/study-notes/)
+
+## Learning Goals
+
+By the end of the roadmap, the project aims to demonstrate practical experience with:
+
+* Applied AI system architecture;
+* LLM provider integration;
+* prompt and structured-output engineering;
+* RAG pipelines;
+* vector retrieval;
+* AI agents and tool use;
+* Model Context Protocol;
+* multi-agent orchestration;
+* AI evaluation and testing;
+* LLMOps and observability;
+* AI security and governance;
+* CI/CD for AI applications;
+* production-oriented engineering practices.
+
+## Project Nature
+
+This repository is an educational and portfolio project developed incrementally.
+
+It is production-oriented, but it should not be considered a complete production system yet. Each module introduces additional reliability, persistence, observability, security and operational capabilities.
