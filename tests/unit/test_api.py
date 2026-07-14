@@ -626,3 +626,62 @@ def test_rag_evaluate_endpoint_should_validate_blank_answer() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_rag_retrieve_endpoint_should_return_retrieved_chunks() -> None:
+    payload = {
+        "query": "boleto cobrança",
+        "documents": [
+            {
+                "source": "billing-doc",
+                "title": "Billing",
+                "document_text": "boleto cobrança vencimento pagamento dívida",
+                "metadata": {
+                    "domain": "billing"
+                },
+            },
+            {
+                "source": "auth-doc",
+                "title": "Authentication",
+                "document_text": "login senha autenticação usuário sessão",
+                "metadata": {
+                    "domain": "auth"
+                },
+            },
+        ],
+        "top_k": 1,
+        "chunk_size": 200,
+        "chunk_overlap": 40,
+    }
+
+    response = client.post("/rag/retrieve", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["query"] == "boleto cobrança"
+    assert body["total_indexed_chunks"] == 2
+    assert body["total_retrieved_chunks"] == 1
+    assert body["retrieved_chunks"][0]["metadata"]["source"] == "billing-doc"
+
+
+def test_rag_retrieve_endpoint_should_validate_blank_query() -> None:
+    payload = {
+        "query": "   ",
+        "documents": [
+            {
+                "source": "doc-1",
+                "document_text": "Texto válido.",
+            }
+        ],
+    }
+
+    response = client.post("/rag/retrieve", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."
