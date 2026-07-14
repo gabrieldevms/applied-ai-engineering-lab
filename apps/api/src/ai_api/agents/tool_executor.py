@@ -3,7 +3,6 @@ import json
 import re
 from collections.abc import Mapping
 from typing import Any, Protocol
-
 from ai_api.agents.exceptions import ToolExecutionError
 from ai_api.agents.schemas import ToolExecutionResponse
 from ai_api.agents.tool_registry import ToolRegistry

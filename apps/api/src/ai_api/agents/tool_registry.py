@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-
 from ai_api.agents.schemas import ToolDefinition, ToolRegistryResponse
 
 

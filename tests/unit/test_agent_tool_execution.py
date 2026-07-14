@@ -1,5 +1,4 @@
 import pytest
-
 from ai_api.agents import ToolExecutionError, ToolExecutionService
 
 

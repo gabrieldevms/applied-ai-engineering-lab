@@ -496,6 +496,7 @@ def run_agent(
         context=payload.context,
         max_steps=payload.max_steps,
         metadata=payload.metadata,
+        tool_calls=payload.tool_calls,
     )
 
 

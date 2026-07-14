@@ -1,6 +1,5 @@
 import pytest
 from pydantic import ValidationError
-
 from ai_api.agents import ToolDefinition, ToolRegistry
 
 
