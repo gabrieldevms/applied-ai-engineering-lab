@@ -17,6 +17,7 @@ from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
     ToolExecutionService,
     ToolHandler,
+    RequirementAnalysisTool,
 )
 from ai_api.agents.tool_registry import ToolRegistry
 
@@ -38,4 +39,5 @@ __all__ = [
     "ToolRegistry",
     "ToolRegistryResponse",
     "AgentToolCall",
+    "RequirementAnalysisTool",
 ]

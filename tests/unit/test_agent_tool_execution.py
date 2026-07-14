@@ -102,3 +102,35 @@ def test_tool_execution_service_should_reject_blank_tool_name() -> None:
             tool_name="   ",
             arguments={},
         )
+
+
+def test_tool_execution_service_should_execute_requirement_analysis_tool() -> None:
+    service = ToolExecutionService()
+
+    response = service.execute(
+        tool_name="requirements.analyze",
+        arguments={
+            "requirement_text": (
+                "Como cliente, quero renegociar minha dívida para gerar "
+                "um boleto atualizado."
+            ),
+            "language": "pt-BR",
+        },
+        metadata={
+            "requested_by": "agent",
+        },
+    )
+
+    assert response.status == "completed"
+    assert response.tool_name == "requirements.analyze"
+    assert response.execution_id.startswith(
+        "tool-execution-requirements-analyze-"
+    )
+    assert response.output["summary"]
+    assert "business_rules" in response.output
+    assert "acceptance_criteria" in response.output
+    assert "risks" in response.output
+    assert "positive_test_scenarios" in response.output
+    assert response.metadata["requested_by"] == "agent"
+    assert response.metadata["tool_category"] == "qa"
+    assert response.metadata["requires_llm"] is True

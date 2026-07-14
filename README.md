@@ -700,6 +700,23 @@ Current behavior:
 
 This is the first step toward autonomous tool usage. Future steps will add LLM-based planning and automatic tool selection.
 
+## Requirement Analysis Tool
+
+The agent tool execution service supports a requirement analysis tool.
+
+    requirements.analyze
+
+Current behavior:
+
+- Receives a software requirement
+- Validates the tool input
+- Executes the requirement analysis service
+- Returns structured analysis output
+- Can be executed directly through the tool execution endpoint
+- Can be called during an agent run
+
+This tool allows agents to analyze requirements and identify business rules, risks, acceptance criteria and test scenarios.
+
 ## Status
 
 This project is currently in the M4 - AI Agents phase.

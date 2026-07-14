@@ -138,3 +138,32 @@ def test_agent_runtime_should_return_failed_status_when_tool_call_fails() -> Non
         == "Tool is not registered: unknown.tool"
     )
     assert "failed while calling a tool" in response.final_answer
+
+
+def test_agent_runtime_should_execute_requirement_analysis_tool_call() -> None:
+    runtime = AgentRuntime()
+
+    response = runtime.run(
+        objective="Analisar requisito de renegociação de dívida.",
+        max_steps=4,
+        tool_calls=[
+            AgentToolCall(
+                tool_name="requirements.analyze",
+                arguments={
+                    "requirement_text": (
+                        "Como cliente, quero renegociar minha dívida para "
+                        "gerar um boleto atualizado."
+                    ),
+                    "language": "pt-BR",
+                },
+            )
+        ],
+    )
+
+    assert response.status == "completed"
+    assert response.metadata["requested_tool_calls"] == 1
+    assert response.steps[2].name == "tool_call:requirements.analyze"
+    assert response.steps[2].status == "completed"
+    assert response.steps[2].output["tool_name"] == "requirements.analyze"
+    assert response.steps[2].output["output"]["summary"]
+    assert "risks" in response.steps[2].output["output"]
