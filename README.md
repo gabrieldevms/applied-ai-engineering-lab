@@ -623,9 +623,27 @@ Current behavior:
 
 This service separates retrieval from answer generation and prepares the project for agent workflows.
 
+## AI Agents
+
+The project includes the initial foundation for controlled AI agent execution.
+
+    POST /agents/run
+
+Current behavior:
+
+- Agent runtime foundation
+- Agent request and response schemas
+- Deterministic agent execution
+- Step-by-step execution trace
+- Optional context handling
+- Execution metadata
+
+This is the first step toward tool-using agents that can plan, retrieve context, call internal services and execute multi-step workflows.
+
 ## Status
 
-This project is currently in the RAG Knowledge Assistant phase.
+This project is currently in the M4 - AI Agents phase.
+M3 delivered a complete RAG Knowledge Assistant foundation, including ingestion, extraction, chunking, embeddings, vector search, retrieval, answer generation, citations and deterministic evaluation.
 
 ## Next Phase — M4 — AI Agents
 
