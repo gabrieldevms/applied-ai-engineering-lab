@@ -88,8 +88,8 @@ Goal: build a document-based AI assistant.
 - [x] RAG answer citations
 - [x] RAG evaluation service
 - [x] RAG evaluation API endpoint
-- [x] Deterministic evaluation metrics
 - [x] Retrieval service
+- [x] Deterministic evaluation metrics
 
 ## M4 — AI Agents
 
