@@ -168,3 +168,50 @@ class DocumentFileIngestionResponse(BaseModel):
     total_chunks: int
     chunks: list[DocumentChunk]
     extraction_metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class TextEmbeddingRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    texts: list[str] = Field(
+        min_length=1,
+        max_length=100,
+        description="Texts to be embedded.",
+    )
+
+    @field_validator("texts")
+    @classmethod
+    def texts_cannot_contain_blank_values(
+        cls,
+        values: list[str],
+    ) -> list[str]:
+        cleaned_values = []
+
+        for value in values:
+            cleaned_value = value.strip()
+
+            if not cleaned_value:
+                raise ValueError("texts cannot contain blank values")
+
+            cleaned_values.append(cleaned_value)
+
+        return cleaned_values
+
+
+class TextEmbedding(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    embedding_id: str
+    text: str
+    vector: list[float]
+    dimensions: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class TextEmbeddingResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    provider: str
+    model: str
+    total_embeddings: int
+    embeddings: list[TextEmbedding]

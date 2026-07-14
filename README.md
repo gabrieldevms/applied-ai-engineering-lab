@@ -485,23 +485,26 @@ Current behavior:
 
 Future steps will include PDF, DOCX and other document formats.
 
+## RAG Embeddings
+
+The API includes a basic embedding endpoint.
+
+    POST /rag/embed
+
+It receives one or more texts and returns deterministic embedding vectors.
+
+Current behavior:
+
+- Embedding provider abstraction
+- Fake deterministic embedding provider
+- Keyword hashing strategy
+- Configurable embedding dimensions
+- Structured embedding response
+
+The fake provider is useful for local development and tests.
+Future providers may include Ollama, OpenAI or other embedding APIs.
+
 ## Status
 
-This project is currently in the foundation phase.
+This project is currently in the RAG Knowledge Assistant phase.
 
-## Next Phase — M2: LLM Engineering
-
-The next phase introduces LLM Engineering concepts and implementation practices.
-
-M2 will focus on:
-
-* LLM provider integration
-* Prompt templates
-* Structured outputs
-* JSON schema validation
-* Retry strategy
-* Fallback strategy
-* Requirement analysis with LLMs
-* LLM response testing
-
-The goal of M2 is to evolve the deterministic `/analyze` endpoint into the foundation for intelligent and structured AI-powered analysis.
