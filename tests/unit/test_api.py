@@ -892,3 +892,38 @@ def test_agents_run_endpoint_should_return_failed_status_for_invalid_tool_call()
         body["steps"][2]["output"]["error"]
         == "Tool is not registered: unknown.tool"
     )
+
+
+def test_agents_tools_execute_endpoint_should_execute_requirement_analysis() -> None:
+    payload = {
+        "tool_name": "requirements.analyze",
+        "arguments": {
+            "requirement_text": (
+                "Como cliente, quero renegociar minha dívida para gerar "
+                "um boleto atualizado."
+            ),
+            "language": "pt-BR",
+        },
+        "metadata": {
+            "requested_by": "api-test"
+        },
+    }
+
+    response = client.post("/agents/tools/execute", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "completed"
+    assert body["tool_name"] == "requirements.analyze"
+    assert body["execution_id"].startswith(
+        "tool-execution-requirements-analyze-"
+    )
+    assert body["output"]["summary"]
+    assert "business_rules" in body["output"]
+    assert "risks" in body["output"]
+    assert "acceptance_criteria" in body["output"]
+    assert body["metadata"]["requested_by"] == "api-test"
+    assert body["metadata"]["tool_category"] == "qa"
+    assert body["metadata"]["requires_llm"] is True

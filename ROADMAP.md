@@ -102,7 +102,7 @@ Goal: build controlled AI agents capable of planning, using tools and executing 
 - [x] Tool execution service
 - [x] Tool calling
 - [x] RAG retrieval tool
-- [ ] Requirement analysis tool
+- [x] Requirement analysis tool
 - [ ] QA agent
 - [ ] Agent planning with LLM
 - [ ] Multi-step agent execution

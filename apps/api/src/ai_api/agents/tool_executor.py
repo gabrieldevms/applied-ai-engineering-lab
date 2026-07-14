@@ -7,6 +7,13 @@ from ai_api.agents.exceptions import ToolExecutionError
 from ai_api.agents.schemas import ToolExecutionResponse
 from ai_api.agents.tool_registry import ToolRegistry
 from ai_api.rag import RetrievalRequest, RetrievalService
+from ai_api.llm import FakeLLMProvider
+from ai_api.requirements.fake_responses import (
+    DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
+)
+from ai_api.requirements.retry import RetryConfig
+from ai_api.requirements.schemas import RequirementAnalysisRequest
+from ai_api.requirements.services import RequirementAnalyzerService
 
 
 class ToolHandler(Protocol):
@@ -38,6 +45,31 @@ class RAGRetrieveTool:
         )
 
         return response.model_dump(mode="json")
+    
+
+class RequirementAnalysisTool:
+    tool_name = "requirements.analyze"
+
+    def __init__(
+        self,
+        analyzer_service: RequirementAnalyzerService | None = None,
+    ) -> None:
+        self.analyzer_service = analyzer_service or RequirementAnalyzerService(
+            llm_provider=FakeLLMProvider(
+                response_content=DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
+            ),
+            retry_config=RetryConfig(max_attempts=2),
+        )
+
+    def execute(self, arguments: Mapping[str, Any]) -> dict[str, Any]:
+        payload = RequirementAnalysisRequest.model_validate(arguments)
+
+        response = self.analyzer_service.analyze(
+            requirement_text=payload.requirement_text,
+            language=payload.language,
+        )
+
+        return response.model_dump(mode="json")
 
 
 class ToolExecutionService:
@@ -51,6 +83,7 @@ class ToolExecutionService:
             handlers
             or {
                 RAGRetrieveTool.tool_name: RAGRetrieveTool(),
+                RequirementAnalysisTool.tool_name: RequirementAnalysisTool(),
             }
         )
 
