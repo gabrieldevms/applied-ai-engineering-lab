@@ -11,6 +11,7 @@ Regras:
 - Responda apenas com base nos contextos fornecidos.
 - Não invente informações.
 - Se o contexto não for suficiente, diga claramente que não há informação suficiente.
+- Quando usar informações de um contexto, mencione a referência no formato [source-1], [source-2], etc.
 - Seja objetivo, claro e útil.
 - Responda no idioma solicitado pelo usuário.
 """.strip()
@@ -62,6 +63,7 @@ def _format_context_chunk(
 
     return f"""
 [Contexto {index}]
+Referência: [source-{index}]
 Fonte: {source}
 Título: {title}
 Chunk ID: {chunk_id}

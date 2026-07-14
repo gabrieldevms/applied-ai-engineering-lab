@@ -6,6 +6,7 @@ from ai_api.rag.schemas import (
     SemanticSearchDocument,
 )
 from ai_api.rag.semantic_search import SemanticSearchService
+from ai_api.rag.citations import build_source_citations
 
 
 class RAGAnswerService:
@@ -58,6 +59,8 @@ class RAGAnswerService:
             raise RAGAnswerGenerationError(
                 "LLM provider returned an empty answer."
             )
+        
+        citations = build_source_citations(search_response.results)
 
         return RAGAnswerResponse(
             query=search_response.query,
@@ -66,6 +69,7 @@ class RAGAnswerService:
             model=llm_response.model,
             total_context_chunks=len(search_response.results),
             context_chunks=search_response.results,
+            citations=citations,
             metadata={
                 "total_indexed_chunks": search_response.total_indexed_chunks,
                 "language": language,

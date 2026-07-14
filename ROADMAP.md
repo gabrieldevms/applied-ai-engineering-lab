@@ -59,7 +59,7 @@ Goal: build a document-based AI assistant.
 - [x] Vector database
 - [x] Semantic search
 - [x] RAG answer generation
-- [ ] Source citation
+- [x] Source citation
 - [ ] RAG evaluation
 
 ### Technical breakdown
@@ -84,6 +84,8 @@ Goal: build a document-based AI assistant.
 - [x] RAG answer prompt
 - [x] RAG answer generation service
 - [x] RAG answer API endpoint
+- [x] Source citation builder
+- [x] RAG answer citations
 - [ ] Retrieval service
 
 ## M4 — AI Agents

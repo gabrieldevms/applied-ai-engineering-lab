@@ -401,6 +401,18 @@ class RAGAnswerRequest(BaseModel):
         return self
 
 
+class SourceCitation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    citation_id: str = Field(min_length=1)
+    source: str = Field(min_length=1)
+    title: str | None = None
+    chunk_id: str = Field(min_length=1)
+    excerpt: str = Field(min_length=1)
+    score: float
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class RAGAnswerResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -410,4 +422,5 @@ class RAGAnswerResponse(BaseModel):
     model: str
     total_context_chunks: int
     context_chunks: list[VectorSearchResult]
+    citations: list[SourceCitation] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
