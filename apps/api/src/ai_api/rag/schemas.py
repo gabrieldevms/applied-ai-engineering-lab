@@ -215,3 +215,31 @@ class TextEmbeddingResponse(BaseModel):
     model: str
     total_embeddings: int
     embeddings: list[TextEmbedding]
+
+
+class VectorRecord(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    record_id: str = Field(min_length=1)
+    text: str = Field(min_length=1)
+    vector: list[float] = Field(min_length=1)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("record_id", "text")
+    @classmethod
+    def required_text_fields_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("value cannot be blank")
+
+        return cleaned_value
+
+
+class VectorSearchResult(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    record_id: str
+    text: str
+    score: float
+    metadata: dict[str, Any] = Field(default_factory=dict)

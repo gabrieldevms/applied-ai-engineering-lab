@@ -20,8 +20,11 @@ from ai_api.rag.schemas import (
     TextEmbeddingRequest,
     TextEmbeddingResponse,
     TextExtractionResponse,
+    VectorRecord,
+    VectorSearchResult,
 )
 from ai_api.rag.text_extraction import TextExtractionService
+from ai_api.rag.vector_store import InMemoryVectorStore, VectorStore
 
 
 __all__ = [
@@ -46,4 +49,8 @@ __all__ = [
     "TextExtractionResponse",
     "TextExtractionService",
     "parse_metadata_json",
+    "InMemoryVectorStore",
+    "VectorRecord",
+    "VectorSearchResult",
+    "VectorStore",
 ]
