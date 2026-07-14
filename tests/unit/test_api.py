@@ -561,3 +561,68 @@ def test_rag_answer_endpoint_should_validate_blank_query() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_rag_evaluate_endpoint_should_return_evaluation_result() -> None:
+    payload = {
+        "query": "Como o cliente pode gerar boleto?",
+        "answer": "O cliente pode gerar boleto atualizado após renegociar a dívida [source-1].",
+        "context_chunks": [
+            {
+                "record_id": "requirement-001-0",
+                "text": "Após renegociar a dívida, o cliente pode gerar um boleto atualizado.",
+                "score": 0.9,
+                "metadata": {
+                    "source": "requirement-001",
+                    "chunk_id": "requirement-001-0"
+                }
+            }
+        ],
+        "citations": [
+            {
+                "citation_id": "source-1",
+                "source": "requirement-001",
+                "title": "Renegociação",
+                "chunk_id": "requirement-001-0",
+                "excerpt": "Após renegociar a dívida, o cliente pode gerar um boleto atualizado.",
+                "score": 0.9,
+                "metadata": {}
+            }
+        ],
+        "minimum_overall_score": 0.6
+    }
+
+    response = client.post("/rag/evaluate", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["passed"] is True
+    assert body["overall_score"] >= 0.6
+    assert len(body["metrics"]) == 4
+    assert body["metadata"]["total_context_chunks"] == 1
+
+
+def test_rag_evaluate_endpoint_should_validate_blank_answer() -> None:
+    payload = {
+        "query": "Pergunta válida?",
+        "answer": "   ",
+        "context_chunks": [
+            {
+                "record_id": "chunk-1",
+                "text": "Texto válido.",
+                "score": 0.8,
+                "metadata": {}
+            }
+        ]
+    }
+
+    response = client.post("/rag/evaluate", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."

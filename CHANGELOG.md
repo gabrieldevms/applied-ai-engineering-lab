@@ -108,3 +108,10 @@ All notable changes to this project will be documented in this file.
 - Citations in RAG answer responses
 - Citation-aware RAG answer prompt instructions
 - Unit tests for source citations
+- Deterministic RAG evaluation service
+- RAG evaluation API endpoint
+- Context relevance metric
+- Answer groundedness metric
+- Query alignment metric
+- Citation coverage metric
+- Unit and API tests for RAG evaluation
