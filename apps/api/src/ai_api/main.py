@@ -39,6 +39,9 @@ from ai_api.rag import (
     RAGAnswerResponse,
     RAGAnswerService,
     get_rag_answer_service,
+    RAGEvaluationRequest,
+    RAGEvaluationResponse,
+    RAGEvaluationService,
 )
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.exceptions import RequirementAnalysisError
@@ -412,4 +415,19 @@ def generate_rag_answer(
         top_k=payload.top_k,
         chunk_size=payload.chunk_size,
         chunk_overlap=payload.chunk_overlap,
+    )
+
+
+@app.post("/rag/evaluate", response_model=RAGEvaluationResponse)
+def evaluate_rag_answer(
+    payload: RAGEvaluationRequest,
+) -> RAGEvaluationResponse:
+    evaluation_service = RAGEvaluationService()
+
+    return evaluation_service.evaluate(
+        query=payload.query,
+        answer=payload.answer,
+        context_chunks=payload.context_chunks,
+        citations=payload.citations,
+        minimum_overall_score=payload.minimum_overall_score,
     )

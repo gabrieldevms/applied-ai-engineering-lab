@@ -424,3 +424,42 @@ class RAGAnswerResponse(BaseModel):
     context_chunks: list[VectorSearchResult]
     citations: list[SourceCitation] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RAGEvaluationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    query: str = Field(min_length=1)
+    answer: str = Field(min_length=1)
+    context_chunks: list[VectorSearchResult] = Field(min_length=1)
+    citations: list[SourceCitation] = Field(default_factory=list)
+    minimum_overall_score: float = Field(default=0.6, ge=0, le=1)
+
+    @field_validator("query", "answer")
+    @classmethod
+    def required_text_fields_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("value cannot be blank")
+
+        return cleaned_value
+
+
+class RAGEvaluationMetric(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    score: float
+    passed: bool
+    details: str
+
+
+class RAGEvaluationResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    overall_score: float
+    passed: bool
+    metrics: list[RAGEvaluationMetric]
+    issues: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)

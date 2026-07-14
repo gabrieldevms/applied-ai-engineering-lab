@@ -578,6 +578,32 @@ Current behavior:
 
 This improves traceability and makes generated answers easier to audit.
 
+## RAG Evaluation
+
+The API includes a deterministic RAG evaluation endpoint.
+
+    POST /rag/evaluate
+
+It evaluates a generated answer using the query, retrieved context chunks and citations.
+
+Current metrics:
+
+- Context relevance
+- Answer groundedness
+- Query alignment
+- Citation coverage
+
+Current behavior:
+
+- Deterministic local evaluation
+- No external LLM dependency
+- Pass/fail result
+- Overall score
+- Metric-level details
+- Issue reporting
+
+Future improvements may include LLM-as-judge evaluation, golden datasets and regression evaluation suites.
+
 ## Status
 
 This project is currently in the RAG Knowledge Assistant phase.

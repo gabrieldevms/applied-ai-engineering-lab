@@ -27,6 +27,9 @@ from ai_api.rag.schemas import (
     RAGAnswerRequest,
     RAGAnswerResponse,
     SourceCitation,
+    RAGEvaluationRequest,
+    RAGEvaluationResponse,
+    RAGEvaluationMetric,
 )
 from ai_api.rag.text_extraction import TextExtractionService
 from ai_api.rag.vector_store import InMemoryVectorStore, VectorStore
@@ -43,6 +46,7 @@ from ai_api.rag.prompts import (
     build_rag_answer_messages,
 )
 from ai_api.rag.citations import build_source_citations
+from ai_api.rag.evaluation import RAGEvaluationService
 
 
 __all__ = [
@@ -83,5 +87,9 @@ __all__ = [
     "build_rag_answer_messages",
     "get_rag_answer_service",
     "SourceCitation",
-    "build_source_citations"
+    "build_source_citations",
+    "RAGEvaluationRequest",
+    "RAGEvaluationResponse",
+    "RAGEvaluationMetric",
+    "RAGEvaluationService",
 ]
