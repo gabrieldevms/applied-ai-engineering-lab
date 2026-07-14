@@ -662,6 +662,27 @@ Initial tools:
 
 The registry does not execute tools yet. Tool execution will be added in the next M4 step.
 
+## Agent Tool Execution
+
+The project includes a controlled tool execution service for AI agents.
+
+    POST /agents/tools/execute
+
+Current behavior:
+
+- Executes registered tools through explicit handlers
+- Validates tool names against the tool registry
+- Returns structured execution output
+- Returns execution metadata
+- Handles unknown or unsupported tools safely
+- Supports the initial `rag.retrieve` tool
+
+Initial executable tool:
+
+- `rag.retrieve`
+
+This service is the foundation for future agent tool calling, where agents will decide which tool to call during multi-step workflows.
+
 ## Status
 
 This project is currently in the M4 - AI Agents phase.

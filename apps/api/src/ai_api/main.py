@@ -60,6 +60,10 @@ from ai_api.agents import (
     AgentRuntime,
     ToolRegistry,
     ToolRegistryResponse,
+    ToolExecutionError,
+    ToolExecutionRequest,
+    ToolExecutionResponse,
+    ToolExecutionService,
 )
 
 
@@ -98,6 +102,29 @@ async def log_requests(
     )
 
     return response
+
+
+@app.exception_handler(ToolExecutionError)
+async def tool_execution_exception_handler(
+    request: Request,
+    exc: ToolExecutionError,
+) -> JSONResponse:
+    logger.warning(
+        "Tool execution error on %s %s: %s",
+        request.method,
+        request.url.path,
+        str(exc),
+    )
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": {
+                "type": "tool_execution_error",
+                "message": str(exc),
+            }
+        },
+    )
 
 
 @app.exception_handler(RAGAnswerGenerationError)
@@ -477,3 +504,16 @@ def list_agent_tools() -> ToolRegistryResponse:
     tool_registry = ToolRegistry()
 
     return tool_registry.describe()
+
+
+@app.post("/agents/tools/execute", response_model=ToolExecutionResponse)
+def execute_agent_tool(
+    payload: ToolExecutionRequest,
+) -> ToolExecutionResponse:
+    tool_execution_service = ToolExecutionService()
+
+    return tool_execution_service.execute(
+        tool_name=payload.tool_name,
+        arguments=payload.arguments,
+        metadata=payload.metadata,
+    )

@@ -99,9 +99,9 @@ Goal: build controlled AI agents capable of planning, using tools and executing 
 - [x] Agent request/response schemas
 - [x] Agent execution trace
 - [x] Tool registry
-- [ ] Tool execution service
+- [x] Tool execution service
 - [ ] Tool calling
-- [ ] RAG retrieval tool
+- [x] RAG retrieval tool
 - [ ] Requirement analysis tool
 - [ ] QA agent
 - [ ] Agent planning with LLM

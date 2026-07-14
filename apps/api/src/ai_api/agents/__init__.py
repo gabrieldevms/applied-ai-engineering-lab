@@ -1,3 +1,4 @@
+from ai_api.agents.exceptions import ToolExecutionError
 from ai_api.agents.runtime import AgentRuntime
 from ai_api.agents.schemas import (
     AgentRunRequest,
@@ -6,7 +7,15 @@ from ai_api.agents.schemas import (
     AgentStep,
     AgentStepStatus,
     ToolDefinition,
+    ToolExecutionRequest,
+    ToolExecutionResponse,
+    ToolExecutionStatus,
     ToolRegistryResponse,
+)
+from ai_api.agents.tool_executor import (
+    RAGRetrieveTool,
+    ToolExecutionService,
+    ToolHandler,
 )
 from ai_api.agents.tool_registry import ToolRegistry
 
@@ -17,7 +26,14 @@ __all__ = [
     "AgentRuntime",
     "AgentStep",
     "AgentStepStatus",
+    "RAGRetrieveTool",
     "ToolDefinition",
+    "ToolExecutionError",
+    "ToolExecutionRequest",
+    "ToolExecutionResponse",
+    "ToolExecutionService",
+    "ToolExecutionStatus",
+    "ToolHandler",
     "ToolRegistry",
     "ToolRegistryResponse",
 ]

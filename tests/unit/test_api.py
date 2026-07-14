@@ -743,3 +743,69 @@ def test_agents_tools_endpoint_should_list_available_tools() -> None:
     assert "rag.answer" in tool_names
     assert "requirements.analyze" in tool_names
     assert body["metadata"]["registry"] == "agent-tool-registry-v1"
+
+
+def test_agents_tools_execute_endpoint_should_execute_rag_retrieve() -> None:
+    payload = {
+        "tool_name": "rag.retrieve",
+        "arguments": {
+            "query": "boleto cobrança",
+            "documents": [
+                {
+                    "source": "billing-doc",
+                    "title": "Cobrança",
+                    "document_text": "boleto cobrança vencimento pagamento dívida",
+                    "metadata": {
+                        "domain": "billing"
+                    },
+                },
+                {
+                    "source": "auth-doc",
+                    "title": "Autenticação",
+                    "document_text": "login senha autenticação usuário sessão",
+                    "metadata": {
+                        "domain": "auth"
+                    },
+                },
+            ],
+            "top_k": 1,
+            "chunk_size": 200,
+            "chunk_overlap": 40,
+        },
+        "metadata": {
+            "requested_by": "api-test"
+        },
+    }
+
+    response = client.post("/agents/tools/execute", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "completed"
+    assert body["tool_name"] == "rag.retrieve"
+    assert body["execution_id"].startswith("tool-execution-rag-retrieve-")
+    assert body["output"]["query"] == "boleto cobrança"
+    assert body["output"]["total_retrieved_chunks"] == 1
+    assert (
+        body["output"]["retrieved_chunks"][0]["metadata"]["source"]
+        == "billing-doc"
+    )
+    assert body["metadata"]["requested_by"] == "api-test"
+
+
+def test_agents_tools_execute_endpoint_should_return_error_for_unknown_tool() -> None:
+    payload = {
+        "tool_name": "unknown.tool",
+        "arguments": {},
+    }
+
+    response = client.post("/agents/tools/execute", json=payload)
+
+    assert response.status_code == 400
+
+    body = response.json()
+
+    assert body["error"]["type"] == "tool_execution_error"
+    assert body["error"]["message"] == "Tool is not registered: unknown.tool"
