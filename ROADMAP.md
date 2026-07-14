@@ -93,14 +93,24 @@ Goal: build a document-based AI assistant.
 
 ## M4 — AI Agents
 
-Goal: build AI agents with tools and controlled execution.
+Goal: build controlled AI agents capable of planning, using tools and executing multi-step workflows.
 
+- [x] Agent runtime foundation
+- [x] Agent request/response schemas
+- [x] Agent execution trace
+- [ ] Tool registry
+- [ ] Tool execution service
 - [ ] Tool calling
-- [ ] Agent service
+- [ ] RAG retrieval tool
+- [ ] Requirement analysis tool
 - [ ] QA agent
+- [ ] Agent planning with LLM
+- [ ] Multi-step agent execution
 - [ ] Memory and state
 - [ ] Human approval flow
 - [ ] Agent execution logs
+- [ ] Agent safety limits
+- [ ] Agent evaluation
 
 ## M5 — MCP QA Server
 

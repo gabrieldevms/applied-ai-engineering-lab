@@ -119,3 +119,8 @@ All notable changes to this project will be documented in this file.
 - Retrieval API endpoint
 - Reusable retrieval layer for semantic search and future agent workflows
 - Unit and API tests for retrieval
+- Agent runtime foundation
+- Agent request and response schemas
+- Agent execution trace
+- Agent run API endpoint
+- Unit and API tests for agent runtime

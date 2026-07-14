@@ -54,6 +54,7 @@ from ai_api.requirements.schemas import (
 )
 from ai_api.requirements.services import RequirementAnalyzerService
 from ai_api.schemas import AnalyzeRequest, AnalyzeResponse
+from ai_api.agents import AgentRunRequest, AgentRunResponse, AgentRuntime
 
 
 logging.basicConfig(
@@ -448,4 +449,18 @@ def retrieve_context(
         top_k=payload.top_k,
         chunk_size=payload.chunk_size,
         chunk_overlap=payload.chunk_overlap,
+    )
+
+
+@app.post("/agents/run", response_model=AgentRunResponse)
+def run_agent(
+    payload: AgentRunRequest,
+) -> AgentRunResponse:
+    agent_runtime = AgentRuntime()
+
+    return agent_runtime.run(
+        objective=payload.objective,
+        context=payload.context,
+        max_steps=payload.max_steps,
+        metadata=payload.metadata,
     )

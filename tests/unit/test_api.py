@@ -685,3 +685,42 @@ def test_rag_retrieve_endpoint_should_validate_blank_query() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_agents_run_endpoint_should_complete_agent_run() -> None:
+    payload = {
+        "objective": "Analyze a requirement and identify risks.",
+        "context": "The requirement is about boleto generation.",
+        "max_steps": 3,
+        "metadata": {
+            "domain": "qa"
+        }
+    }
+
+    response = client.post("/agents/run", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "completed"
+    assert body["run_id"].startswith("agent-run-")
+    assert body["objective"] == "Analyze a requirement and identify risks."
+    assert len(body["steps"]) == 3
+    assert body["metadata"]["domain"] == "qa"
+    assert body["metadata"]["has_context"] is True
+
+
+def test_agents_run_endpoint_should_validate_blank_objective() -> None:
+    payload = {
+        "objective": "   "
+    }
+
+    response = client.post("/agents/run", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."
