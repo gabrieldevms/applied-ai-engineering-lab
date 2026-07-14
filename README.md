@@ -504,7 +504,40 @@ Current behavior:
 The fake provider is useful for local development and tests.
 Future providers may include Ollama, OpenAI or other embedding APIs.
 
+## RAG Vector Store
+
+The project includes a basic vector store foundation.
+
+Current behavior:
+
+- Vector store abstraction
+- In-memory vector store implementation
+- Vector record upsert
+- Vector record lookup
+- Cosine similarity search
+- Ranked search results
+
+The current implementation is local and in-memory.
+It is useful for development, tests and architecture validation.
+
+Future implementations may include persistent vector databases such as Qdrant, Chroma, pgvector or other vector search backends.
+
 ## Status
 
 This project is currently in the RAG Knowledge Assistant phase.
 
+## Next Phase — M4 — AI Agents
+
+The next phase will introduce AI agent capabilities on top of the LLM and RAG foundations.
+
+M4 will focus on:
+
+- Agent architecture
+- Tool usage
+- Task planning
+- Multi-step reasoning workflows
+- Integration with RAG retrieval
+- Agent execution boundaries
+- Safety and observability for agent behavior
+
+The goal of M4 is to evolve the project from a structured AI API into an agent-based system capable of using tools, retrieving knowledge and executing multi-step workflows.

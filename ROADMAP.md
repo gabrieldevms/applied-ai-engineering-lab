@@ -56,7 +56,7 @@ Goal: build a document-based AI assistant.
 - [x] Text extraction
 - [x] Chunking strategy
 - [x] Embeddings
-- [ ] Vector database
+- [x] Vector database
 - [ ] Semantic search
 - [ ] RAG answer generation
 - [ ] Source citation
@@ -76,8 +76,9 @@ Goal: build a document-based AI assistant.
 - [x] Fake embedding provider
 - [x] Embedding service
 - [x] Embedding API endpoint
-- [ ] Vector store abstraction
-- [ ] In-memory vector store
+- [x] Vector store abstraction
+- [x] In-memory vector store
+- [x] Cosine similarity search
 - [ ] Retrieval service
 
 ## M4 — AI Agents

@@ -90,3 +90,7 @@ All notable changes to this project will be documented in this file.
 - Embedding API endpoint
 - Settings for embedding provider and dimensions
 - Unit and API tests for embeddings
+- Vector store abstraction for RAG
+- In-memory vector store implementation
+- Cosine similarity search for vector records
+- Unit tests for vector store behavior
