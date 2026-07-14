@@ -927,3 +927,91 @@ def test_agents_tools_execute_endpoint_should_execute_requirement_analysis() -> 
     assert body["metadata"]["requested_by"] == "api-test"
     assert body["metadata"]["tool_category"] == "qa"
     assert body["metadata"]["requires_llm"] is True
+
+
+def test_agents_qa_run_endpoint_should_analyze_requirement() -> None:
+    payload = {
+        "requirement_text": (
+            "Como cliente, quero renegociar minha dívida para gerar "
+            "um boleto atualizado."
+        ),
+        "language": "pt-BR",
+        "max_steps": 4,
+        "metadata": {
+            "domain": "qa"
+        },
+    }
+
+    response = client.post("/agents/qa/run", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "completed"
+    assert body["metadata"]["agent_type"] == "qa-agent-v1"
+    assert body["requirement_analysis"]["summary"]
+    assert body["retrieved_context"] is None
+    assert body["steps"][2]["name"] == "tool_call:requirements.analyze"
+
+
+def test_agents_qa_run_endpoint_should_retrieve_context_and_analyze_requirement() -> None:
+    payload = {
+        "requirement_text": (
+            "Como cliente, quero renegociar minha dívida para gerar "
+            "um boleto atualizado."
+        ),
+        "knowledge_documents": [
+            {
+                "source": "billing-doc",
+                "title": "Cobrança",
+                "document_text": (
+                    "boleto cobrança renegociação dívida pagamento vencimento"
+                ),
+                "metadata": {
+                    "domain": "billing"
+                },
+            },
+            {
+                "source": "auth-doc",
+                "title": "Autenticação",
+                "document_text": "login senha autenticação usuário sessão",
+                "metadata": {
+                    "domain": "auth"
+                },
+            },
+        ],
+        "language": "pt-BR",
+        "top_k": 1,
+        "chunk_size": 200,
+        "chunk_overlap": 40,
+        "max_steps": 5,
+    }
+
+    response = client.post("/agents/qa/run", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "completed"
+    assert body["metadata"]["knowledge_documents"] == 2
+    assert body["retrieved_context"]["total_retrieved_chunks"] == 1
+    assert body["requirement_analysis"]["summary"]
+    assert body["steps"][2]["name"] == "tool_call:rag.retrieve"
+    assert body["steps"][3]["name"] == "tool_call:requirements.analyze"
+
+
+def test_agents_qa_run_endpoint_should_validate_blank_requirement() -> None:
+    payload = {
+        "requirement_text": "   "
+    }
+
+    response = client.post("/agents/qa/run", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."

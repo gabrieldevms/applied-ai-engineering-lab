@@ -64,6 +64,9 @@ from ai_api.agents import (
     ToolExecutionRequest,
     ToolExecutionResponse,
     ToolExecutionService,
+    QAAgentRunRequest,
+    QAAgentRunResponse,
+    QAAgentService,
 )
 
 
@@ -516,5 +519,23 @@ def execute_agent_tool(
     return tool_execution_service.execute(
         tool_name=payload.tool_name,
         arguments=payload.arguments,
+        metadata=payload.metadata,
+    )
+
+
+@app.post("/agents/qa/run", response_model=QAAgentRunResponse)
+def run_qa_agent(
+    payload: QAAgentRunRequest,
+) -> QAAgentRunResponse:
+    qa_agent_service = QAAgentService()
+
+    return qa_agent_service.run(
+        requirement_text=payload.requirement_text,
+        knowledge_documents=payload.knowledge_documents,
+        language=payload.language,
+        top_k=payload.top_k,
+        chunk_size=payload.chunk_size,
+        chunk_overlap=payload.chunk_overlap,
+        max_steps=payload.max_steps,
         metadata=payload.metadata,
     )
