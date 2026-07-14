@@ -541,6 +541,27 @@ Current behavior:
 
 This endpoint validates the full retrieval foundation before adding RAG answer generation.
 
+## RAG Answer Generation
+
+The API includes a RAG answer generation endpoint.
+
+    POST /rag/answer
+
+It receives a query and a set of documents, retrieves the most relevant chunks and generates an answer using the configured LLM provider.
+
+Current behavior:
+
+- Document chunking
+- Fake deterministic embeddings
+- In-memory vector search
+- Context assembly
+- LLM-based answer generation
+- Provider-based LLM execution
+- Retrieved context returned with the answer
+
+The answer generation flow uses the same provider abstraction as the rest of the project.
+Depending on environment configuration, it can use fake, OpenAI or Ollama providers.
+
 ## Status
 
 This project is currently in the RAG Knowledge Assistant phase.

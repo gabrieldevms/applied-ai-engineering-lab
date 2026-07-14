@@ -58,7 +58,7 @@ Goal: build a document-based AI assistant.
 - [x] Embeddings
 - [x] Vector database
 - [x] Semantic search
-- [ ] RAG answer generation
+- [x] RAG answer generation
 - [ ] Source citation
 - [ ] RAG evaluation
 
@@ -81,6 +81,9 @@ Goal: build a document-based AI assistant.
 - [x] Cosine similarity search
 - [x] SemanticSearchService
 - [x] Semantic search API endpoint
+- [x] RAG answer prompt
+- [x] RAG answer generation service
+- [x] RAG answer API endpoint
 - [ ] Retrieval service
 
 ## M4 — AI Agents

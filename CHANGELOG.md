@@ -99,3 +99,8 @@ All notable changes to this project will be documented in this file.
 - Query embedding and document chunk indexing flow
 - Ranked vector search results with metadata
 - Unit and API tests for semantic search
+- RAG answer generation service
+- RAG answer prompt builder
+- RAG answer API endpoint
+- Shared LLM provider factory
+- RAG answer generation tests
