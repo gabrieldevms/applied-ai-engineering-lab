@@ -6,9 +6,9 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 
 ## Project Status
 
-**Current module:** M4 — AI Agents
-**Current milestone:** Agent planning with LLM completed
-**Next milestone:** Automatic tool selection
+**Current module:** M4 — AI Agents  
+**Current milestone:** Automatic tool selection completed  
+**Next milestone:** Multi-step agent execution  
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -224,13 +224,14 @@ http://127.0.0.1:8000/docs
 
 ### Agents
 
-| Method | Endpoint                | Description                                       |
-| ------ | ----------------------- | ---------------------------------------------     |
-| `POST` | `/agents/run`           | Execute an agent run with optional tool calls     |
-| `GET`  | `/agents/tools`         | Describe registered agent tools                   |
-| `POST` | `/agents/tools/execute` | Execute a registered tool through its handler     |
-| `POST` | `/agents/qa/run`        | Execute the specialized QA Agent                  |
-| `POST` | `/agents/plan`          | Generate a structured execution plan for an agent |
+| Method | Endpoint                | Description                                         |
+| ------ | ----------------------- | ---------------------------------------------       |
+| `POST` | `/agents/run`           | Execute an agent run with optional tool calls       |
+| `GET`  | `/agents/tools`         | Describe registered agent tools                     |
+| `POST` | `/agents/tools/execute` | Execute a registered tool through its handler       |
+| `POST` | `/agents/qa/run`        | Execute the specialized QA Agent                    |
+| `POST` | `/agents/plan`          | Generate a structured execution plan for an agent   |
+| `POST` | `/agents/tools/select`  | Select executable tools from a generated agent plan |
 
 ## Technology Stack
 
@@ -498,18 +499,16 @@ The project is intentionally evolving in small, testable increments.
 
 Current limitations include:
 
-* tool selection is explicitly supplied or orchestrated by deterministic flows;
-* tool selection is not yet fully automatic during execution;
-* the agent can generate structured plans, but does not yet automatically execute planned tool calls;
+* agents can generate plans and select executable tools, but do not yet automatically execute a full planned workflow;
 * agent memory, approval workflows and safety limits are not implemented yet;
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: Automatic Tool Selection
+## Next Milestone: Multi-step Agent Execution
 
-The next M4 milestone is to allow agents to select tools from a generated plan and convert planned steps into executable tool calls.
+The next M4 milestone is to execute selected tool calls from a structured plan through the controlled agent runtime.
 
-This will connect LLM-based planning with controlled tool execution.
+This will connect planning, tool selection and execution into a complete multi-step workflow.
 
 Later M4 milestones will introduce:
 

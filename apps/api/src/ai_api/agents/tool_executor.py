@@ -112,13 +112,17 @@ class ToolExecutionService:
         handlers: Mapping[str, ToolHandler] | None = None,
     ) -> None:
         self.registry = registry or ToolRegistry()
+
+        default_handlers = {
+            RAGRetrieveTool.tool_name: RAGRetrieveTool(),
+            RequirementAnalysisTool.tool_name: RequirementAnalysisTool(),
+            RAGAnswerTool.tool_name: RAGAnswerTool(),
+        }
+
         self.handlers = dict(
-            handlers
-            or {
-                RAGRetrieveTool.tool_name: RAGRetrieveTool(),
-                RequirementAnalysisTool.tool_name: RequirementAnalysisTool(),
-                RAGAnswerTool.tool_name: RAGAnswerTool(),
-            }
+            default_handlers
+            if handlers is None
+            else handlers
         )
 
     def execute(
@@ -191,3 +195,11 @@ class ToolExecutionService:
         ).hexdigest()[:12]
 
         return f"tool-execution-{safe_tool_name}-{arguments_hash}"
+    
+    def has_handler(self, tool_name: str) -> bool:
+        cleaned_tool_name = tool_name.strip()
+
+        if not cleaned_tool_name:
+            return False
+
+        return cleaned_tool_name in self.handlers
