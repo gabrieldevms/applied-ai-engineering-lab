@@ -13,6 +13,8 @@ from ai_api.rag import (
     SemanticSearchService,
     get_rag_answer_service,
 )
+from ai_api.agents import AgentPlanningService, get_agent_planning_service
+
 
 client = TestClient(app)
 
@@ -1063,3 +1065,72 @@ def test_agents_tools_execute_endpoint_should_execute_rag_answer() -> None:
     assert body["metadata"]["requested_by"] == "api-test"
     assert body["metadata"]["tool_category"] == "rag"
     assert body["metadata"]["requires_llm"] is True
+
+
+def test_agents_plan_endpoint_should_generate_plan() -> None:
+    def get_test_agent_planning_service() -> AgentPlanningService:
+        return AgentPlanningService(
+            llm_provider=FakeLLMProvider(
+                response_content="""
+                {
+                  "summary": "Plano estruturado para análise de requisito.",
+                  "steps": [
+                    {
+                      "step_id": "plan-step-1",
+                      "objective": "Analisar o requisito informado.",
+                      "tool_name": "requirements.analyze",
+                      "arguments": {},
+                      "rationale": "A ferramenta de análise de requisitos ajuda a identificar riscos, regras e cenários de teste."
+                    }
+                  ]
+                }
+                """
+            )
+        )
+
+    app.dependency_overrides[
+        get_agent_planning_service
+    ] = get_test_agent_planning_service
+
+    try:
+        payload = {
+            "objective": "Analisar requisito de boleto.",
+            "context": "Contexto de qualidade.",
+            "max_steps": 3,
+            "language": "pt-BR",
+            "metadata": {
+                "domain": "qa"
+            },
+        }
+
+        response = client.post("/agents/plan", json=payload)
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["objective"] == "Analisar requisito de boleto."
+        assert body["summary"] == "Plano estruturado para análise de requisito."
+        assert len(body["steps"]) == 1
+        assert body["provider"] == "fake"
+        assert body["model"] == "fake-llm-v1"
+        assert body["metadata"]["domain"] == "qa"
+        assert body["metadata"]["planner"] == "agent-planning-service-v1"
+        assert body["steps"][0]["tool_name"] == "requirements.analyze"
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_agents_plan_endpoint_should_validate_blank_objective() -> None:
+    payload = {
+        "objective": "   "
+    }
+
+    response = client.post("/agents/plan", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."

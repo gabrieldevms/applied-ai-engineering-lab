@@ -5,8 +5,8 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M4 — AI Agents
-**Current milestone:** RAG Answer Tool execution handler completed
-**Next milestone:** Agent planning with LLM
+**Current milestone:** Agent planning with LLM completed
+**Next milestone:** Automatic tool selection
 
 | Module                             | Status      |
 | ---------------------------------- | ----------- |
@@ -165,7 +165,7 @@ The initial QA Agent will coordinate the existing tools through an explicit and 
 
 ### Agent orchestration
 
-* [ ] Agent planning with LLM
+* [x] Agent planning with LLM
 * [ ] Automatic tool selection
 * [ ] Multi-step agent execution
 * [ ] Memory and execution state
