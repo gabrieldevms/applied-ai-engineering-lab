@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents
-**Current milestone:** Requirement Analysis Tool completed
-**Next milestone:** QA Agent
+**Current milestone:** RAG Answer Tool execution handler completed
+**Next milestone:** Agent planning with LLM
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -114,6 +114,7 @@ The project includes a controlled agent runtime with:
 * structured tool results;
 * safe handling of tool failures;
 * execution metadata.
+* an initial specialized QA Agent.
 
 ### Agent Tools
 
@@ -123,9 +124,22 @@ The Tool Registry currently describes:
 | ---------------------- | ---------: | ---------: | ------------------------------------------------- |
 | `rag.retrieve`         |          ✅ |          ✅ | Retrieve relevant document chunks                 |
 | `requirements.analyze` |          ✅ |          ✅ | Analyze software requirements                     |
-| `rag.answer`           |          ✅ |         🚧 | Generate a grounded answer from retrieved context |
+| `rag.answer`           |          ✅ |          ✅ | Generate a grounded answer from retrieved context |
 
 Tool execution is centralized in the `ToolExecutionService`. The service validates the requested tool against the registry and only allows tools with explicit execution handlers.
+
+### QA Agent
+
+The project includes an initial specialized QA Agent that coordinates existing tools around software quality workflows.
+
+The QA Agent currently supports:
+
+* software requirement analysis;
+* optional supporting knowledge documents;
+* RAG retrieval when documents are provided;
+* requirement analysis through the agent tool execution layer;
+* structured QA-oriented output;
+* full execution trace.
 
 ## Architecture
 
@@ -213,6 +227,7 @@ http://127.0.0.1:8000/docs
 | `POST` | `/agents/run`           | Execute an agent run with optional tool calls |
 | `GET`  | `/agents/tools`         | Describe registered agent tools               |
 | `POST` | `/agents/tools/execute` | Execute a registered tool through its handler |
+| `POST` | `/agents/qa/run`        | Execute the specialized QA Agent              |
 
 ## Technology Stack
 
@@ -451,6 +466,7 @@ The test suite covers areas such as:
 * embeddings and vector search;
 * semantic retrieval;
 * RAG answer generation;
+* RAG answer tool execution;
 * citations;
 * RAG evaluation;
 * agent runtime;
@@ -479,32 +495,17 @@ The project is intentionally evolving in small, testable increments.
 
 Current limitations include:
 
-* embeddings are deterministic and local;
-* the vector store is in memory;
-* indexed data is not persisted between application restarts;
-* file extraction is limited to text and Markdown formats;
-* tool selection is explicitly supplied in agent requests;
+* tool selection is explicitly supplied or orchestrated by deterministic flows;
 * the agent does not yet autonomously plan with an LLM;
-* `rag.answer` is registered but does not yet have an agent execution handler;
 * agent memory, approval workflows and safety limits are not implemented yet;
-* the current Requirement Analysis Tool uses a deterministic provider in its default handler.
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: QA Agent
+## Next Milestone: Agent Planning with LLM
 
-The next M4 milestone is the first specialized QA Agent.
+The next M4 milestone is to introduce LLM-based planning for agents.
 
-It will build on the existing:
-
-* agent runtime;
-* execution trace;
-* Tool Registry;
-* Tool Execution Service;
-* RAG Retrieval Tool;
-* Requirement Analysis Tool.
-
-The QA Agent will coordinate these capabilities around a quality-engineering objective instead of requiring the API consumer to manually compose each isolated tool call.
+This will allow the agent to create a structured plan before execution, preparing the project for automatic tool selection and richer multi-step workflows.
 
 Later M4 milestones will introduce:
 

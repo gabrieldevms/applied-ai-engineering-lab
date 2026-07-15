@@ -167,3 +167,45 @@ def test_agent_runtime_should_execute_requirement_analysis_tool_call() -> None:
     assert response.steps[2].output["tool_name"] == "requirements.analyze"
     assert response.steps[2].output["output"]["summary"]
     assert "risks" in response.steps[2].output["output"]
+
+
+def test_agent_runtime_should_execute_rag_answer_tool_call() -> None:
+    runtime = AgentRuntime()
+
+    response = runtime.run(
+        objective="Responder pergunta com base em contexto recuperado.",
+        max_steps=4,
+        tool_calls=[
+            AgentToolCall(
+                tool_name="rag.answer",
+                arguments={
+                    "query": "Como o cliente pode gerar boleto?",
+                    "documents": [
+                        {
+                            "source": "requirement-001",
+                            "title": "Renegociação",
+                            "document_text": (
+                                "Após renegociar a dívida, o cliente pode "
+                                "gerar um boleto atualizado."
+                            ),
+                            "metadata": {
+                                "domain": "billing",
+                            },
+                        }
+                    ],
+                    "language": "pt-BR",
+                    "top_k": 1,
+                    "chunk_size": 200,
+                    "chunk_overlap": 40,
+                },
+            )
+        ],
+    )
+
+    assert response.status == "completed"
+    assert response.metadata["requested_tool_calls"] == 1
+    assert response.steps[2].name == "tool_call:rag.answer"
+    assert response.steps[2].status == "completed"
+    assert response.steps[2].output["tool_name"] == "rag.answer"
+    assert response.steps[2].output["output"]["answer"]
+    assert len(response.steps[2].output["output"]["citations"]) == 1
