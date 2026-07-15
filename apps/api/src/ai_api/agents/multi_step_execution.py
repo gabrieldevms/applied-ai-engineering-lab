@@ -5,6 +5,7 @@ from ai_api.agents.schemas import (
     ToolDefinition,
 )
 from ai_api.agents.tool_selection import AgentToolSelectionService
+from ai_api.agents.state import AgentStateService
 
 
 class AgentMultiStepExecutionService:
@@ -12,9 +13,11 @@ class AgentMultiStepExecutionService:
         self,
         tool_selection_service: AgentToolSelectionService,
         agent_runtime: AgentRuntime | None = None,
+        state_service: AgentStateService | None = None,
     ) -> None:
         self.tool_selection_service = tool_selection_service
         self.agent_runtime = agent_runtime or AgentRuntime()
+        self.state_service = state_service or AgentStateService()
 
     def execute(
         self,
@@ -72,6 +75,15 @@ class AgentMultiStepExecutionService:
             tool_calls=tool_calls,
         )
 
+        execution_state = self.state_service.record_run_state(
+            agent_run=agent_run,
+            metadata={
+                "source": "multi_step_execution",
+                "selected_tool_calls": len(tool_calls),
+                "skipped_plan_steps": len(selection_response.skipped_steps),
+            },
+        )
+
         return AgentMultiStepExecutionResponse(
             objective=cleaned_objective,
             status=agent_run.status,
@@ -79,6 +91,7 @@ class AgentMultiStepExecutionService:
             selected_tool_calls=selection_response.selected_tool_calls,
             skipped_steps=selection_response.skipped_steps,
             agent_run=agent_run,
+            execution_state=execution_state,
             provider=selection_response.provider,
             model=selection_response.model,
             metadata={

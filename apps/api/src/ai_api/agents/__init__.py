@@ -23,6 +23,7 @@ from ai_api.agents.schemas import (
     AgentToolSelectionResponse,
     AgentMultiStepExecutionRequest,
     AgentMultiStepExecutionResponse,
+    AgentExecutionState,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -46,6 +47,11 @@ from ai_api.agents.dependencies import (
 )
 from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.multi_step_execution import AgentMultiStepExecutionService
+from ai_api.agents.state import (
+    AgentStateService,
+    AgentStateStore,
+    InMemoryAgentStateStore,
+)
 
 __all__ = [
     "AgentRunRequest",
@@ -89,4 +95,8 @@ __all__ = [
     "AgentMultiStepExecutionResponse",
     "AgentMultiStepExecutionService",
     "get_agent_multi_step_execution_service",
+    "AgentExecutionState",
+    "AgentStateService",
+    "AgentStateStore",
+    "InMemoryAgentStateStore",
 ]

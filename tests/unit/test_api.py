@@ -1275,6 +1275,10 @@ def test_agents_execute_endpoint_should_plan_select_and_execute() -> None:
         assert body["plan_summary"] == "Plano para análise de requisito."
         assert body["provider"] == "fake"
         assert len(body["selected_tool_calls"]) == 1
+        assert body["execution_state"]["run_id"] == body["agent_run"]["run_id"]
+        assert body["execution_state"]["status"] == "completed"
+        assert body["execution_state"]["tool_calls"] == 1
+        assert body["execution_state"]["metadata"]["source"] == "multi_step_execution"
         assert (
             body["selected_tool_calls"][0]["tool_name"]
             == "requirements.analyze"

@@ -523,6 +523,22 @@ class AgentMultiStepExecutionRequest(BaseModel):
         return cleaned_value
 
 
+class AgentExecutionState(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    state_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    objective: str = Field(min_length=1)
+    status: AgentRunStatus
+    current_step: str | None = None
+    total_steps: int = Field(ge=0)
+    completed_steps: int = Field(ge=0)
+    failed_steps: int = Field(ge=0)
+    skipped_steps: int = Field(ge=0)
+    tool_calls: int = Field(ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class AgentMultiStepExecutionResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -532,6 +548,7 @@ class AgentMultiStepExecutionResponse(BaseModel):
     selected_tool_calls: list[AgentSelectedToolCall]
     skipped_steps: list[AgentSkippedPlanStep]
     agent_run: AgentRunResponse
+    execution_state: AgentExecutionState | None = None
     provider: str
     model: str
     metadata: dict[str, Any] = Field(default_factory=dict)
