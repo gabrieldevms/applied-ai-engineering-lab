@@ -251,3 +251,106 @@ class QAAgentRunResponse(BaseModel):
     retrieved_context: dict[str, Any] | None = None
     steps: list[AgentStep]
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentPlanStep(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    step_id: str = Field(min_length=1)
+    objective: str = Field(min_length=1)
+    tool_name: str | None = None
+    arguments: dict[str, Any] = Field(default_factory=dict)
+    rationale: str = Field(min_length=1)
+
+    @field_validator("step_id", "objective", "rationale")
+    @classmethod
+    def required_plan_fields_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("value cannot be blank")
+
+        return cleaned_value
+
+    @field_validator("tool_name")
+    @classmethod
+    def optional_tool_name_cannot_be_blank(
+        cls,
+        value: str | None,
+    ) -> str | None:
+        if value is None:
+            return value
+
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("tool_name cannot be blank")
+
+        return cleaned_value
+
+
+class AgentPlanRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    objective: str = Field(
+        min_length=1,
+        description="Goal the agent should plan for.",
+    )
+    context: str | None = Field(
+        default=None,
+        description="Optional context for planning.",
+    )
+    available_tools: list[ToolDefinition] = Field(
+        default_factory=list,
+        max_length=20,
+        description="Tools available for the agent planner.",
+    )
+    max_steps: int = Field(
+        default=5,
+        ge=1,
+        le=10,
+        description="Maximum number of planned steps.",
+    )
+    language: str = Field(
+        default="pt-BR",
+        min_length=2,
+        max_length=10,
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("objective")
+    @classmethod
+    def objective_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("objective cannot be blank")
+
+        return cleaned_value
+
+    @field_validator("context")
+    @classmethod
+    def context_cannot_be_blank(
+        cls,
+        value: str | None,
+    ) -> str | None:
+        if value is None:
+            return value
+
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("context cannot be blank")
+
+        return cleaned_value
+
+
+class AgentPlanResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    objective: str
+    summary: str
+    steps: list[AgentPlanStep]
+    provider: str
+    model: str
+    metadata: dict[str, Any] = Field(default_factory=dict)

@@ -14,6 +14,9 @@ from ai_api.agents.schemas import (
     AgentToolCall,
     QAAgentRunRequest,
     QAAgentRunResponse,
+    AgentPlanRequest,
+    AgentPlanResponse,
+    AgentPlanStep,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -24,6 +27,13 @@ from ai_api.agents.tool_executor import (
 )
 from ai_api.agents.tool_registry import ToolRegistry
 from ai_api.agents.qa_agent import QAAgentService
+from ai_api.agents.dependencies import get_agent_planning_service
+from ai_api.agents.parsers import ParsedAgentPlan, parse_agent_plan_response
+from ai_api.agents.planning import AgentPlanningService
+from ai_api.agents.prompts import (
+    AGENT_PLANNER_SYSTEM_PROMPT,
+    build_agent_planning_messages,
+)
 
 __all__ = [
     "AgentRunRequest",
@@ -48,4 +58,13 @@ __all__ = [
     "QAAgentRunResponse",
     "QAAgentService",
     "RAGAnswerTool",
+    "AGENT_PLANNER_SYSTEM_PROMPT",
+    "AgentPlanRequest",
+    "AgentPlanResponse",
+    "AgentPlanStep",
+    "AgentPlanningService",
+    "ParsedAgentPlan",
+    "build_agent_planning_messages",
+    "get_agent_planning_service",
+    "parse_agent_plan_response",
 ]

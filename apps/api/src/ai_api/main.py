@@ -67,6 +67,11 @@ from ai_api.agents import (
     QAAgentRunRequest,
     QAAgentRunResponse,
     QAAgentService,
+    AgentPlanRequest,
+    AgentPlanResponse,
+    AgentPlanningService,
+    ToolRegistry,
+    get_agent_planning_service,
 )
 
 
@@ -537,5 +542,29 @@ def run_qa_agent(
         chunk_size=payload.chunk_size,
         chunk_overlap=payload.chunk_overlap,
         max_steps=payload.max_steps,
+        metadata=payload.metadata,
+    )
+
+
+@app.post("/agents/plan", response_model=AgentPlanResponse)
+def plan_agent_execution(
+    payload: AgentPlanRequest,
+    planning_service: Annotated[
+        AgentPlanningService,
+        Depends(get_agent_planning_service),
+    ],
+) -> AgentPlanResponse:
+    available_tools = (
+        payload.available_tools
+        if payload.available_tools
+        else ToolRegistry().list_tools()
+    )
+
+    return planning_service.plan(
+        objective=payload.objective,
+        context=payload.context,
+        available_tools=available_tools,
+        max_steps=payload.max_steps,
+        language=payload.language,
         metadata=payload.metadata,
     )

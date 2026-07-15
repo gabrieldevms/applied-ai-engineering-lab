@@ -152,3 +152,9 @@ All notable changes to this project will be documented in this file.
 - Support for executing `rag.answer` through the tool execution service
 - RAG answer tool calls in agent runtime
 - Unit and API tests for RAG answer tool execution
+- LLM-based agent planning service
+- Agent planning prompt builder
+- Agent planning response parser
+- Agent planning API endpoint
+- Structured agent plan schemas
+- Unit and API tests for agent planning
