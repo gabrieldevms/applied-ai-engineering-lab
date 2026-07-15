@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Automatic tool selection completed  
-**Next milestone:** Multi-step agent execution  
+**Current milestone:** Multi-step agent execution completed  
+**Next milestone:** Memory and execution state  
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -114,9 +114,10 @@ The project includes a controlled agent runtime with:
 * structured tool results;
 * safe handling of tool failures;
 * execution metadata.
-* an initial specialized QA Agent.
+* an initial specialized QA Agent;
 * LLM-based planning;
 * structured agent plans;
+* multi-step execution from selected tools;
 
 ### Agent Tools
 
@@ -232,6 +233,7 @@ http://127.0.0.1:8000/docs
 | `POST` | `/agents/qa/run`        | Execute the specialized QA Agent                    |
 | `POST` | `/agents/plan`          | Generate a structured execution plan for an agent   |
 | `POST` | `/agents/tools/select`  | Select executable tools from a generated agent plan |
+| `POST` | `/agents/execute` | Plan, select tools and execute a controlled multi-step agent workflow |
 
 ## Technology Stack
 
@@ -499,16 +501,16 @@ The project is intentionally evolving in small, testable increments.
 
 Current limitations include:
 
-* agents can generate plans and select executable tools, but do not yet automatically execute a full planned workflow;
+* agents can plan, select tools and execute controlled multi-step workflows, but execution state is not yet persisted;
 * agent memory, approval workflows and safety limits are not implemented yet;
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: Multi-step Agent Execution
+## Next Milestone: Memory and Execution State
 
-The next M4 milestone is to execute selected tool calls from a structured plan through the controlled agent runtime.
+The next M4 milestone is to introduce memory and execution state for agent workflows.
 
-This will connect planning, tool selection and execution into a complete multi-step workflow.
+This will prepare the project for resumable executions, richer traces, persistent logs and more advanced orchestration.
 
 Later M4 milestones will introduce:
 

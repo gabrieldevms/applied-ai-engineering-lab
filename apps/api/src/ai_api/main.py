@@ -76,6 +76,10 @@ from ai_api.agents import (
     AgentToolSelectionResponse,
     AgentToolSelectionService,
     get_agent_tool_selection_service,
+    AgentMultiStepExecutionRequest,
+    AgentMultiStepExecutionResponse,
+    AgentMultiStepExecutionService,
+    get_agent_multi_step_execution_service,
 )
 
 
@@ -593,6 +597,31 @@ def select_agent_tools(
         context=payload.context,
         available_tools=available_tools,
         max_steps=payload.max_steps,
+        language=payload.language,
+        metadata=payload.metadata,
+    )
+
+
+@app.post("/agents/execute", response_model=AgentMultiStepExecutionResponse)
+def execute_agent_workflow(
+    payload: AgentMultiStepExecutionRequest,
+    execution_service: Annotated[
+        AgentMultiStepExecutionService,
+        Depends(get_agent_multi_step_execution_service),
+    ],
+) -> AgentMultiStepExecutionResponse:
+    available_tools = (
+        payload.available_tools
+        if payload.available_tools
+        else ToolRegistry().list_tools()
+    )
+
+    return execution_service.execute(
+        objective=payload.objective,
+        context=payload.context,
+        available_tools=available_tools,
+        max_plan_steps=payload.max_plan_steps,
+        max_execution_steps=payload.max_execution_steps,
         language=payload.language,
         metadata=payload.metadata,
     )
