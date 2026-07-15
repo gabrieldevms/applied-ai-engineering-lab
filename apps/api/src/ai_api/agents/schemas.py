@@ -459,3 +459,79 @@ class AgentToolSelectionResponse(BaseModel):
     provider: str
     model: str
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentMultiStepExecutionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    objective: str = Field(
+        min_length=1,
+        description="Goal the agent should plan, select tools and execute.",
+    )
+    context: str | None = Field(
+        default=None,
+        description="Optional context for planning and execution.",
+    )
+    available_tools: list[ToolDefinition] = Field(
+        default_factory=list,
+        max_length=20,
+        description="Tools available for planning and selection.",
+    )
+    max_plan_steps: int = Field(
+        default=5,
+        ge=1,
+        le=10,
+        description="Maximum number of planned steps.",
+    )
+    max_execution_steps: int = Field(
+        default=10,
+        ge=3,
+        le=10,
+        description="Maximum number of runtime execution steps.",
+    )
+    language: str = Field(
+        default="pt-BR",
+        min_length=2,
+        max_length=10,
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("objective")
+    @classmethod
+    def objective_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("objective cannot be blank")
+
+        return cleaned_value
+
+    @field_validator("context")
+    @classmethod
+    def context_cannot_be_blank(
+        cls,
+        value: str | None,
+    ) -> str | None:
+        if value is None:
+            return value
+
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("context cannot be blank")
+
+        return cleaned_value
+
+
+class AgentMultiStepExecutionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    objective: str
+    status: AgentRunStatus
+    plan_summary: str
+    selected_tool_calls: list[AgentSelectedToolCall]
+    skipped_steps: list[AgentSkippedPlanStep]
+    agent_run: AgentRunResponse
+    provider: str
+    model: str
+    metadata: dict[str, Any] = Field(default_factory=dict)

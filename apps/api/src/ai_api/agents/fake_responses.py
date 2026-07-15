@@ -11,9 +11,12 @@ DEFAULT_AGENT_PLAN_RESPONSE_JSON = """
     },
     {
       "step_id": "plan-step-2",
-      "objective": "Selecionar a ferramenta mais adequada para apoiar a execução.",
+      "objective": "Analisar o requisito informado com foco em qualidade.",
       "tool_name": "requirements.analyze",
-      "arguments": {},
+      "arguments": {
+        "requirement_text": "Como cliente, quero renegociar minha dívida para gerar um boleto atualizado.",
+        "language": "pt-BR"
+      },
       "rationale": "A análise de requisitos é útil para identificar regras, riscos e cenários de teste."
     },
     {

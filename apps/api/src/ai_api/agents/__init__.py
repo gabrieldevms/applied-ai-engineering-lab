@@ -21,6 +21,8 @@ from ai_api.agents.schemas import (
     AgentSkippedPlanStep,
     AgentToolSelectionRequest,
     AgentToolSelectionResponse,
+    AgentMultiStepExecutionRequest,
+    AgentMultiStepExecutionResponse,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -40,8 +42,10 @@ from ai_api.agents.prompts import (
 from ai_api.agents.dependencies import (
     get_agent_planning_service,
     get_agent_tool_selection_service,
+    get_agent_multi_step_execution_service,
 )
 from ai_api.agents.tool_selection import AgentToolSelectionService
+from ai_api.agents.multi_step_execution import AgentMultiStepExecutionService
 
 __all__ = [
     "AgentRunRequest",
@@ -81,4 +85,8 @@ __all__ = [
     "AgentToolSelectionResponse",
     "AgentToolSelectionService",
     "get_agent_tool_selection_service",
+    "AgentMultiStepExecutionRequest",
+    "AgentMultiStepExecutionResponse",
+    "AgentMultiStepExecutionService",
+    "get_agent_multi_step_execution_service",
 ]

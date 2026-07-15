@@ -18,6 +18,8 @@ from ai_api.agents import (
     get_agent_planning_service,
     AgentToolSelectionService,
     get_agent_tool_selection_service,
+    AgentMultiStepExecutionService,
+    get_agent_multi_step_execution_service,
 )
 
 client = TestClient(app)
@@ -1209,6 +1211,92 @@ def test_agents_tools_select_endpoint_should_validate_blank_objective() -> None:
     }
 
     response = client.post("/agents/tools/select", json=payload)
+
+    assert response.status_code == 422
+
+    body = response.json()
+
+    assert body["error"]["type"] == "validation_error"
+    assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_agents_execute_endpoint_should_plan_select_and_execute() -> None:
+    def get_test_agent_multi_step_execution_service() -> AgentMultiStepExecutionService:
+        return AgentMultiStepExecutionService(
+            tool_selection_service=AgentToolSelectionService(
+                planning_service=AgentPlanningService(
+                    llm_provider=FakeLLMProvider(
+                        response_content="""
+                        {
+                          "summary": "Plano para análise de requisito.",
+                          "steps": [
+                            {
+                              "step_id": "plan-step-1",
+                              "objective": "Analisar requisito.",
+                              "tool_name": "requirements.analyze",
+                              "arguments": {
+                                "requirement_text": "Como cliente, quero gerar boleto.",
+                                "language": "pt-BR"
+                              },
+                              "rationale": "A ferramenta de requisitos é adequada."
+                            }
+                          ]
+                        }
+                        """
+                    )
+                )
+            )
+        )
+
+    app.dependency_overrides[
+        get_agent_multi_step_execution_service
+    ] = get_test_agent_multi_step_execution_service
+
+    try:
+        payload = {
+            "objective": "Analisar requisito de boleto.",
+            "context": "Contexto de qualidade.",
+            "max_plan_steps": 3,
+            "max_execution_steps": 5,
+            "language": "pt-BR",
+            "metadata": {
+                "domain": "qa"
+            },
+        }
+
+        response = client.post("/agents/execute", json=payload)
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["status"] == "completed"
+        assert body["objective"] == "Analisar requisito de boleto."
+        assert body["plan_summary"] == "Plano para análise de requisito."
+        assert body["provider"] == "fake"
+        assert len(body["selected_tool_calls"]) == 1
+        assert (
+            body["selected_tool_calls"][0]["tool_name"]
+            == "requirements.analyze"
+        )
+        assert body["agent_run"]["status"] == "completed"
+        assert (
+            body["agent_run"]["steps"][2]["name"]
+            == "tool_call:requirements.analyze"
+        )
+        assert body["metadata"]["executor"] == (
+            "agent-multi-step-execution-service-v1"
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_agents_execute_endpoint_should_validate_blank_objective() -> None:
+    payload = {
+        "objective": "   "
+    }
+
+    response = client.post("/agents/execute", json=payload)
 
     assert response.status_code == 422
 

@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from ai_api.agents.schemas import ToolDefinition
 from ai_api.llm import LLMMessage
+import json
 
 
 AGENT_PLANNER_SYSTEM_PROMPT = """
@@ -14,6 +15,10 @@ Regras:
 - Use somente ferramentas listadas como disponíveis.
 - Se nenhuma ferramenta for necessária, use tool_name como null.
 - Não invente nomes de ferramentas.
+- Quando escolher uma ferramenta, o campo arguments deve obedecer exatamente ao input_schema da ferramenta.
+- Use somente propriedades existentes em input_schema.properties.
+- Inclua todos os campos obrigatórios listados em input_schema.required.
+- Não use aliases, não renomeie campos e não crie propriedades extras.
 - Respeite o limite máximo de passos.
 - Responda somente com JSON válido.
 - Não inclua markdown.
@@ -82,8 +87,26 @@ Retorne um JSON exatamente neste formato:
 
 
 def _format_tool(tool: ToolDefinition) -> str:
+    input_schema = json.dumps(
+        tool.input_schema,
+        ensure_ascii=False,
+        indent=2,
+    )
+    output_schema = json.dumps(
+        tool.output_schema,
+        ensure_ascii=False,
+        indent=2,
+    )
+    metadata = json.dumps(
+        tool.metadata,
+        ensure_ascii=False,
+        indent=2,
+    )
+
     return (
         f"- name: {tool.name}\n"
         f"  description: {tool.description}\n"
-        f"  metadata: {tool.metadata}"
+        f"  input_schema:\n{input_schema}\n"
+        f"  output_schema:\n{output_schema}\n"
+        f"  metadata:\n{metadata}"
     )

@@ -164,3 +164,7 @@ All notable changes to this project will be documented in this file.
 - Skipped-step reporting for non-tool or invalid tool plan steps
 - Unit and API tests for automatic tool selection
 - Exposed tool execution handler availability for agent tool selection
+- Multi-step agent execution service
+- Agent execution endpoint for planning, tool selection and execution
+- Structured response combining plan, selected tools and runtime trace
+- Unit and API tests for multi-step agent execution
