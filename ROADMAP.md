@@ -5,8 +5,8 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Multi-step agent execution completed  
-**Next milestone:** Memory and execution state  
+**Current milestone:** Memory and execution state completed  
+**Next milestone:** Human approval flow  
 
 | Module                             | Status      |
 | ---------------------------------- | ----------- |
@@ -168,7 +168,7 @@ The initial QA Agent will coordinate the existing tools through an explicit and 
 * [x] Agent planning with LLM
 * [x] Automatic tool selection
 * [x] Multi-step agent execution
-* [ ] Memory and execution state
+* [x] Memory and execution state
 
 ### Control and reliability
 

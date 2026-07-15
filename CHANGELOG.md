@@ -168,3 +168,8 @@ All notable changes to this project will be documented in this file.
 - Agent execution endpoint for planning, tool selection and execution
 - Structured response combining plan, selected tools and runtime trace
 - Unit and API tests for multi-step agent execution
+- Agent execution state schema
+- In-memory agent state store
+- Agent state service
+- Execution state snapshots for multi-step agent workflows
+- Unit tests for agent execution state

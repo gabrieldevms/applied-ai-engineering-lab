@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Multi-step agent execution completed  
-**Next milestone:** Memory and execution state  
+**Current milestone:** Memory and execution state completed  
+**Next milestone:** Human approval flow  
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -118,6 +118,7 @@ The project includes a controlled agent runtime with:
 * LLM-based planning;
 * structured agent plans;
 * multi-step execution from selected tools;
+* in-memory execution state snapshots;
 
 ### Agent Tools
 
@@ -501,16 +502,17 @@ The project is intentionally evolving in small, testable increments.
 
 Current limitations include:
 
-* agents can plan, select tools and execute controlled multi-step workflows, but execution state is not yet persisted;
-* agent memory, approval workflows and safety limits are not implemented yet;
+* execution state is currently stored in memory and is not persisted between application restarts;
+* agent memory is limited to execution state snapshots;
+* approval workflows and safety limits are not implemented yet;
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: Memory and Execution State
+## Next Milestone: Human Approval Flow
 
-The next M4 milestone is to introduce memory and execution state for agent workflows.
+The next M4 milestone is to introduce a controlled human approval flow for agent actions.
 
-This will prepare the project for resumable executions, richer traces, persistent logs and more advanced orchestration.
+This will prepare the project for workflows where selected tools or sensitive steps must be approved before execution.
 
 Later M4 milestones will introduce:
 
