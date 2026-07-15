@@ -1015,3 +1015,51 @@ def test_agents_qa_run_endpoint_should_validate_blank_requirement() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_agents_tools_execute_endpoint_should_execute_rag_answer() -> None:
+    payload = {
+        "tool_name": "rag.answer",
+        "arguments": {
+            "query": "Como o cliente pode gerar boleto?",
+            "documents": [
+                {
+                    "source": "requirement-001",
+                    "title": "Renegociação",
+                    "document_text": (
+                        "Após renegociar a dívida, o cliente pode gerar "
+                        "um boleto atualizado."
+                    ),
+                    "metadata": {
+                        "domain": "billing"
+                    },
+                }
+            ],
+            "language": "pt-BR",
+            "top_k": 1,
+            "chunk_size": 200,
+            "chunk_overlap": 40,
+        },
+        "metadata": {
+            "requested_by": "api-test"
+        },
+    }
+
+    response = client.post("/agents/tools/execute", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "completed"
+    assert body["tool_name"] == "rag.answer"
+    assert body["execution_id"].startswith(
+        "tool-execution-rag-answer-"
+    )
+    assert body["output"]["answer"]
+    assert body["output"]["provider"] == "fake"
+    assert body["output"]["total_context_chunks"] == 1
+    assert len(body["output"]["citations"]) == 1
+    assert body["metadata"]["requested_by"] == "api-test"
+    assert body["metadata"]["tool_category"] == "rag"
+    assert body["metadata"]["requires_llm"] is True

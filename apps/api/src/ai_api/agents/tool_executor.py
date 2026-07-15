@@ -14,6 +14,10 @@ from ai_api.requirements.fake_responses import (
 from ai_api.requirements.retry import RetryConfig
 from ai_api.requirements.schemas import RequirementAnalysisRequest
 from ai_api.requirements.services import RequirementAnalyzerService
+from ai_api.rag.answer_generation import RAGAnswerService
+from ai_api.rag.fake_responses import DEFAULT_RAG_ANSWER_RESPONSE
+from ai_api.rag.schemas import RAGAnswerRequest
+from ai_api.rag.semantic_search import SemanticSearchService
 
 
 class ToolHandler(Protocol):
@@ -72,6 +76,35 @@ class RequirementAnalysisTool:
         return response.model_dump(mode="json")
 
 
+class RAGAnswerTool:
+    tool_name = "rag.answer"
+
+    def __init__(
+        self,
+        answer_service: RAGAnswerService | None = None,
+    ) -> None:
+        self.answer_service = answer_service or RAGAnswerService(
+            semantic_search_service=SemanticSearchService(),
+            llm_provider=FakeLLMProvider(
+                response_content=DEFAULT_RAG_ANSWER_RESPONSE,
+            ),
+        )
+
+    def execute(self, arguments: Mapping[str, Any]) -> dict[str, Any]:
+        payload = RAGAnswerRequest.model_validate(arguments)
+
+        response = self.answer_service.answer(
+            query=payload.query,
+            documents=payload.documents,
+            language=payload.language,
+            top_k=payload.top_k,
+            chunk_size=payload.chunk_size,
+            chunk_overlap=payload.chunk_overlap,
+        )
+
+        return response.model_dump(mode="json")
+    
+
 class ToolExecutionService:
     def __init__(
         self,
@@ -84,6 +117,7 @@ class ToolExecutionService:
             or {
                 RAGRetrieveTool.tool_name: RAGRetrieveTool(),
                 RequirementAnalysisTool.tool_name: RequirementAnalysisTool(),
+                RAGAnswerTool.tool_name: RAGAnswerTool(),
             }
         )
 

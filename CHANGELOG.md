@@ -148,3 +148,7 @@ All notable changes to this project will be documented in this file.
 - QA Agent orchestration using RAG retrieval and requirement analysis tools
 - Structured QA Agent response with requirement analysis and retrieved context
 - Unit and API tests for QA Agent
+- RAG answer tool handler for agents
+- Support for executing `rag.answer` through the tool execution service
+- RAG answer tool calls in agent runtime
+- Unit and API tests for RAG answer tool execution

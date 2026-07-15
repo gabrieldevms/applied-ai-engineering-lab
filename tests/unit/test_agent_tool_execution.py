@@ -1,5 +1,5 @@
 import pytest
-from ai_api.agents import ToolExecutionError, ToolExecutionService
+from ai_api.agents import ToolExecutionError, ToolExecutionService, ToolDefinition, ToolRegistry
 
 
 def test_tool_execution_service_should_execute_rag_retrieve_tool() -> None:
@@ -62,15 +62,30 @@ def test_tool_execution_service_should_reject_unknown_tool() -> None:
         )
 
 
-def test_tool_execution_service_should_reject_unimplemented_tool() -> None:
-    service = ToolExecutionService()
+def test_tool_execution_service_should_reject_registered_tool_without_handler() -> None:
+    registry = ToolRegistry(
+        tools=[
+            ToolDefinition(
+                name="custom.unimplemented",
+                description="Ferramenta registrada sem handler.",
+                metadata={
+                    "category": "test",
+                    "requires_llm": False,
+                },
+            )
+        ]
+    )
+    service = ToolExecutionService(
+        registry=registry,
+        handlers={},
+    )
 
     with pytest.raises(
         ToolExecutionError,
-        match="Tool has no execution handler: rag.answer",
+        match="Tool has no execution handler: custom.unimplemented",
     ):
         service.execute(
-            tool_name="rag.answer",
+            tool_name="custom.unimplemented",
             arguments={},
         )
 
@@ -133,4 +148,49 @@ def test_tool_execution_service_should_execute_requirement_analysis_tool() -> No
     assert "positive_test_scenarios" in response.output
     assert response.metadata["requested_by"] == "agent"
     assert response.metadata["tool_category"] == "qa"
+    assert response.metadata["requires_llm"] is True
+
+
+def test_tool_execution_service_should_execute_rag_answer_tool() -> None:
+    service = ToolExecutionService()
+
+    response = service.execute(
+        tool_name="rag.answer",
+        arguments={
+            "query": "Como o cliente pode gerar boleto?",
+            "documents": [
+                {
+                    "source": "requirement-001",
+                    "title": "Renegociação",
+                    "document_text": (
+                        "Após renegociar a dívida, o cliente pode gerar "
+                        "um boleto atualizado."
+                    ),
+                    "metadata": {
+                        "domain": "billing",
+                    },
+                }
+            ],
+            "language": "pt-BR",
+            "top_k": 1,
+            "chunk_size": 200,
+            "chunk_overlap": 40,
+        },
+        metadata={
+            "requested_by": "agent",
+        },
+    )
+
+    assert response.status == "completed"
+    assert response.tool_name == "rag.answer"
+    assert response.execution_id.startswith(
+        "tool-execution-rag-answer-"
+    )
+    assert response.output["answer"]
+    assert response.output["provider"] == "fake"
+    assert response.output["total_context_chunks"] == 1
+    assert len(response.output["context_chunks"]) == 1
+    assert len(response.output["citations"]) == 1
+    assert response.metadata["requested_by"] == "agent"
+    assert response.metadata["tool_category"] == "rag"
     assert response.metadata["requires_llm"] is True

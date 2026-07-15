@@ -20,6 +20,7 @@ from ai_api.agents.tool_executor import (
     ToolExecutionService,
     ToolHandler,
     RequirementAnalysisTool,
+    RAGAnswerTool,
 )
 from ai_api.agents.tool_registry import ToolRegistry
 from ai_api.agents.qa_agent import QAAgentService
@@ -46,4 +47,5 @@ __all__ = [
     "QAAgentRunRequest",
     "QAAgentRunResponse",
     "QAAgentService",
+    "RAGAnswerTool",
 ]

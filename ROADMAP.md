@@ -5,8 +5,8 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M4 — AI Agents
-**Current milestone:** Requirement Analysis Tool completed
-**Next milestone:** QA Agent
+**Current milestone:** RAG Answer Tool execution handler completed
+**Next milestone:** Agent planning with LLM
 
 | Module                             | Status      |
 | ---------------------------------- | ----------- |
@@ -155,7 +155,7 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 * [x] RAG Retrieval Tool
 * [x] Requirement Analysis Tool
-* [ ] RAG Answer Tool execution handler
+* [x] RAG Answer Tool execution handler
 
 ### Specialized agent
 
