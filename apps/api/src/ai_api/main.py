@@ -72,6 +72,10 @@ from ai_api.agents import (
     AgentPlanningService,
     ToolRegistry,
     get_agent_planning_service,
+    AgentToolSelectionRequest,
+    AgentToolSelectionResponse,
+    AgentToolSelectionService,
+    get_agent_tool_selection_service,
 )
 
 
@@ -561,6 +565,30 @@ def plan_agent_execution(
     )
 
     return planning_service.plan(
+        objective=payload.objective,
+        context=payload.context,
+        available_tools=available_tools,
+        max_steps=payload.max_steps,
+        language=payload.language,
+        metadata=payload.metadata,
+    )
+
+
+@app.post("/agents/tools/select", response_model=AgentToolSelectionResponse)
+def select_agent_tools(
+    payload: AgentToolSelectionRequest,
+    selection_service: Annotated[
+        AgentToolSelectionService,
+        Depends(get_agent_tool_selection_service),
+    ],
+) -> AgentToolSelectionResponse:
+    available_tools = (
+        payload.available_tools
+        if payload.available_tools
+        else ToolRegistry().list_tools()
+    )
+
+    return selection_service.select_tools(
         objective=payload.objective,
         context=payload.context,
         available_tools=available_tools,

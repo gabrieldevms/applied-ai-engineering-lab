@@ -158,3 +158,9 @@ All notable changes to this project will be documented in this file.
 - Agent planning API endpoint
 - Structured agent plan schemas
 - Unit and API tests for agent planning
+- Agent automatic tool selection service
+- Tool selection API endpoint
+- Selection of executable tools from structured agent plans
+- Skipped-step reporting for non-tool or invalid tool plan steps
+- Unit and API tests for automatic tool selection
+- Exposed tool execution handler availability for agent tool selection
