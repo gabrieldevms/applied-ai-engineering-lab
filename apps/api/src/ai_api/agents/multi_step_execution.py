@@ -1,3 +1,5 @@
+from ai_api.agents.approval import AgentApprovalService
+from ai_api.agents.execution_logs import AgentExecutionLogService
 from ai_api.agents.runtime import AgentRuntime
 from ai_api.agents.schemas import (
     AgentApprovalPolicy,
@@ -6,10 +8,8 @@ from ai_api.agents.schemas import (
     AgentToolCall,
     ToolDefinition,
 )
-from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.state import AgentStateService
-from ai_api.agents.approval import AgentApprovalService
-from ai_api.agents.schemas import AgentApprovalPolicy
+from ai_api.agents.tool_selection import AgentToolSelectionService
 
 
 class AgentMultiStepExecutionService:
@@ -19,11 +19,13 @@ class AgentMultiStepExecutionService:
         agent_runtime: AgentRuntime | None = None,
         state_service: AgentStateService | None = None,
         approval_service: AgentApprovalService | None = None,
+        log_service: AgentExecutionLogService | None = None,
     ) -> None:
         self.tool_selection_service = tool_selection_service
         self.agent_runtime = agent_runtime or AgentRuntime()
         self.state_service = state_service or AgentStateService()
         self.approval_service = approval_service or AgentApprovalService()
+        self.log_service = log_service or AgentExecutionLogService()
 
     def execute(
         self,
@@ -55,11 +57,12 @@ class AgentMultiStepExecutionService:
             approval_policy=approval_policy,
         )
 
-        executable_tool_calls = self.approval_service.filter_executable_tool_calls(
-            selected_tool_calls=selection_response.selected_tool_calls,
-            approval_decisions=approval_decisions,
+        executable_tool_calls = (
+            self.approval_service.filter_executable_tool_calls(
+                selected_tool_calls=selection_response.selected_tool_calls,
+                approval_decisions=approval_decisions,
+            )
         )
-        
 
         tool_calls = [
             AgentToolCall(
@@ -89,7 +92,9 @@ class AgentMultiStepExecutionService:
                 **(metadata or {}),
                 "execution": "agent-multi-step-execution-v1",
                 "plan_summary": selection_response.plan_summary,
-                "selected_tool_calls": len(tool_calls),
+                "selected_tool_calls": len(
+                    selection_response.selected_tool_calls
+                ),
                 "skipped_plan_steps": len(selection_response.skipped_steps),
                 "planning_provider": selection_response.provider,
                 "planning_model": selection_response.model,
@@ -103,10 +108,24 @@ class AgentMultiStepExecutionService:
             agent_run=agent_run,
             metadata={
                 "source": "multi_step_execution",
-                "selected_tool_calls": len(tool_calls),
+                "selected_tool_calls": len(
+                    selection_response.selected_tool_calls
+                ),
                 "skipped_plan_steps": len(selection_response.skipped_steps),
                 "approval_decisions": len(approval_decisions),
                 "executable_tool_calls": len(tool_calls),
+            },
+        )
+
+        execution_logs = self.log_service.record_workflow_execution(
+            plan_summary=selection_response.plan_summary,
+            selected_tool_calls=selection_response.selected_tool_calls,
+            skipped_steps=selection_response.skipped_steps,
+            approval_decisions=approval_decisions,
+            agent_run=agent_run,
+            execution_state=execution_state,
+            metadata={
+                "source": "multi_step_execution",
             },
         )
 
@@ -115,10 +134,11 @@ class AgentMultiStepExecutionService:
             status=agent_run.status,
             plan_summary=selection_response.plan_summary,
             selected_tool_calls=selection_response.selected_tool_calls,
-            approval_decisions=approval_decisions,
             skipped_steps=selection_response.skipped_steps,
+            approval_decisions=approval_decisions,
             agent_run=agent_run,
             execution_state=execution_state,
+            execution_logs=execution_logs,
             provider=selection_response.provider,
             model=selection_response.model,
             metadata={
@@ -126,9 +146,9 @@ class AgentMultiStepExecutionService:
                 "executor": "agent-multi-step-execution-service-v1",
                 "agent_run_id": agent_run.run_id,
                 "agent_run_status": agent_run.status,
+                "execution_logs": len(execution_logs),
             },
         )
-
 
     def _get_approval_status(
         self,

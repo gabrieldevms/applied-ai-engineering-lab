@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     embedding_provider: EmbeddingProviderName = Field(default="fake")
     embedding_dimensions: int = Field(default=32, ge=4, le=4096)
 
+    agent_execution_log_path: str = ".data/agent-execution-logs.jsonl"
+
 
 @lru_cache
 def get_settings() -> Settings:

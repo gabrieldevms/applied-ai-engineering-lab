@@ -2,8 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
 ### Added
 
 - Initial repository structure
@@ -178,3 +176,10 @@ All notable changes to this project will be documented in this file.
 - Human approval service for selected tool calls
 - Approval-aware multi-step agent execution
 - Unit and API tests for approval-controlled execution
+- File-based persistent agent execution logs
+- Agent execution log service
+- Agent execution log stores for memory and JSONL files
+- Execution log events for planning, tool selection, approval, runtime and state recording
+- Log retrieval endpoints for all events and by run ID
+- Unit and API tests for execution logs
+- Multi-step agent execution now records execution log events

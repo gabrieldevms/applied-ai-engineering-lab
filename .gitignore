@@ -21,6 +21,7 @@ env/
 
 .pytest_cache/
 .cache/
+.data/
 
 # OS / Editor
 .DS_Store

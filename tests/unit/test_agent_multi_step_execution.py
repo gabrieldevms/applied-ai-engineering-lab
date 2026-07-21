@@ -72,6 +72,9 @@ def test_agent_multi_step_execution_should_plan_select_and_execute_tool() -> Non
     assert response.metadata["executor"] == (
         "agent-multi-step-execution-service-v1"
     )
+    assert len(response.execution_logs) == 5
+    assert response.execution_logs[0].event_type == "plan_generated"
+    assert response.metadata["execution_logs"] == 5
 
 
 def test_agent_multi_step_execution_should_complete_when_no_tools_are_selected() -> None:
@@ -150,6 +153,11 @@ def test_agent_multi_step_execution_should_return_failed_status_when_tool_fails(
     assert response.execution_state.status == "failed"
     assert response.execution_state.failed_steps == 1
     assert response.execution_state.tool_calls == 1
+    assert len(response.execution_logs) == 5
+    assert any(
+        event.event_type == "runtime_failed"
+        for event in response.execution_logs
+    )
 
 
 def test_agent_multi_step_execution_should_not_execute_pending_tool_calls() -> None:
@@ -195,3 +203,8 @@ def test_agent_multi_step_execution_should_not_execute_pending_tool_calls() -> N
     assert response.agent_run.metadata["requested_tool_calls"] == 0
     assert response.execution_state is not None
     assert response.execution_state.tool_calls == 0
+    assert len(response.execution_logs) == 5
+    assert any(
+        event.event_type == "approval_evaluated"
+        for event in response.execution_logs
+    )
