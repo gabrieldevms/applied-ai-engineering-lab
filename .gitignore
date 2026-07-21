@@ -19,6 +19,9 @@ env/
 .env.local
 .env.*.local
 
+.pytest_cache/
+.cache/
+
 # OS / Editor
 .DS_Store
 Thumbs.db

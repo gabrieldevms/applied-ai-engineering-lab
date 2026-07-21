@@ -1279,6 +1279,8 @@ def test_agents_execute_endpoint_should_plan_select_and_execute() -> None:
         assert body["execution_state"]["status"] == "completed"
         assert body["execution_state"]["tool_calls"] == 1
         assert body["execution_state"]["metadata"]["source"] == "multi_step_execution"
+        assert len(body["approval_decisions"]) == 1
+        assert body["approval_decisions"][0]["status"] == "not_required"
         assert (
             body["selected_tool_calls"][0]["tool_name"]
             == "requirements.analyze"
@@ -1308,3 +1310,68 @@ def test_agents_execute_endpoint_should_validate_blank_objective() -> None:
 
     assert body["error"]["type"] == "validation_error"
     assert body["error"]["message"] == "Invalid request payload."
+
+
+def test_agents_execute_endpoint_should_not_execute_pending_tool_calls() -> None:
+    def get_test_agent_multi_step_execution_service() -> AgentMultiStepExecutionService:
+        return AgentMultiStepExecutionService(
+            tool_selection_service=AgentToolSelectionService(
+                planning_service=AgentPlanningService(
+                    llm_provider=FakeLLMProvider(
+                        response_content="""
+                        {
+                          "summary": "Plano para análise de requisito.",
+                          "steps": [
+                            {
+                              "step_id": "plan-step-1",
+                              "objective": "Analisar requisito.",
+                              "tool_name": "requirements.analyze",
+                              "arguments": {
+                                "requirement_text": "Como cliente, quero gerar boleto.",
+                                "language": "pt-BR"
+                              },
+                              "rationale": "A ferramenta de requisitos é adequada."
+                            }
+                          ]
+                        }
+                        """
+                    )
+                )
+            )
+        )
+
+    app.dependency_overrides[
+        get_agent_multi_step_execution_service
+    ] = get_test_agent_multi_step_execution_service
+
+    try:
+        payload = {
+            "objective": "Analisar requisito de boleto.",
+            "max_plan_steps": 3,
+            "max_execution_steps": 5,
+            "approval_policy": {
+                "require_approval_for_tools": [
+                    "requirements.analyze"
+                ],
+                "auto_approve_safe_tools": True,
+                "reject_tools": [],
+                "metadata": {
+                    "approval_reason": "manual review required"
+                },
+            },
+        }
+
+        response = client.post("/agents/execute", json=payload)
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["status"] == "completed"
+        assert len(body["selected_tool_calls"]) == 1
+        assert len(body["approval_decisions"]) == 1
+        assert body["approval_decisions"][0]["status"] == "pending"
+        assert body["agent_run"]["metadata"]["requested_tool_calls"] == 0
+        assert body["execution_state"]["tool_calls"] == 0
+    finally:
+        app.dependency_overrides.clear()

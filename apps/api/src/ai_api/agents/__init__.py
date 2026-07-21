@@ -24,6 +24,9 @@ from ai_api.agents.schemas import (
     AgentMultiStepExecutionRequest,
     AgentMultiStepExecutionResponse,
     AgentExecutionState,
+    AgentApprovalPolicy,
+    AgentApprovalStatus,
+    AgentToolApprovalDecision,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -52,6 +55,7 @@ from ai_api.agents.state import (
     AgentStateStore,
     InMemoryAgentStateStore,
 )
+from ai_api.agents.approval import AgentApprovalService
 
 __all__ = [
     "AgentRunRequest",
@@ -99,4 +103,8 @@ __all__ = [
     "AgentStateService",
     "AgentStateStore",
     "InMemoryAgentStateStore",
+    "AgentApprovalPolicy",
+    "AgentApprovalService",
+    "AgentApprovalStatus",
+    "AgentToolApprovalDecision",
 ]

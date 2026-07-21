@@ -173,3 +173,8 @@ All notable changes to this project will be documented in this file.
 - Agent state service
 - Execution state snapshots for multi-step agent workflows
 - Unit tests for agent execution state
+- Agent approval policy schema
+- Agent tool approval decision schema
+- Human approval service for selected tool calls
+- Approval-aware multi-step agent execution
+- Unit and API tests for approval-controlled execution
