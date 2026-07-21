@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Human approval flow completed  
-**Next milestone:** Persistent agent execution logs  
+**Current milestone:** Persistent agent execution logs completed  
+**Next milestone:** Agent safety limits  
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -119,6 +119,8 @@ The project includes a controlled agent runtime with:
 * structured agent plans;
 * multi-step execution from selected tools;
 * in-memory execution state snapshots;
+* file-based persistent execution logs;
+* execution log retrieval by run ID;
 
 ### Agent Tools
 
@@ -235,6 +237,8 @@ http://127.0.0.1:8000/docs
 | `POST` | `/agents/plan`          | Generate a structured execution plan for an agent   |
 | `POST` | `/agents/tools/select`  | Select executable tools from a generated agent plan |
 | `POST` | `/agents/execute` | Plan, select tools and execute a controlled multi-step agent workflow |
+| `GET`  | `/agents/logs` | List persisted agent execution log events |
+| `GET`  | `/agents/logs/{run_id}` | List persisted agent execution log events by run ID |
 
 ## Technology Stack
 
@@ -502,18 +506,18 @@ The project is intentionally evolving in small, testable increments.
 
 Current limitations include:
 
+* execution logs are persisted locally as JSONL files, not yet in a production database;
 * approval flow is currently policy-based and synchronous;
 * there is no external human review UI yet;
-* execution state is currently stored in memory and is not persisted between application restarts;
-* persistent execution logs and safety limits are not implemented yet;
+* safety limits are not implemented yet;
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: Persistent Agent Execution Logs
+## Next Milestone: Agent Safety Limits
 
-The next M4 milestone is to introduce persistent-style execution logs for agent workflows.
+The next M4 milestone is to introduce safety limits for agent workflows.
 
-This will improve auditability by recording workflow execution events, selected tools, approval decisions, execution state and final status.
+This will add explicit boundaries for tool execution, approval requirements and workflow control before moving into agent evaluation.
 
 Later M4 milestones will introduce:
 

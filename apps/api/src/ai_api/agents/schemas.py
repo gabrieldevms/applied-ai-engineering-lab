@@ -572,6 +572,33 @@ class AgentExecutionState(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+AgentExecutionLogLevel = Literal[
+    "info",
+    "warning",
+    "error",
+]
+
+
+class AgentExecutionLogEvent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    log_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    event_type: str = Field(min_length=1)
+    level: AgentExecutionLogLevel = "info"
+    message: str = Field(min_length=1)
+    created_at: str = Field(min_length=1)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentExecutionLogListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    events: list[AgentExecutionLogEvent]
+    total: int = Field(ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class AgentMultiStepExecutionResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -583,6 +610,7 @@ class AgentMultiStepExecutionResponse(BaseModel):
     skipped_steps: list[AgentSkippedPlanStep]
     agent_run: AgentRunResponse
     execution_state: AgentExecutionState | None = None
+    execution_logs: list[AgentExecutionLogEvent] = Field(default_factory=list)
     provider: str
     model: str
     metadata: dict[str, Any] = Field(default_factory=dict)

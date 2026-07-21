@@ -27,6 +27,9 @@ from ai_api.agents.schemas import (
     AgentApprovalPolicy,
     AgentApprovalStatus,
     AgentToolApprovalDecision,
+    AgentExecutionLogEvent,
+    AgentExecutionLogLevel,
+    AgentExecutionLogListResponse,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -47,6 +50,7 @@ from ai_api.agents.dependencies import (
     get_agent_planning_service,
     get_agent_tool_selection_service,
     get_agent_multi_step_execution_service,
+    get_agent_execution_log_service,
 )
 from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.multi_step_execution import AgentMultiStepExecutionService
@@ -56,6 +60,12 @@ from ai_api.agents.state import (
     InMemoryAgentStateStore,
 )
 from ai_api.agents.approval import AgentApprovalService
+from ai_api.agents.execution_logs import (
+    AgentExecutionLogService,
+    AgentExecutionLogStore,
+    FileAgentExecutionLogStore,
+    InMemoryAgentExecutionLogStore,
+)
 
 __all__ = [
     "AgentRunRequest",
@@ -107,4 +117,12 @@ __all__ = [
     "AgentApprovalService",
     "AgentApprovalStatus",
     "AgentToolApprovalDecision",
+    "AgentExecutionLogEvent",
+    "AgentExecutionLogLevel",
+    "AgentExecutionLogListResponse",
+    "AgentExecutionLogService",
+    "AgentExecutionLogStore",
+    "FileAgentExecutionLogStore",
+    "InMemoryAgentExecutionLogStore",
+    "get_agent_execution_log_service",
 ]

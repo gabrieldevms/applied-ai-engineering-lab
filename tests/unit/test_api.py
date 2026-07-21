@@ -20,6 +20,10 @@ from ai_api.agents import (
     get_agent_tool_selection_service,
     AgentMultiStepExecutionService,
     get_agent_multi_step_execution_service,
+    AgentExecutionLogService,
+    InMemoryAgentExecutionLogStore,
+    get_agent_execution_log_service,
+    
 )
 
 client = TestClient(app)
@@ -1290,6 +1294,9 @@ def test_agents_execute_endpoint_should_plan_select_and_execute() -> None:
             body["agent_run"]["steps"][2]["name"]
             == "tool_call:requirements.analyze"
         )
+        assert len(body["execution_logs"]) == 5
+        assert body["execution_logs"][0]["event_type"] == "plan_generated"
+        assert body["metadata"]["execution_logs"] == 5
         assert body["metadata"]["executor"] == (
             "agent-multi-step-execution-service-v1"
         )
@@ -1373,5 +1380,73 @@ def test_agents_execute_endpoint_should_not_execute_pending_tool_calls() -> None
         assert body["approval_decisions"][0]["status"] == "pending"
         assert body["agent_run"]["metadata"]["requested_tool_calls"] == 0
         assert body["execution_state"]["tool_calls"] == 0
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_agents_logs_endpoint_should_list_execution_logs() -> None:
+    log_service = AgentExecutionLogService(
+        log_store=InMemoryAgentExecutionLogStore(),
+    )
+
+    log_service.record_event(
+        run_id="agent-run-123",
+        event_type="runtime_completed",
+        message="Runtime completed.",
+    )
+
+    def get_test_agent_execution_log_service() -> AgentExecutionLogService:
+        return log_service
+
+    app.dependency_overrides[
+        get_agent_execution_log_service
+    ] = get_test_agent_execution_log_service
+
+    try:
+        response = client.get("/agents/logs")
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["total"] == 1
+        assert body["events"][0]["run_id"] == "agent-run-123"
+        assert body["events"][0]["event_type"] == "runtime_completed"
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_agents_logs_by_run_id_endpoint_should_filter_execution_logs() -> None:
+    log_service = AgentExecutionLogService(
+        log_store=InMemoryAgentExecutionLogStore(),
+    )
+
+    log_service.record_event(
+        run_id="agent-run-1",
+        event_type="runtime_completed",
+        message="Run 1 completed.",
+    )
+    log_service.record_event(
+        run_id="agent-run-2",
+        event_type="runtime_completed",
+        message="Run 2 completed.",
+    )
+
+    def get_test_agent_execution_log_service() -> AgentExecutionLogService:
+        return log_service
+
+    app.dependency_overrides[
+        get_agent_execution_log_service
+    ] = get_test_agent_execution_log_service
+
+    try:
+        response = client.get("/agents/logs/agent-run-1")
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["total"] == 1
+        assert body["events"][0]["run_id"] == "agent-run-1"
     finally:
         app.dependency_overrides.clear()

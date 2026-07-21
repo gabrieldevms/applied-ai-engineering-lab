@@ -80,6 +80,9 @@ from ai_api.agents import (
     AgentMultiStepExecutionResponse,
     AgentMultiStepExecutionService,
     get_agent_multi_step_execution_service,
+    AgentExecutionLogListResponse,
+    AgentExecutionLogService,
+    get_agent_execution_log_service,
 )
 
 
@@ -625,4 +628,42 @@ def execute_agent_workflow(
         language=payload.language,
         metadata=payload.metadata,
         approval_policy=payload.approval_policy,
+    )
+
+
+@app.get("/agents/logs", response_model=AgentExecutionLogListResponse)
+def list_agent_execution_logs(
+    log_service: Annotated[
+        AgentExecutionLogService,
+        Depends(get_agent_execution_log_service),
+    ],
+) -> AgentExecutionLogListResponse:
+    events = log_service.list_events()
+
+    return AgentExecutionLogListResponse(
+        events=events,
+        total=len(events),
+        metadata={
+            "source": "agent-execution-logs",
+        },
+    )
+
+
+@app.get("/agents/logs/{run_id}", response_model=AgentExecutionLogListResponse)
+def list_agent_execution_logs_by_run_id(
+    run_id: str,
+    log_service: Annotated[
+        AgentExecutionLogService,
+        Depends(get_agent_execution_log_service),
+    ],
+) -> AgentExecutionLogListResponse:
+    events = log_service.list_events_by_run_id(run_id)
+
+    return AgentExecutionLogListResponse(
+        events=events,
+        total=len(events),
+        metadata={
+            "source": "agent-execution-logs",
+            "run_id": run_id,
+        },
     )

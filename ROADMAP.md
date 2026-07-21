@@ -5,8 +5,8 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Human approval flow completed  
-**Next milestone:** Persistent agent execution logs  
+**Current milestone:** Persistent agent execution logs completed  
+**Next milestone:** Agent safety limits  
 
 | Module                             | Status      |
 | ---------------------------------- | ----------- |
@@ -173,7 +173,7 @@ The initial QA Agent will coordinate the existing tools through an explicit and 
 ### Control and reliability
 
 * [x] Human approval flow
-* [ ] Persistent agent execution logs
+* [x] Persistent agent execution logs
 * [ ] Agent safety limits
 * [ ] Agent evaluation
 

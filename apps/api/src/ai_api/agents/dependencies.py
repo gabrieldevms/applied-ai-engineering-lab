@@ -4,6 +4,10 @@ from ai_api.config import get_settings
 from ai_api.llm.factory import build_llm_provider
 from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.multi_step_execution import AgentMultiStepExecutionService
+from ai_api.agents.execution_logs import (
+    AgentExecutionLogService,
+    FileAgentExecutionLogStore,
+)
 
 def get_agent_planning_service() -> AgentPlanningService:
     settings = get_settings()
@@ -28,7 +32,18 @@ def get_agent_tool_selection_service() -> AgentToolSelectionService:
 
 def get_agent_multi_step_execution_service() -> AgentMultiStepExecutionService:
     tool_selection_service = get_agent_tool_selection_service()
+    log_service = get_agent_execution_log_service()
 
     return AgentMultiStepExecutionService(
         tool_selection_service=tool_selection_service,
+        log_service=log_service,
+    )
+
+def get_agent_execution_log_service() -> AgentExecutionLogService:
+    settings = get_settings()
+
+    return AgentExecutionLogService(
+        log_store=FileAgentExecutionLogStore(
+            file_path=settings.agent_execution_log_path,
+        ),
     )
