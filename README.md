@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Memory and execution state completed  
-**Next milestone:** Human approval flow  
+**Current milestone:** Human approval flow completed  
+**Next milestone:** Persistent agent execution logs  
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -502,17 +502,18 @@ The project is intentionally evolving in small, testable increments.
 
 Current limitations include:
 
+* approval flow is currently policy-based and synchronous;
+* there is no external human review UI yet;
 * execution state is currently stored in memory and is not persisted between application restarts;
-* agent memory is limited to execution state snapshots;
-* approval workflows and safety limits are not implemented yet;
+* persistent execution logs and safety limits are not implemented yet;
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: Human Approval Flow
+## Next Milestone: Persistent Agent Execution Logs
 
-The next M4 milestone is to introduce a controlled human approval flow for agent actions.
+The next M4 milestone is to introduce persistent-style execution logs for agent workflows.
 
-This will prepare the project for workflows where selected tools or sensitive steps must be approved before execution.
+This will improve auditability by recording workflow execution events, selected tools, approval decisions, execution state and final status.
 
 Later M4 milestones will introduce:
 

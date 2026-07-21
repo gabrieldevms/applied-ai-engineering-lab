@@ -1,11 +1,15 @@
 from ai_api.agents.runtime import AgentRuntime
 from ai_api.agents.schemas import (
+    AgentApprovalPolicy,
     AgentMultiStepExecutionResponse,
+    AgentToolApprovalDecision,
     AgentToolCall,
     ToolDefinition,
 )
 from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.state import AgentStateService
+from ai_api.agents.approval import AgentApprovalService
+from ai_api.agents.schemas import AgentApprovalPolicy
 
 
 class AgentMultiStepExecutionService:
@@ -14,10 +18,12 @@ class AgentMultiStepExecutionService:
         tool_selection_service: AgentToolSelectionService,
         agent_runtime: AgentRuntime | None = None,
         state_service: AgentStateService | None = None,
+        approval_service: AgentApprovalService | None = None,
     ) -> None:
         self.tool_selection_service = tool_selection_service
         self.agent_runtime = agent_runtime or AgentRuntime()
         self.state_service = state_service or AgentStateService()
+        self.approval_service = approval_service or AgentApprovalService()
 
     def execute(
         self,
@@ -28,6 +34,7 @@ class AgentMultiStepExecutionService:
         max_execution_steps: int = 10,
         language: str = "pt-BR",
         metadata: dict | None = None,
+        approval_policy: AgentApprovalPolicy | None = None,
     ) -> AgentMultiStepExecutionResponse:
         cleaned_objective = objective.strip()
 
@@ -43,6 +50,17 @@ class AgentMultiStepExecutionService:
             metadata=metadata,
         )
 
+        approval_decisions = self.approval_service.evaluate_tool_calls(
+            selected_tool_calls=selection_response.selected_tool_calls,
+            approval_policy=approval_policy,
+        )
+
+        executable_tool_calls = self.approval_service.filter_executable_tool_calls(
+            selected_tool_calls=selection_response.selected_tool_calls,
+            approval_decisions=approval_decisions,
+        )
+        
+
         tool_calls = [
             AgentToolCall(
                 tool_name=selected_tool.tool_name,
@@ -54,9 +72,13 @@ class AgentMultiStepExecutionService:
                         selected_tool.source_step_objective
                     ),
                     "rationale": selected_tool.rationale,
+                    "approval_status": self._get_approval_status(
+                        source_step_id=selected_tool.source_step_id,
+                        approval_decisions=approval_decisions,
+                    ),
                 },
             )
-            for selected_tool in selection_response.selected_tool_calls
+            for selected_tool in executable_tool_calls
         ]
 
         agent_run = self.agent_runtime.run(
@@ -71,6 +93,8 @@ class AgentMultiStepExecutionService:
                 "skipped_plan_steps": len(selection_response.skipped_steps),
                 "planning_provider": selection_response.provider,
                 "planning_model": selection_response.model,
+                "approval_decisions": len(approval_decisions),
+                "executable_tool_calls": len(tool_calls),
             },
             tool_calls=tool_calls,
         )
@@ -81,6 +105,8 @@ class AgentMultiStepExecutionService:
                 "source": "multi_step_execution",
                 "selected_tool_calls": len(tool_calls),
                 "skipped_plan_steps": len(selection_response.skipped_steps),
+                "approval_decisions": len(approval_decisions),
+                "executable_tool_calls": len(tool_calls),
             },
         )
 
@@ -89,6 +115,7 @@ class AgentMultiStepExecutionService:
             status=agent_run.status,
             plan_summary=selection_response.plan_summary,
             selected_tool_calls=selection_response.selected_tool_calls,
+            approval_decisions=approval_decisions,
             skipped_steps=selection_response.skipped_steps,
             agent_run=agent_run,
             execution_state=execution_state,
@@ -101,3 +128,15 @@ class AgentMultiStepExecutionService:
                 "agent_run_status": agent_run.status,
             },
         )
+
+
+    def _get_approval_status(
+        self,
+        source_step_id: str,
+        approval_decisions: list[AgentToolApprovalDecision],
+    ) -> str:
+        for decision in approval_decisions:
+            if decision.source_step_id == source_step_id:
+                return decision.status
+
+        return "unknown"

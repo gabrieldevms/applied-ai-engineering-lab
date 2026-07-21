@@ -624,4 +624,5 @@ def execute_agent_workflow(
         max_execution_steps=payload.max_execution_steps,
         language=payload.language,
         metadata=payload.metadata,
+        approval_policy=payload.approval_policy,
     )

@@ -4,6 +4,7 @@ from ai_api.agents import (
     AgentToolSelectionService,
 )
 from ai_api.llm import FakeLLMProvider
+from ai_api.agents import AgentApprovalPolicy
 
 
 def test_agent_multi_step_execution_should_plan_select_and_execute_tool() -> None:
@@ -66,6 +67,8 @@ def test_agent_multi_step_execution_should_plan_select_and_execute_tool() -> Non
     assert response.execution_state.status == "completed"
     assert response.execution_state.tool_calls == 1
     assert response.execution_state.metadata["source"] == "multi_step_execution"
+    assert len(response.approval_decisions) == 1
+    assert response.approval_decisions[0].status == "not_required"
     assert response.metadata["executor"] == (
         "agent-multi-step-execution-service-v1"
     )
@@ -147,3 +150,48 @@ def test_agent_multi_step_execution_should_return_failed_status_when_tool_fails(
     assert response.execution_state.status == "failed"
     assert response.execution_state.failed_steps == 1
     assert response.execution_state.tool_calls == 1
+
+
+def test_agent_multi_step_execution_should_not_execute_pending_tool_calls() -> None:
+    execution_service = AgentMultiStepExecutionService(
+        tool_selection_service=AgentToolSelectionService(
+            planning_service=AgentPlanningService(
+                llm_provider=FakeLLMProvider(
+                    response_content="""
+                    {
+                      "summary": "Plano com aprovação obrigatória.",
+                      "steps": [
+                        {
+                          "step_id": "plan-step-1",
+                          "objective": "Analisar requisito.",
+                          "tool_name": "requirements.analyze",
+                          "arguments": {
+                            "requirement_text": "Como cliente, quero gerar boleto.",
+                            "language": "pt-BR"
+                          },
+                          "rationale": "A análise de requisito precisa aprovação neste teste."
+                        }
+                      ]
+                    }
+                    """
+                )
+            )
+        )
+    )
+
+    response = execution_service.execute(
+        objective="Analisar requisito de boleto.",
+        max_plan_steps=3,
+        max_execution_steps=5,
+        approval_policy=AgentApprovalPolicy(
+            require_approval_for_tools=["requirements.analyze"],
+        ),
+    )
+
+    assert response.status == "completed"
+    assert len(response.selected_tool_calls) == 1
+    assert len(response.approval_decisions) == 1
+    assert response.approval_decisions[0].status == "pending"
+    assert response.agent_run.metadata["requested_tool_calls"] == 0
+    assert response.execution_state is not None
+    assert response.execution_state.tool_calls == 0

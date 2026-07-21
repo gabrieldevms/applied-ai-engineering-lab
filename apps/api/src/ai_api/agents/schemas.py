@@ -394,6 +394,34 @@ class AgentSkippedPlanStep(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+AgentApprovalStatus = Literal[
+    "approved",
+    "rejected",
+    "pending",
+    "not_required",
+]
+
+
+class AgentApprovalPolicy(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    require_approval_for_tools: list[str] = Field(default_factory=list)
+    auto_approve_safe_tools: bool = True
+    reject_tools: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentToolApprovalDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    source_step_id: str = Field(min_length=1)
+    tool_name: str = Field(min_length=1)
+    status: AgentApprovalStatus
+    reason: str = Field(min_length=1)
+    arguments: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class AgentToolSelectionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -463,6 +491,11 @@ class AgentToolSelectionResponse(BaseModel):
 
 class AgentMultiStepExecutionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
+
+    approval_policy: AgentApprovalPolicy = Field(
+        default_factory=AgentApprovalPolicy,
+        description="Policy used to decide whether selected tool calls require approval.",
+    )
 
     objective: str = Field(
         min_length=1,
@@ -546,6 +579,7 @@ class AgentMultiStepExecutionResponse(BaseModel):
     status: AgentRunStatus
     plan_summary: str
     selected_tool_calls: list[AgentSelectedToolCall]
+    approval_decisions: list[AgentToolApprovalDecision] = Field(default_factory=list)
     skipped_steps: list[AgentSkippedPlanStep]
     agent_run: AgentRunResponse
     execution_state: AgentExecutionState | None = None
