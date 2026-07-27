@@ -112,6 +112,7 @@ def test_agent_execution_log_service_should_record_workflow_execution() -> None:
         selected_tool_calls=[],
         skipped_steps=[],
         approval_decisions=[],
+        safety_check=None,
         agent_run=agent_run,
         execution_state=execution_state,
         metadata={

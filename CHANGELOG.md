@@ -183,3 +183,12 @@ All notable changes to this project will be documented in this file.
 - Log retrieval endpoints for all events and by run ID
 - Unit and API tests for execution logs
 - Multi-step agent execution now records execution log events
+- Agent safety policy schema
+- Agent safety violation schema
+- Agent safety check response schema
+- Agent safety service for tool execution boundaries
+- Safety-aware multi-step agent execution
+- Safety evaluation events in agent execution logs
+- Unit and API tests for agent safety limits
+- Multi-step agent execution now filters executable tool calls through safety limits
+- Agent execution logs now include safety evaluation events

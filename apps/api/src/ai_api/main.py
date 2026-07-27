@@ -628,6 +628,7 @@ def execute_agent_workflow(
         language=payload.language,
         metadata=payload.metadata,
         approval_policy=payload.approval_policy,
+        safety_policy=payload.safety_policy,
     )
 
 

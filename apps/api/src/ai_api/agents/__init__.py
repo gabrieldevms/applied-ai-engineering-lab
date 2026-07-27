@@ -30,6 +30,10 @@ from ai_api.agents.schemas import (
     AgentExecutionLogEvent,
     AgentExecutionLogLevel,
     AgentExecutionLogListResponse,
+    AgentSafetyCheckResponse,
+    AgentSafetyPolicy,
+    AgentSafetyStatus,
+    AgentSafetyViolation,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -66,6 +70,7 @@ from ai_api.agents.execution_logs import (
     FileAgentExecutionLogStore,
     InMemoryAgentExecutionLogStore,
 )
+from ai_api.agents.safety import AgentSafetyService
 
 __all__ = [
     "AgentRunRequest",
@@ -125,4 +130,9 @@ __all__ = [
     "FileAgentExecutionLogStore",
     "InMemoryAgentExecutionLogStore",
     "get_agent_execution_log_service",
+    "AgentSafetyCheckResponse",
+    "AgentSafetyPolicy",
+    "AgentSafetyService",
+    "AgentSafetyStatus",
+    "AgentSafetyViolation",
 ]

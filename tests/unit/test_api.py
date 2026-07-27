@@ -1289,17 +1289,86 @@ def test_agents_execute_endpoint_should_plan_select_and_execute() -> None:
             body["selected_tool_calls"][0]["tool_name"]
             == "requirements.analyze"
         )
+        assert body["safety_check"]["status"] == "passed"
+        assert len(body["execution_logs"]) == 6
+        assert body["metadata"]["execution_logs"] == 6
+        assert any(
+            event["event_type"] == "safety_evaluated"
+            for event in body["execution_logs"]
+        )
         assert body["agent_run"]["status"] == "completed"
         assert (
             body["agent_run"]["steps"][2]["name"]
             == "tool_call:requirements.analyze"
         )
-        assert len(body["execution_logs"]) == 5
-        assert body["execution_logs"][0]["event_type"] == "plan_generated"
-        assert body["metadata"]["execution_logs"] == 5
         assert body["metadata"]["executor"] == (
             "agent-multi-step-execution-service-v1"
         )
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_agents_execute_endpoint_should_not_execute_safety_blocked_tool_calls() -> None:
+    def get_test_agent_multi_step_execution_service() -> AgentMultiStepExecutionService:
+        return AgentMultiStepExecutionService(
+            tool_selection_service=AgentToolSelectionService(
+                planning_service=AgentPlanningService(
+                    llm_provider=FakeLLMProvider(
+                        response_content="""
+                        {
+                          "summary": "Plano para análise de requisito.",
+                          "steps": [
+                            {
+                              "step_id": "plan-step-1",
+                              "objective": "Analisar requisito.",
+                              "tool_name": "requirements.analyze",
+                              "arguments": {
+                                "requirement_text": "Como cliente, quero gerar boleto.",
+                                "language": "pt-BR"
+                              },
+                              "rationale": "A ferramenta de requisitos é adequada."
+                            }
+                          ]
+                        }
+                        """
+                    )
+                )
+            )
+        )
+
+    app.dependency_overrides[
+        get_agent_multi_step_execution_service
+    ] = get_test_agent_multi_step_execution_service
+
+    try:
+        payload = {
+            "objective": "Analisar requisito de boleto.",
+            "max_plan_steps": 3,
+            "max_execution_steps": 5,
+            "safety_policy": {
+                "max_selected_tool_calls": 5,
+                "max_executable_tool_calls": 5,
+                "blocked_tools": [
+                    "requirements.analyze"
+                ],
+                "allow_llm_tools": True,
+                "metadata": {
+                    "safety_reason": "blocked for test"
+                },
+            },
+        }
+
+        response = client.post("/agents/execute", json=payload)
+
+        assert response.status_code == 200
+
+        body = response.json()
+
+        assert body["status"] == "completed"
+        assert body["safety_check"]["status"] == "blocked"
+        assert body["safety_check"]["violations"][0]["rule"] == "blocked_tool"
+        assert body["agent_run"]["metadata"]["requested_tool_calls"] == 0
+        assert body["execution_state"]["tool_calls"] == 0
     finally:
         app.dependency_overrides.clear()
 

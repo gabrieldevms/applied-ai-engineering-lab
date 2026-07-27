@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Persistent agent execution logs completed  
-**Next milestone:** Agent safety limits  
+**Current milestone:** Agent safety limits completed  
+**Next milestone:** Agent evaluation  
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -121,6 +121,8 @@ The project includes a controlled agent runtime with:
 * in-memory execution state snapshots;
 * file-based persistent execution logs;
 * execution log retrieval by run ID;
+* safety limits for agent tool execution;
+* safety violation reporting;
 
 ### Agent Tools
 
@@ -509,15 +511,15 @@ Current limitations include:
 * execution logs are persisted locally as JSONL files, not yet in a production database;
 * approval flow is currently policy-based and synchronous;
 * there is no external human review UI yet;
-* safety limits are not implemented yet;
+* agent evaluation is not implemented yet;
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: Agent Safety Limits
+## Next Milestone: Agent Evaluation
 
-The next M4 milestone is to introduce safety limits for agent workflows.
+The next M4 milestone is to evaluate agent executions using deterministic quality checks.
 
-This will add explicit boundaries for tool execution, approval requirements and workflow control before moving into agent evaluation.
+This will help assess whether agent workflows are traceable, safe, complete and aligned with the requested objective.
 
 Later M4 milestones will introduce:
 

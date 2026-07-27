@@ -489,12 +489,93 @@ class AgentToolSelectionResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class AgentExecutionState(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    state_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    objective: str = Field(min_length=1)
+    status: AgentRunStatus
+    current_step: str | None = None
+    total_steps: int = Field(ge=0)
+    completed_steps: int = Field(ge=0)
+    failed_steps: int = Field(ge=0)
+    skipped_steps: int = Field(ge=0)
+    tool_calls: int = Field(ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AgentExecutionLogLevel = Literal[
+    "info",
+    "warning",
+    "error",
+]
+
+
+class AgentExecutionLogEvent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    log_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    event_type: str = Field(min_length=1)
+    level: AgentExecutionLogLevel = "info"
+    message: str = Field(min_length=1)
+    created_at: str = Field(min_length=1)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentExecutionLogListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    events: list[AgentExecutionLogEvent]
+    total: int = Field(ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AgentSafetyStatus = Literal[
+    "passed",
+    "blocked",
+]
+
+
+class AgentSafetyPolicy(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    max_selected_tool_calls: int = Field(default=5, ge=0, le=20)
+    max_executable_tool_calls: int = Field(default=5, ge=0, le=10)
+    blocked_tools: list[str] = Field(default_factory=list)
+    allow_llm_tools: bool = True
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentSafetyViolation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    rule: str = Field(min_length=1)
+    message: str = Field(min_length=1)
+    tool_name: str | None = None
+    source_step_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentSafetyCheckResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: AgentSafetyStatus
+    violations: list[AgentSafetyViolation] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
 class AgentMultiStepExecutionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     approval_policy: AgentApprovalPolicy = Field(
         default_factory=AgentApprovalPolicy,
         description="Policy used to decide whether selected tool calls require approval.",
+    )
+
+    safety_policy: AgentSafetyPolicy = Field(
+        default_factory=AgentSafetyPolicy,
+        description="Safety limits applied before executing selected tool calls.",
     )
 
     objective: str = Field(
@@ -556,49 +637,6 @@ class AgentMultiStepExecutionRequest(BaseModel):
         return cleaned_value
 
 
-class AgentExecutionState(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    state_id: str = Field(min_length=1)
-    run_id: str = Field(min_length=1)
-    objective: str = Field(min_length=1)
-    status: AgentRunStatus
-    current_step: str | None = None
-    total_steps: int = Field(ge=0)
-    completed_steps: int = Field(ge=0)
-    failed_steps: int = Field(ge=0)
-    skipped_steps: int = Field(ge=0)
-    tool_calls: int = Field(ge=0)
-    metadata: dict[str, Any] = Field(default_factory=dict)
-
-
-AgentExecutionLogLevel = Literal[
-    "info",
-    "warning",
-    "error",
-]
-
-
-class AgentExecutionLogEvent(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    log_id: str = Field(min_length=1)
-    run_id: str = Field(min_length=1)
-    event_type: str = Field(min_length=1)
-    level: AgentExecutionLogLevel = "info"
-    message: str = Field(min_length=1)
-    created_at: str = Field(min_length=1)
-    metadata: dict[str, Any] = Field(default_factory=dict)
-
-
-class AgentExecutionLogListResponse(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    events: list[AgentExecutionLogEvent]
-    total: int = Field(ge=0)
-    metadata: dict[str, Any] = Field(default_factory=dict)
-
-
 class AgentMultiStepExecutionResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -606,8 +644,9 @@ class AgentMultiStepExecutionResponse(BaseModel):
     status: AgentRunStatus
     plan_summary: str
     selected_tool_calls: list[AgentSelectedToolCall]
-    approval_decisions: list[AgentToolApprovalDecision] = Field(default_factory=list)
     skipped_steps: list[AgentSkippedPlanStep]
+    approval_decisions: list[AgentToolApprovalDecision] = Field(default_factory=list)
+    safety_check: AgentSafetyCheckResponse | None = None
     agent_run: AgentRunResponse
     execution_state: AgentExecutionState | None = None
     execution_logs: list[AgentExecutionLogEvent] = Field(default_factory=list)
