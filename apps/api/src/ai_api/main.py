@@ -83,6 +83,9 @@ from ai_api.agents import (
     AgentExecutionLogListResponse,
     AgentExecutionLogService,
     get_agent_execution_log_service,
+    AgentEvaluationRequest,
+    AgentEvaluationResponse,
+    AgentEvaluationService,
 )
 
 
@@ -629,6 +632,24 @@ def execute_agent_workflow(
         metadata=payload.metadata,
         approval_policy=payload.approval_policy,
         safety_policy=payload.safety_policy,
+    )
+
+
+@app.post("/agents/evaluate", response_model=AgentEvaluationResponse)
+def evaluate_agent_execution(
+    payload: AgentEvaluationRequest,
+) -> AgentEvaluationResponse:
+    evaluation_service = AgentEvaluationService()
+
+    return evaluation_service.evaluate_execution(
+        objective=payload.objective,
+        agent_run=payload.agent_run,
+        execution_state=payload.execution_state,
+        selected_tool_calls=payload.selected_tool_calls,
+        approval_decisions=payload.approval_decisions,
+        safety_check=payload.safety_check,
+        execution_logs=payload.execution_logs,
+        metadata=payload.metadata,
     )
 
 

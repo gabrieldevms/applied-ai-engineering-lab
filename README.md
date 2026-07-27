@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Agent safety limits completed  
-**Next milestone:** Agent evaluation  
+**Current milestone:** Agent evaluation completed  
+**Next milestone:** M4 final review  
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -123,6 +123,8 @@ The project includes a controlled agent runtime with:
 * execution log retrieval by run ID;
 * safety limits for agent tool execution;
 * safety violation reporting;
+* deterministic agent execution evaluation;
+* evaluation metrics for traceability, completion, safety, approval control and objective alignment;
 
 ### Agent Tools
 
@@ -241,6 +243,7 @@ http://127.0.0.1:8000/docs
 | `POST` | `/agents/execute` | Plan, select tools and execute a controlled multi-step agent workflow |
 | `GET`  | `/agents/logs` | List persisted agent execution log events |
 | `GET`  | `/agents/logs/{run_id}` | List persisted agent execution log events by run ID |
+| `POST` | `/agents/evaluate` | Evaluate an agent execution using deterministic quality checks |
 
 ## Technology Stack
 
@@ -508,16 +511,16 @@ The project is intentionally evolving in small, testable increments.
 
 Current limitations include:
 
+* agent evaluation is currently deterministic and rule-based;
 * execution logs are persisted locally as JSONL files, not yet in a production database;
 * approval flow is currently policy-based and synchronous;
 * there is no external human review UI yet;
-* agent evaluation is not implemented yet;
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: Agent Evaluation
+## Next Milestone: M4 Final Review
 
-The next M4 milestone is to evaluate agent executions using deterministic quality checks.
+The next step is to review the full AI Agents module, consolidate documentation, validate endpoints and prepare the project for the next major module.
 
 This will help assess whether agent workflows are traceable, safe, complete and aligned with the requested objective.
 

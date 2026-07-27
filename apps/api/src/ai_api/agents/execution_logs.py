@@ -13,6 +13,7 @@ from ai_api.agents.schemas import (
     AgentSkippedPlanStep,
     AgentToolApprovalDecision,
     AgentSafetyCheckResponse,
+    AgentEvaluationResponse,
 )
 
 
@@ -181,6 +182,7 @@ class AgentExecutionLogService:
         skipped_steps: Sequence[AgentSkippedPlanStep],
         approval_decisions: Sequence[AgentToolApprovalDecision],
         safety_check: AgentSafetyCheckResponse | None,
+        evaluation: AgentEvaluationResponse | None,
         agent_run: AgentRunResponse,
         execution_state: AgentExecutionState,
         metadata: dict | None = None,
@@ -243,6 +245,26 @@ class AgentExecutionLogService:
                         **common_metadata,
                         "safety_status": safety_check.status,
                         "safety_violations": len(safety_check.violations),
+                    },
+                )
+            )
+
+        if evaluation is not None:
+            events.append(
+                self.record_event(
+                    run_id=agent_run.run_id,
+                    event_type="evaluation_completed",
+                    message="Agent execution evaluation was completed.",
+                    level=(
+                        "warning"
+                        if evaluation.status != "passed"
+                        else "info"
+                    ),
+                    metadata={
+                        **common_metadata,
+                        "evaluation_status": evaluation.status,
+                        "overall_score": evaluation.overall_score,
+                        "metrics": len(evaluation.metrics),
                     },
                 )
             )

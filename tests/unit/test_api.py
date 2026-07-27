@@ -1290,10 +1290,17 @@ def test_agents_execute_endpoint_should_plan_select_and_execute() -> None:
             == "requirements.analyze"
         )
         assert body["safety_check"]["status"] == "passed"
-        assert len(body["execution_logs"]) == 6
-        assert body["metadata"]["execution_logs"] == 6
+        assert body["evaluation"]["status"] == "passed"
+        assert body["evaluation"]["overall_score"] >= 0.8
+        assert len(body["execution_logs"]) == 7
+        assert body["metadata"]["execution_logs"] == 7
+        assert body["metadata"]["evaluation_status"] == "passed"
         assert any(
             event["event_type"] == "safety_evaluated"
+            for event in body["execution_logs"]
+        )
+        assert any(
+            event["event_type"] == "evaluation_completed"
             for event in body["execution_logs"]
         )
         assert body["agent_run"]["status"] == "completed"
@@ -1519,3 +1526,70 @@ def test_agents_logs_by_run_id_endpoint_should_filter_execution_logs() -> None:
         assert body["events"][0]["run_id"] == "agent-run-1"
     finally:
         app.dependency_overrides.clear()
+
+
+def test_agents_evaluate_endpoint_should_evaluate_execution() -> None:
+    payload = {
+        "objective": "Analisar requisito.",
+        "agent_run": {
+            "run_id": "agent-run-123",
+            "objective": "Analisar requisito.",
+            "status": "completed",
+            "final_answer": "Execução concluída.",
+            "steps": [
+                {
+                    "step_id": "step-1",
+                    "name": "understand_objective",
+                    "status": "completed",
+                    "input": {},
+                    "output": {},
+                    "metadata": {},
+                }
+            ],
+            "metadata": {},
+        },
+        "execution_state": {
+            "state_id": "agent-state-agent-run-123",
+            "run_id": "agent-run-123",
+            "objective": "Analisar requisito.",
+            "status": "completed",
+            "current_step": "understand_objective",
+            "total_steps": 1,
+            "completed_steps": 1,
+            "failed_steps": 0,
+            "skipped_steps": 0,
+            "tool_calls": 0,
+            "metadata": {},
+        },
+        "safety_check": {
+            "status": "passed",
+            "violations": [],
+            "metadata": {},
+        },
+        "execution_logs": [
+            {
+                "log_id": "agent-log-123",
+                "run_id": "agent-run-123",
+                "event_type": "runtime_completed",
+                "level": "info",
+                "message": "Runtime completed.",
+                "created_at": "2026-01-01T00:00:00+00:00",
+                "metadata": {},
+            }
+        ],
+        "metadata": {
+            "source": "api-test"
+        },
+    }
+
+    response = client.post("/agents/evaluate", json=payload)
+
+    assert response.status_code == 200
+
+    body = response.json()
+
+    assert body["status"] == "passed"
+    assert body["overall_score"] == 1.0
+    assert len(body["metrics"]) == 5
+    assert body["metadata"]["source"] == "api-test"
+    assert body["metadata"]["evaluator"] == "agent-evaluation-service-v1"
