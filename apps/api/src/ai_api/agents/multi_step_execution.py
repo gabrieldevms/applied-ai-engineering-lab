@@ -1,14 +1,15 @@
 from ai_api.agents.approval import AgentApprovalService
+from ai_api.agents.evaluation import AgentEvaluationService
 from ai_api.agents.execution_logs import AgentExecutionLogService
 from ai_api.agents.runtime import AgentRuntime
 from ai_api.agents.safety import AgentSafetyService
 from ai_api.agents.schemas import (
     AgentApprovalPolicy,
     AgentMultiStepExecutionResponse,
+    AgentSafetyPolicy,
     AgentToolApprovalDecision,
     AgentToolCall,
     ToolDefinition,
-    AgentSafetyPolicy,
 )
 from ai_api.agents.state import AgentStateService
 from ai_api.agents.tool_selection import AgentToolSelectionService
@@ -21,15 +22,17 @@ class AgentMultiStepExecutionService:
         agent_runtime: AgentRuntime | None = None,
         state_service: AgentStateService | None = None,
         approval_service: AgentApprovalService | None = None,
-        safety_service: AgentSafetyService | None = None,
         log_service: AgentExecutionLogService | None = None,
+        safety_service: AgentSafetyService | None = None,
+        evaluation_service: AgentEvaluationService | None = None,
     ) -> None:
         self.tool_selection_service = tool_selection_service
         self.agent_runtime = agent_runtime or AgentRuntime()
         self.state_service = state_service or AgentStateService()
         self.approval_service = approval_service or AgentApprovalService()
-        self.safety_service = safety_service or AgentSafetyService()
         self.log_service = log_service or AgentExecutionLogService()
+        self.safety_service = safety_service or AgentSafetyService()
+        self.evaluation_service = evaluation_service or AgentEvaluationService()
 
     def execute(
         self,
@@ -118,7 +121,7 @@ class AgentMultiStepExecutionService:
                 "planning_provider": selection_response.provider,
                 "planning_model": selection_response.model,
                 "approval_decisions": len(approval_decisions),
-                "executable_tool_calls": len(tool_calls),
+                "executable_tool_calls": len(executable_tool_calls),
                 "safety_status": safety_check.status,
                 "safety_violations": len(safety_check.violations),
                 "safe_executable_tool_calls": len(tool_calls),
@@ -135,7 +138,7 @@ class AgentMultiStepExecutionService:
                 ),
                 "skipped_plan_steps": len(selection_response.skipped_steps),
                 "approval_decisions": len(approval_decisions),
-                "executable_tool_calls": len(tool_calls),
+                "executable_tool_calls": len(executable_tool_calls),
                 "safety_status": safety_check.status,
                 "safety_violations": len(safety_check.violations),
                 "safe_executable_tool_calls": len(tool_calls),
@@ -148,13 +151,45 @@ class AgentMultiStepExecutionService:
             skipped_steps=selection_response.skipped_steps,
             approval_decisions=approval_decisions,
             safety_check=safety_check,
+            evaluation=None,
             agent_run=agent_run,
             execution_state=execution_state,
             metadata={
                 "source": "multi_step_execution",
-                
             },
         )
+
+        evaluation = self.evaluation_service.evaluate_execution(
+            objective=cleaned_objective,
+            agent_run=agent_run,
+            execution_state=execution_state,
+            selected_tool_calls=selection_response.selected_tool_calls,
+            approval_decisions=approval_decisions,
+            safety_check=safety_check,
+            execution_logs=execution_logs,
+            metadata={
+                "source": "multi_step_execution",
+            },
+        )
+
+        evaluation_log = self.log_service.record_event(
+            run_id=agent_run.run_id,
+            event_type="evaluation_completed",
+            message="Agent execution evaluation was completed.",
+            level=(
+                "warning"
+                if evaluation.status != "passed"
+                else "info"
+            ),
+            metadata={
+                "source": "multi_step_execution",
+                "evaluation_status": evaluation.status,
+                "overall_score": evaluation.overall_score,
+                "metrics": len(evaluation.metrics),
+            },
+        )
+
+        execution_logs.append(evaluation_log)
 
         return AgentMultiStepExecutionResponse(
             objective=cleaned_objective,
@@ -163,18 +198,21 @@ class AgentMultiStepExecutionService:
             selected_tool_calls=selection_response.selected_tool_calls,
             skipped_steps=selection_response.skipped_steps,
             approval_decisions=approval_decisions,
+            safety_check=safety_check,
             agent_run=agent_run,
             execution_state=execution_state,
             execution_logs=execution_logs,
+            evaluation=evaluation,
             provider=selection_response.provider,
             model=selection_response.model,
-            safety_check=safety_check,
             metadata={
                 **selection_response.metadata,
                 "executor": "agent-multi-step-execution-service-v1",
                 "agent_run_id": agent_run.run_id,
                 "agent_run_status": agent_run.status,
                 "execution_logs": len(execution_logs),
+                "evaluation_status": evaluation.status,
+                "evaluation_score": evaluation.overall_score,
                 "safety_status": safety_check.status,
                 "safety_violations": len(safety_check.violations),
             },

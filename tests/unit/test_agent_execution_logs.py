@@ -5,6 +5,8 @@ from ai_api.agents import (
     AgentStep,
     FileAgentExecutionLogStore,
     InMemoryAgentExecutionLogStore,
+    AgentEvaluationResponse,
+    AgentEvaluationMetric,
 )
 
 
@@ -113,6 +115,7 @@ def test_agent_execution_log_service_should_record_workflow_execution() -> None:
         skipped_steps=[],
         approval_decisions=[],
         safety_check=None,
+        evaluation=None,
         agent_run=agent_run,
         execution_state=execution_state,
         metadata={
@@ -132,3 +135,68 @@ def test_agent_execution_log_service_should_record_workflow_execution() -> None:
     assert "runtime_completed" in event_types
     assert "state_recorded" in event_types
     assert store.count() == 5
+
+
+def test_agent_execution_log_service_should_record_evaluation_event() -> None:
+    store = InMemoryAgentExecutionLogStore()
+    service = AgentExecutionLogService(log_store=store)
+
+    agent_run = AgentRunResponse(
+        run_id="agent-run-123",
+        objective="Analisar requisito.",
+        status="completed",
+        final_answer="Execução concluída.",
+        steps=[
+            AgentStep(
+                step_id="step-1",
+                name="understand_objective",
+                status="completed",
+            )
+        ],
+    )
+
+    execution_state = AgentExecutionState(
+        state_id="agent-state-agent-run-123",
+        run_id="agent-run-123",
+        objective="Analisar requisito.",
+        status="completed",
+        current_step="understand_objective",
+        total_steps=1,
+        completed_steps=1,
+        failed_steps=0,
+        skipped_steps=0,
+        tool_calls=0,
+    )
+
+    evaluation = AgentEvaluationResponse(
+        status="passed",
+        overall_score=1.0,
+        metrics=[
+            AgentEvaluationMetric(
+                name="completion",
+                score=1.0,
+                status="passed",
+                message="Completed.",
+            )
+        ],
+    )
+
+    events = service.record_workflow_execution(
+        plan_summary="Plano gerado.",
+        selected_tool_calls=[],
+        skipped_steps=[],
+        approval_decisions=[],
+        safety_check=None,
+        evaluation=evaluation,
+        agent_run=agent_run,
+        execution_state=execution_state,
+        metadata={
+            "source": "test",
+        },
+    )
+
+    assert len(events) == 6
+    assert any(
+        event.event_type == "evaluation_completed"
+        for event in events
+    )

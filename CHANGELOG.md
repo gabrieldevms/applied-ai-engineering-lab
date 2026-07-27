@@ -192,3 +192,11 @@ All notable changes to this project will be documented in this file.
 - Unit and API tests for agent safety limits
 - Multi-step agent execution now filters executable tool calls through safety limits
 - Agent execution logs now include safety evaluation events
+- Deterministic agent evaluation service
+- Agent evaluation schemas and metrics
+- Agent execution evaluation endpoint
+- Evaluation metrics for traceability, completion, safety, approval control and objective alignment
+- Evaluation events in agent execution logs
+- Unit and API tests for agent evaluation
+- Multi-step agent execution now returns evaluation results
+- Agent execution logs now include evaluation completion events

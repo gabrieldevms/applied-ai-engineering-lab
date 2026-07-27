@@ -565,6 +565,56 @@ class AgentSafetyCheckResponse(BaseModel):
     violations: list[AgentSafetyViolation] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
+
+AgentEvaluationStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+
+class AgentEvaluationMetric(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1)
+    score: float = Field(ge=0.0, le=1.0)
+    status: AgentEvaluationStatus
+    message: str = Field(min_length=1)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentEvaluationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    objective: str = Field(min_length=1)
+    agent_run: AgentRunResponse
+    execution_state: AgentExecutionState | None = None
+    selected_tool_calls: list[AgentSelectedToolCall] = Field(default_factory=list)
+    approval_decisions: list[AgentToolApprovalDecision] = Field(default_factory=list)
+    safety_check: AgentSafetyCheckResponse | None = None
+    execution_logs: list[AgentExecutionLogEvent] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("objective")
+    @classmethod
+    def objective_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("objective cannot be blank")
+
+        return cleaned_value
+
+
+class AgentEvaluationResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: AgentEvaluationStatus
+    overall_score: float = Field(ge=0.0, le=1.0)
+    metrics: list[AgentEvaluationMetric]
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class AgentMultiStepExecutionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -650,6 +700,7 @@ class AgentMultiStepExecutionResponse(BaseModel):
     agent_run: AgentRunResponse
     execution_state: AgentExecutionState | None = None
     execution_logs: list[AgentExecutionLogEvent] = Field(default_factory=list)
+    evaluation: AgentEvaluationResponse | None = None
     provider: str
     model: str
     metadata: dict[str, Any] = Field(default_factory=dict)

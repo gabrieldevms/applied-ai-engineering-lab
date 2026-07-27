@@ -34,6 +34,10 @@ from ai_api.agents.schemas import (
     AgentSafetyPolicy,
     AgentSafetyStatus,
     AgentSafetyViolation,
+    AgentEvaluationMetric,
+    AgentEvaluationRequest,
+    AgentEvaluationResponse,
+    AgentEvaluationStatus,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -71,6 +75,7 @@ from ai_api.agents.execution_logs import (
     InMemoryAgentExecutionLogStore,
 )
 from ai_api.agents.safety import AgentSafetyService
+from ai_api.agents.evaluation import AgentEvaluationService
 
 __all__ = [
     "AgentRunRequest",
@@ -135,4 +140,9 @@ __all__ = [
     "AgentSafetyService",
     "AgentSafetyStatus",
     "AgentSafetyViolation",
+    "AgentEvaluationMetric",
+    "AgentEvaluationRequest",
+    "AgentEvaluationResponse",
+    "AgentEvaluationService",
+    "AgentEvaluationStatus",
 ]
