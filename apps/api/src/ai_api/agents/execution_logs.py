@@ -12,6 +12,7 @@ from ai_api.agents.schemas import (
     AgentSelectedToolCall,
     AgentSkippedPlanStep,
     AgentToolApprovalDecision,
+    AgentSafetyCheckResponse,
 )
 
 
@@ -179,6 +180,7 @@ class AgentExecutionLogService:
         selected_tool_calls: Sequence[AgentSelectedToolCall],
         skipped_steps: Sequence[AgentSkippedPlanStep],
         approval_decisions: Sequence[AgentToolApprovalDecision],
+        safety_check: AgentSafetyCheckResponse | None,
         agent_run: AgentRunResponse,
         execution_state: AgentExecutionState,
         metadata: dict | None = None,
@@ -224,28 +226,52 @@ class AgentExecutionLogService:
                     ),
                 },
             ),
-            self.record_event(
-                run_id=agent_run.run_id,
-                event_type=self._build_runtime_event_type(agent_run),
-                message="Agent runtime execution finished.",
-                level="error" if agent_run.status == "failed" else "info",
-                metadata={
-                    **common_metadata,
-                    "executed_steps": len(agent_run.steps),
-                    "final_status": agent_run.status,
-                },
-            ),
-            self.record_event(
-                run_id=agent_run.run_id,
-                event_type="state_recorded",
-                message="Agent execution state snapshot was recorded.",
-                metadata={
-                    **common_metadata,
-                    "total_steps": execution_state.total_steps,
-                    "tool_calls": execution_state.tool_calls,
-                },
-            ),
         ]
+
+        if safety_check is not None:
+            events.append(
+                self.record_event(
+                    run_id=agent_run.run_id,
+                    event_type="safety_evaluated",
+                    message="Safety limits were evaluated for executable tools.",
+                    level=(
+                        "warning"
+                        if safety_check.status == "blocked"
+                        else "info"
+                    ),
+                    metadata={
+                        **common_metadata,
+                        "safety_status": safety_check.status,
+                        "safety_violations": len(safety_check.violations),
+                    },
+                )
+            )
+
+        events.extend(
+            [
+                self.record_event(
+                    run_id=agent_run.run_id,
+                    event_type=self._build_runtime_event_type(agent_run),
+                    message="Agent runtime execution finished.",
+                    level="error" if agent_run.status == "failed" else "info",
+                    metadata={
+                        **common_metadata,
+                        "executed_steps": len(agent_run.steps),
+                        "final_status": agent_run.status,
+                    },
+                ),
+                self.record_event(
+                    run_id=agent_run.run_id,
+                    event_type="state_recorded",
+                    message="Agent execution state snapshot was recorded.",
+                    metadata={
+                        **common_metadata,
+                        "total_steps": execution_state.total_steps,
+                        "tool_calls": execution_state.tool_calls,
+                    },
+                ),
+            ]
+        )
 
         return events
 
