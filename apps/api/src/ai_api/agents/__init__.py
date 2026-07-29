@@ -95,6 +95,13 @@ from ai_api.agents.qa_data_validation_selection import (
     QADataValidationSelectionResult,
     QADataValidationSelector,
 )
+from ai_api.agents.qa_evaluation import (
+    QAAgentEvaluationMetric,
+    QAAgentEvaluationRequest,
+    QAAgentEvaluationResponse,
+    QAAgentEvaluationService,
+    QAAgentEvaluationStatus,
+)
 
 __all__ = [
     "AgentRunRequest",
@@ -179,4 +186,10 @@ __all__ = [
     "QADataValidationSelectionResult",
     "QADataValidationSelector",
     "QAAgentDataValidationMode",
+    "QAAgentEvaluationMetric",
+    "QAAgentEvaluationRequest",
+    "QAAgentEvaluationResponse",
+    "QAAgentEvaluationService",
+    "QAAgentEvaluationStatus",
+    "get_qa_agent_evaluation_service",
 ]

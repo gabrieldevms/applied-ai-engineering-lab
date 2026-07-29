@@ -91,6 +91,9 @@ from ai_api.agents import (
     SpecializedAgentRegistry,
     SpecializedAgentRegistryResponse,
     get_specialized_agent_registry,
+    QAAgentEvaluationRequest,
+    QAAgentEvaluationResponse,
+    QAAgentEvaluationService,
 )
 from ai_api.data_analysis import (
     DataAnalystAgentEvaluationRequest,
@@ -120,6 +123,7 @@ from ai_api.agents.dependencies import (
     get_agent_runtime,
     get_tool_execution_service,
     get_qa_agent_service,
+    get_qa_agent_evaluation_service,
 )
 
 logging.basicConfig(
@@ -727,6 +731,20 @@ def run_qa_agent(
         max_steps=payload.max_steps,
         metadata=payload.metadata,
     )
+
+
+@app.post(
+    "/agents/qa/evaluate",
+    response_model=QAAgentEvaluationResponse,
+)
+def evaluate_qa_agent(
+    payload: QAAgentEvaluationRequest,
+    service: Annotated[
+        QAAgentEvaluationService,
+        Depends(get_qa_agent_evaluation_service),
+    ],
+) -> QAAgentEvaluationResponse:
+    return service.evaluate(payload)
 
 
 @app.post("/agents/plan", response_model=AgentPlanResponse)
