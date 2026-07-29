@@ -49,10 +49,10 @@ def test_file_ingestion_should_reject_unsupported_file_type() -> None:
 
     with pytest.raises(
         TextExtractionError,
-        match="Unsupported file type: .pdf",
+        match="Unsupported file type: .exe",
     ):
         service.ingest_file(
-            file_content=b"fake pdf content",
-            filename="document.pdf",
-            content_type="application/pdf",
+            file_content=b"fake executable content",
+            filename="document.exe",
+            content_type="application/octet-stream",
         )

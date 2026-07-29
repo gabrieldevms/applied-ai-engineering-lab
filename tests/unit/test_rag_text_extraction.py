@@ -50,12 +50,14 @@ def test_text_extraction_should_reject_unsupported_file_type() -> None:
 
     with pytest.raises(
         TextExtractionError,
-        match="Unsupported file type: .pdf",
+        match="Unsupported file type: .exe",
     ):
         service.extract_from_bytes(
-            file_content=b"fake pdf content",
-            filename="document.pdf",
+            file_content=b"fake executable content",
+            filename="document.exe",
+            content_type="application/octet-stream",
         )
+
 
 
 def test_text_extraction_should_reject_empty_text() -> None:

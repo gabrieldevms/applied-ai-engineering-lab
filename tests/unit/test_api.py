@@ -318,9 +318,9 @@ def test_rag_extract_text_endpoint_should_reject_unsupported_file_type() -> None
         "/rag/extract-text",
         files={
             "file": (
-                "document.pdf",
-                b"fake pdf content",
-                "application/pdf",
+                "document.exe",
+                b"fake executable content",
+                "application/octet-stream",
             )
         },
     )
@@ -330,7 +330,7 @@ def test_rag_extract_text_endpoint_should_reject_unsupported_file_type() -> None
     body = response.json()
 
     assert body["error"]["type"] == "text_extraction_error"
-    assert body["error"]["message"] == "Unsupported file type: .pdf"
+    assert body["error"]["message"] == "Unsupported file type: .exe"
 
 
 def test_rag_ingest_file_endpoint_should_extract_and_ingest_file() -> None:
@@ -392,9 +392,9 @@ def test_rag_ingest_file_endpoint_should_reject_unsupported_file_type() -> None:
         "/rag/ingest-file",
         files={
             "file": (
-                "document.pdf",
-                b"fake pdf content",
-                "application/pdf",
+                "document.exe",
+                b"fake executable content",
+                "application/octet-stream",
             )
         },
     )
@@ -404,8 +404,7 @@ def test_rag_ingest_file_endpoint_should_reject_unsupported_file_type() -> None:
     body = response.json()
 
     assert body["error"]["type"] == "text_extraction_error"
-    assert body["error"]["message"] == "Unsupported file type: .pdf"
-
+    assert body["error"]["message"] == "Unsupported file type: .exe"
 
 def test_rag_embed_endpoint_should_return_embeddings() -> None:
     payload = {
