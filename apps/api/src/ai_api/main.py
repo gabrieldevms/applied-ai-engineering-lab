@@ -88,6 +88,9 @@ from ai_api.agents import (
     AgentEvaluationRequest,
     AgentEvaluationResponse,
     AgentEvaluationService,
+    SpecializedAgentRegistry,
+    SpecializedAgentRegistryResponse,
+    get_specialized_agent_registry,
 )
 from ai_api.data_analysis import (
     DataAnalystAgentEvaluationRequest,
@@ -668,6 +671,16 @@ def list_agent_tools() -> ToolRegistryResponse:
     tool_registry = ToolRegistry()
 
     return tool_registry.describe()
+
+
+@app.get("/agents/specialized", response_model=SpecializedAgentRegistryResponse,)
+def list_specialized_agents(
+    registry: Annotated[
+        SpecializedAgentRegistry,
+        Depends(get_specialized_agent_registry),
+    ],
+) -> SpecializedAgentRegistryResponse:
+    return registry.to_response()
 
 
 @app.post("/agents/tools/execute", response_model=ToolExecutionResponse)
