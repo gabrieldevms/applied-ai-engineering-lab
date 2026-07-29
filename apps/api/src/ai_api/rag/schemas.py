@@ -521,3 +521,28 @@ class RetrievalResponse(BaseModel):
     total_retrieved_chunks: int
     retrieved_chunks: list[VectorSearchResult]
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ExtractedTable(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    table_id: str = Field(min_length=1)
+    source: str = Field(min_length=1)
+    filename: str = Field(min_length=1)
+    table_index: int = Field(ge=0)
+    rows: list[list[str]]
+    row_count: int = Field(ge=0)
+    column_count: int = Field(ge=0)
+    sheet_name: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class StructuredTableExtractionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    source: str = Field(min_length=1)
+    filename: str = Field(min_length=1)
+    content_type: str | None = None
+    tables: list[ExtractedTable]
+    table_count: int = Field(ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)

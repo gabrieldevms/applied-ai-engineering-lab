@@ -32,6 +32,8 @@ from ai_api.rag.schemas import (
     RAGEvaluationMetric,
     RetrievalResponse,
     RetrievalRequest,
+    ExtractedTable,
+    StructuredTableExtractionResponse,
 )
 from ai_api.rag.text_extraction import TextExtractionService
 from ai_api.rag.vector_store import InMemoryVectorStore, VectorStore
@@ -50,6 +52,14 @@ from ai_api.rag.prompts import (
 from ai_api.rag.citations import build_source_citations
 from ai_api.rag.evaluation import RAGEvaluationService
 from ai_api.rag.retrieval import RetrievalService
+from ai_api.rag.table_extraction import (
+    CSVStructuredTableExtractor,
+    DOCXStructuredTableExtractor,
+    ExcelStructuredTableExtractor,
+    StructuredTableExtractor,
+    StructuredTableExtractorRegistry,
+    TableExtractionService,
+)
 
 
 __all__ = [
@@ -98,4 +108,12 @@ __all__ = [
     "RetrievalRequest",
     "RetrievalResponse",
     "RetrievalService",
+    "CSVStructuredTableExtractor",
+    "DOCXStructuredTableExtractor",
+    "ExcelStructuredTableExtractor",
+    "ExtractedTable",
+    "StructuredTableExtractionResponse",
+    "StructuredTableExtractor",
+    "StructuredTableExtractorRegistry",
+    "TableExtractionService",
 ]

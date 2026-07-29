@@ -45,6 +45,8 @@ from ai_api.rag import (
     RetrievalRequest,
     RetrievalResponse,
     RetrievalService,
+    StructuredTableExtractionResponse,
+    TableExtractionService,
 )
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 from ai_api.requirements.exceptions import RequirementAnalysisError
@@ -438,6 +440,21 @@ async def extract_text_from_file(
     extraction_service = TextExtractionService()
 
     return extraction_service.extract_from_bytes(
+        file_content=file_content,
+        filename=file.filename or "uploaded-file",
+        content_type=file.content_type,
+    )
+
+
+@app.post("/rag/extract-tables", response_model=StructuredTableExtractionResponse)
+async def extract_tables_from_file(
+    file: Annotated[UploadFile, File(...)],
+) -> StructuredTableExtractionResponse:
+    file_content = await file.read()
+
+    service = TableExtractionService()
+
+    return service.extract_from_bytes(
         file_content=file_content,
         filename=file.filename or "uploaded-file",
         content_type=file.content_type,
