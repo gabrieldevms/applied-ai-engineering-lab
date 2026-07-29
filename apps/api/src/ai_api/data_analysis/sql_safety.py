@@ -19,6 +19,7 @@ class ReadOnlySQLValidator:
             "execute",
             "grant",
             "insert",
+            "load_extension",
             "merge",
             "pragma",
             "replace",
@@ -144,6 +145,10 @@ class ReadOnlySQLValidator:
         if not stripped_sql:
             return False
 
-        without_trailing_semicolon = stripped_sql[:-1] if stripped_sql.endswith(";") else stripped_sql
+        without_trailing_semicolon = (
+            stripped_sql[:-1]
+            if stripped_sql.endswith(";")
+            else stripped_sql
+        )
 
         return ";" in without_trailing_semicolon

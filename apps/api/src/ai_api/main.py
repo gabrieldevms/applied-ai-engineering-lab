@@ -92,9 +92,14 @@ from ai_api.agents import (
 from ai_api.data_analysis import (
     DataAnalystSQLGenerationService,
     NaturalLanguageSQLRequest,
+    SQLExecutionError,
+    SQLExecutionRequest,
+    SQLExecutionResponse,
     SQLGenerationError,
     SQLGenerationResponse,
+    SQLiteReadOnlyQueryExecutor,
     get_data_analyst_sql_generation_service,
+    get_sql_query_executor,
 )
 
 
@@ -152,6 +157,29 @@ async def sql_generation_exception_handler(
         content={
             "error": {
                 "type": "sql_generation_error",
+                "message": str(exc),
+            }
+        },
+    )
+
+
+@app.exception_handler(SQLExecutionError)
+async def sql_execution_exception_handler(
+    request: Request,
+    exc: SQLExecutionError,
+) -> JSONResponse:
+    logger.warning(
+        "SQL execution error on %s %s: %s",
+        request.method,
+        request.url.path,
+        str(exc),
+    )
+
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": {
+                "type": "sql_execution_error",
                 "message": str(exc),
             }
         },
@@ -390,10 +418,7 @@ def analyze_requirement(
     )
 
 
-@app.post(
-    "/data-analysis/sql/generate",
-    response_model=SQLGenerationResponse,
-)
+@app.post("/data-analysis/sql/generate", response_model=SQLGenerationResponse,)
 def generate_sql(
     payload: NaturalLanguageSQLRequest,
     service: Annotated[
@@ -402,6 +427,17 @@ def generate_sql(
     ],
 ) -> SQLGenerationResponse:
     return service.generate(payload)
+
+
+@app.post("/data-analysis/sql/execute", response_model=SQLExecutionResponse,)
+def execute_sql(
+    payload: SQLExecutionRequest,
+    executor: Annotated[
+        SQLiteReadOnlyQueryExecutor,
+        Depends(get_sql_query_executor),
+    ],
+) -> SQLExecutionResponse:
+    return executor.execute(payload)
 
 
 @app.post("/rag/chunk", response_model=DocumentChunkingResponse)
