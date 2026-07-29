@@ -2,7 +2,9 @@ import pytest
 
 from ai_api.rag.exceptions import TextExtractionError
 from ai_api.rag.file_extractors import (
+    DOCXFileExtractor,
     FileExtractorRegistry,
+    PDFFileExtractor,
     Utf8TextFileExtractor,
 )
 from ai_api.rag.schemas import TextExtractionResponse
@@ -40,12 +42,14 @@ class CustomFileExtractor:
         )
 
 
-def test_file_extractor_registry_should_register_default_text_extensions() -> None:
+def test_file_extractor_registry_should_register_default_extensions() -> None:
     registry = FileExtractorRegistry()
 
     assert registry.supported_extensions == (
+        ".docx",
         ".markdown",
         ".md",
+        ".pdf",
         ".txt",
     )
 
@@ -53,9 +57,13 @@ def test_file_extractor_registry_should_register_default_text_extensions() -> No
 def test_file_extractor_registry_should_resolve_extension_case_insensitively() -> None:
     registry = FileExtractorRegistry()
 
-    extractor = registry.get_for_filename("NOTES.MD")
+    markdown_extractor = registry.get_for_filename("NOTES.MD")
+    pdf_extractor = registry.get_for_filename("REPORT.PDF")
+    docx_extractor = registry.get_for_filename("REQUIREMENT.DOCX")
 
-    assert isinstance(extractor, Utf8TextFileExtractor)
+    assert isinstance(markdown_extractor, Utf8TextFileExtractor)
+    assert isinstance(pdf_extractor, PDFFileExtractor)
+    assert isinstance(docx_extractor, DOCXFileExtractor)
 
 
 def test_text_extraction_service_should_use_injected_custom_extractor() -> None:
@@ -103,6 +111,6 @@ def test_empty_file_extractor_registry_should_reject_unknown_extension() -> None
 
     with pytest.raises(
         TextExtractionError,
-        match="Unsupported file type: .pdf",
+        match="Unsupported file type: .exe",
     ):
-        registry.get_for_filename("document.pdf")
+        registry.get_for_filename("document.exe")

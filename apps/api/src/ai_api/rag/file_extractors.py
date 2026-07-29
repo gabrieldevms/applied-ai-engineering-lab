@@ -1,6 +1,10 @@
 from collections.abc import Iterable
+from io import BytesIO
 from pathlib import Path
 from typing import Protocol
+from docx import Document
+from pypdf import PdfReader
+
 from ai_api.rag.exceptions import TextExtractionError
 from ai_api.rag.schemas import TextExtractionResponse
 
@@ -23,6 +27,12 @@ def normalize_extracted_text(text: str) -> str:
     return text.replace("\r\n", "\n").replace("\r", "\n").strip()
 
 
+def get_file_extension(filename: str) -> str:
+    cleaned_filename = filename.strip() or "uploaded-file"
+
+    return Path(cleaned_filename).suffix.lower()
+
+
 class Utf8TextFileExtractor:
     name = "utf-8-text"
 
@@ -41,7 +51,7 @@ class Utf8TextFileExtractor:
         content_type: str | None = None,
     ) -> TextExtractionResponse:
         cleaned_filename = filename.strip() or "uploaded-file"
-        extension = Path(cleaned_filename).suffix.lower()
+        extension = get_file_extension(cleaned_filename)
 
         if extension not in self.supported_extensions:
             raise TextExtractionError(
@@ -74,13 +84,164 @@ class Utf8TextFileExtractor:
         )
 
 
+class PDFFileExtractor:
+    name = "pdf"
+
+    supported_extensions = frozenset(
+        {
+            ".pdf",
+        }
+    )
+
+    def extract(
+        self,
+        file_content: bytes,
+        filename: str,
+        content_type: str | None = None,
+    ) -> TextExtractionResponse:
+        cleaned_filename = filename.strip() or "uploaded-file"
+        extension = get_file_extension(cleaned_filename)
+
+        if extension not in self.supported_extensions:
+            raise TextExtractionError(
+                f"Unsupported file type: {extension or 'unknown'}"
+            )
+
+        try:
+            reader = PdfReader(BytesIO(file_content))
+
+            if reader.is_encrypted:
+                raise TextExtractionError(
+                    "Encrypted PDF files are not supported."
+                )
+
+            page_texts = [
+                normalize_extracted_text(page.extract_text() or "")
+                for page in reader.pages
+            ]
+
+            page_count = len(reader.pages)
+        except TextExtractionError:
+            raise
+        except Exception as exc:
+            raise TextExtractionError(
+                "PDF content could not be extracted."
+            ) from exc
+
+        normalized_text = normalize_extracted_text(
+            "\n\n".join(
+                page_text
+                for page_text in page_texts
+                if page_text
+            )
+        )
+
+        if not normalized_text:
+            raise TextExtractionError("Extracted text is empty.")
+
+        return TextExtractionResponse(
+            source=cleaned_filename,
+            filename=cleaned_filename,
+            content_type=content_type,
+            character_count=len(normalized_text),
+            text=normalized_text,
+            metadata={
+                "extension": extension,
+                "extraction_method": self.name,
+                "extractor": type(self).__name__,
+                "page_count": page_count,
+            },
+        )
+
+
+class DOCXFileExtractor:
+    name = "docx"
+
+    supported_extensions = frozenset(
+        {
+            ".docx",
+        }
+    )
+
+    def extract(
+        self,
+        file_content: bytes,
+        filename: str,
+        content_type: str | None = None,
+    ) -> TextExtractionResponse:
+        cleaned_filename = filename.strip() or "uploaded-file"
+        extension = get_file_extension(cleaned_filename)
+
+        if extension not in self.supported_extensions:
+            raise TextExtractionError(
+                f"Unsupported file type: {extension or 'unknown'}"
+            )
+
+        try:
+            document = Document(BytesIO(file_content))
+        except Exception as exc:
+            raise TextExtractionError(
+                "DOCX content could not be extracted."
+            ) from exc
+
+        paragraph_texts = [
+            normalize_extracted_text(paragraph.text)
+            for paragraph in document.paragraphs
+            if normalize_extracted_text(paragraph.text)
+        ]
+
+        table_texts: list[str] = []
+
+        for table in document.tables:
+            for row in table.rows:
+                row_values = [
+                    normalize_extracted_text(cell.text)
+                    for cell in row.cells
+                    if normalize_extracted_text(cell.text)
+                ]
+
+                if row_values:
+                    table_texts.append(" | ".join(row_values))
+
+        normalized_text = normalize_extracted_text(
+            "\n\n".join(
+                [
+                    *paragraph_texts,
+                    *table_texts,
+                ]
+            )
+        )
+
+        if not normalized_text:
+            raise TextExtractionError("Extracted text is empty.")
+
+        return TextExtractionResponse(
+            source=cleaned_filename,
+            filename=cleaned_filename,
+            content_type=content_type,
+            character_count=len(normalized_text),
+            text=normalized_text,
+            metadata={
+                "extension": extension,
+                "extraction_method": self.name,
+                "extractor": type(self).__name__,
+                "paragraph_count": len(paragraph_texts),
+                "table_count": len(document.tables),
+            },
+        )
+
+
 class FileExtractorRegistry:
     def __init__(
         self,
         extractors: Iterable[FileExtractor] | None = None,
     ) -> None:
         selected_extractors = (
-            [Utf8TextFileExtractor()]
+            [
+                Utf8TextFileExtractor(),
+                PDFFileExtractor(),
+                DOCXFileExtractor(),
+            ]
             if extractors is None
             else list(extractors)
         )
