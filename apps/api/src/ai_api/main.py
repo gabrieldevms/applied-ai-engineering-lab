@@ -90,6 +90,9 @@ from ai_api.agents import (
     AgentEvaluationService,
 )
 from ai_api.data_analysis import (
+    DataAnalystAgentRequest,
+    DataAnalystAgentResponse,
+    DataAnalystAgentService,
     DataAnalystSQLGenerationService,
     DataAnalystSQLWorkflowService,
     NaturalLanguageSQLRequest,
@@ -101,11 +104,11 @@ from ai_api.data_analysis import (
     SQLWorkflowRequest,
     SQLWorkflowResponse,
     SQLiteReadOnlyQueryExecutor,
+    get_data_analyst_agent_service,
     get_data_analyst_sql_generation_service,
     get_data_analyst_sql_workflow_service,
     get_sql_query_executor,
 )
-
 
 logging.basicConfig(
     level=logging.INFO,
@@ -452,6 +455,17 @@ def run_sql_workflow(
         Depends(get_data_analyst_sql_workflow_service),
     ],
 ) -> SQLWorkflowResponse:
+    return service.run(payload)
+
+
+@app.post("/data-analysis/agent/run", response_model=DataAnalystAgentResponse,)
+def run_data_analyst_agent(
+    payload: DataAnalystAgentRequest,
+    service: Annotated[
+        DataAnalystAgentService,
+        Depends(get_data_analyst_agent_service),
+    ],
+) -> DataAnalystAgentResponse:
     return service.run(payload)
 
 

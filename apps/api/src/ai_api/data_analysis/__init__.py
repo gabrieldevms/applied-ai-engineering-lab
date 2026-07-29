@@ -1,4 +1,12 @@
+from ai_api.data_analysis.agent import (
+    DataAnalystAgentRequest,
+    DataAnalystAgentResponse,
+    DataAnalystAgentService,
+    DataAnalystAgentStatus,
+    DataAnalystAgentTraceStep,
+)
 from ai_api.data_analysis.dependencies import (
+    get_data_analyst_agent_service,
     get_data_analyst_sql_generation_service,
     get_data_analyst_sql_workflow_service,
     get_sql_query_executor,
@@ -35,6 +43,11 @@ from ai_api.data_analysis.sql_execution import SQLiteReadOnlyQueryExecutor
 from ai_api.data_analysis.sql_safety import ReadOnlySQLValidator
 
 __all__ = [
+    "DataAnalystAgentRequest",
+    "DataAnalystAgentResponse",
+    "DataAnalystAgentService",
+    "DataAnalystAgentStatus",
+    "DataAnalystAgentTraceStep",
     "DatabaseColumn",
     "DatabaseSchema",
     "DatabaseTable",
@@ -59,6 +72,7 @@ __all__ = [
     "SQLWorkflowResponse",
     "SQLWorkflowStatus",
     "SQLiteReadOnlyQueryExecutor",
+    "get_data_analyst_agent_service",
     "get_data_analyst_sql_generation_service",
     "get_data_analyst_sql_workflow_service",
     "get_sql_query_executor",
