@@ -7,8 +7,15 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Agent evaluation completed  
-**Next milestone:** M4 final review  
+**Module status:** Completed  
+**Latest milestone:** Agent evaluation completed  
+**Next milestone:** File ingestion expansion  
+
+The project currently provides a tested foundation for LLM Engineering, RAG and controlled AI agent workflows applied to software quality scenarios.
+
+For a detailed review of the completed agents module, see:
+
+- [M4 — AI Agents Module Review](docs/study-notes/04-ai-agents-module-review.md)
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -103,28 +110,21 @@ The RAG foundation currently supports:
 
 ### AI Agent Foundation
 
-The project includes a controlled agent runtime with:
-
-* structured agent requests and responses;
-* deterministic execution;
-* configurable execution limits;
-* optional contextual information;
-* explicit tool calls;
-* step-by-step execution traces;
-* structured tool results;
-* safe handling of tool failures;
-* execution metadata.
-* an initial specialized QA Agent;
-* LLM-based planning;
-* structured agent plans;
-* multi-step execution from selected tools;
-* in-memory execution state snapshots;
-* file-based persistent execution logs;
-* execution log retrieval by run ID;
-* safety limits for agent tool execution;
-* safety violation reporting;
-* deterministic agent execution evaluation;
-* evaluation metrics for traceability, completion, safety, approval control and objective alignment;
+- controlled agent runtime with explicit execution steps;
+- agent request, response and execution trace schemas;
+- schema-driven Tool Registry;
+- controlled Tool Execution Service;
+- direct and runtime-based tool calling;
+- specialized QA Agent;
+- LLM-based agent planning;
+- automatic tool selection;
+- multi-step workflow execution;
+- in-memory execution state snapshots;
+- policy-based human approval flow;
+- agent safety limits and violation reporting;
+- persistent JSONL execution logs;
+- deterministic agent execution evaluation;
+- evaluation metrics for traceability, completion, safety, approval control and objective alignment.
 
 ### Agent Tools
 
@@ -232,17 +232,17 @@ http://127.0.0.1:8000/docs
 
 ### Agents
 
-| Method | Endpoint                | Description                                         |
-| ------ | ----------------------- | ---------------------------------------------       |
-| `POST` | `/agents/run`           | Execute an agent run with optional tool calls       |
-| `GET`  | `/agents/tools`         | Describe registered agent tools                     |
-| `POST` | `/agents/tools/execute` | Execute a registered tool through its handler       |
-| `POST` | `/agents/qa/run`        | Execute the specialized QA Agent                    |
-| `POST` | `/agents/plan`          | Generate a structured execution plan for an agent   |
-| `POST` | `/agents/tools/select`  | Select executable tools from a generated agent plan |
-| `POST` | `/agents/execute` | Plan, select tools and execute a controlled multi-step agent workflow |
-| `GET`  | `/agents/logs` | List persisted agent execution log events |
-| `GET`  | `/agents/logs/{run_id}` | List persisted agent execution log events by run ID |
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/agents/run` | Run the deterministic base agent runtime |
+| `GET` | `/agents/tools` | List registered agent tools |
+| `POST` | `/agents/tools/execute` | Execute a registered tool directly |
+| `POST` | `/agents/qa/run` | Run the specialized QA Agent |
+| `POST` | `/agents/plan` | Generate a structured agent plan with an LLM |
+| `POST` | `/agents/tools/select` | Select executable tools from an agent plan |
+| `POST` | `/agents/execute` | Run the complete controlled multi-step agent workflow |
+| `GET` | `/agents/logs` | List persisted agent execution log events |
+| `GET` | `/agents/logs/{run_id}` | List execution log events for a specific run |
 | `POST` | `/agents/evaluate` | Evaluate an agent execution using deterministic quality checks |
 
 ## Technology Stack
@@ -507,33 +507,39 @@ The current CI workflow:
 
 ## Current Limitations
 
-The project is intentionally evolving in small, testable increments.
-
-Current limitations include:
-
-* agent evaluation is currently deterministic and rule-based;
-* execution logs are persisted locally as JSONL files, not yet in a production database;
-* approval flow is currently policy-based and synchronous;
-* there is no external human review UI yet;
+- supported ingestion formats are currently limited and will be expanded to PDF, DOCX, CSV and spreadsheets;
+- embeddings and vector storage still use deterministic local implementations intended for development and testing;
+- execution logs are persisted locally as JSONL files instead of a production database;
+- agent approval is policy-based and synchronous;
+- there is no external human approval interface yet;
+- agent evaluation is currently deterministic and rule-based;
+- authentication, authorization and multi-user isolation are not implemented;
+- the project does not yet provide a deployed frontend.
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: M4 Final Review
+## Next Milestone: File Ingestion Expansion
 
-The next step is to review the full AI Agents module, consolidate documentation, validate endpoints and prepare the project for the next major module.
+The next milestone will expand the document ingestion pipeline beyond plain text and Markdown.
 
-This will help assess whether agent workflows are traceable, safe, complete and aligned with the requested objective.
+Planned formats include:
 
-Later M4 milestones will introduce:
+- PDF;
+- DOCX;
+- CSV;
+- Excel and spreadsheet files;
+- structured table extraction.
 
-* LLM-based planning;
-* automatic tool selection;
-* multi-step execution;
-* memory and state;
-* human approval;
-* safety limits;
-* execution logs;
-* agent evaluation.
+This expansion will make the RAG pipeline and future agents more useful with real-world business and QA documentation.
+
+The planned short-term implementation order is:
+
+```text
+File ingestion expansion
+  ↓
+Data Analyst Agent foundation
+  ↓
+M5 — MCP QA Server
 
 ## Engineering Approach
 

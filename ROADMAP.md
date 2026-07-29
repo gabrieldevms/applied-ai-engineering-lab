@@ -5,8 +5,19 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M4 — AI Agents  
-**Current milestone:** Agent evaluation completed  
-**Next milestone:** M4 final review  
+**Module status:** Completed  
+**Latest milestone:** Agent evaluation completed  
+**Next milestone:** File ingestion expansion  
+
+The short-term implementation order is:
+
+```text
+File ingestion expansion
+  ↓
+Data Analyst Agent foundation
+  ↓
+M5 — MCP QA Server
+```
 
 | Module                             | Status      |
 | ---------------------------------- | ----------- |
@@ -14,7 +25,7 @@ This roadmap tracks the incremental development of a production-oriented Applied
 | M1 — AI API Base                   | Completed   |
 | M2 — LLM Engineering               | Completed   |
 | M3 — RAG Knowledge Assistant       | Completed   |
-| M4 — AI Agents                     | In progress |
+| M4 — AI Agents                     | Completed   |
 | M5 — MCP QA Server                 | Planned     |
 | M6 — Multi-Agent QA Copilot        | Planned     |
 | M7 — Evaluation and LLMOps         | Planned     |
@@ -161,8 +172,6 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 * [x] QA Agent
 
-The initial QA Agent will coordinate the existing tools through an explicit and controlled workflow. Autonomous LLM planning will be introduced in a later milestone.
-
 ### Agent orchestration
 
 * [x] Agent planning with LLM
@@ -176,6 +185,44 @@ The initial QA Agent will coordinate the existing tools through an explicit and 
 * [x] Persistent agent execution logs
 * [x] Agent safety limits
 * [x] Agent evaluation
+
+Detailed review:
+
+- [M4 — AI Agents Module Review](docs/study-notes/04-ai-agents-module-review.md)
+
+## Pre-M5 Applied AI Extensions
+
+These extensions will improve the practical usefulness of the platform before MCP integration.
+
+### File ingestion expansion
+
+Goal: support real-world business and technical documents in RAG and agent workflows.
+
+- [ ] PDF text extraction
+- [ ] DOCX text extraction
+- [ ] CSV ingestion
+- [ ] Excel and spreadsheet ingestion
+- [ ] Structured table extraction
+- [ ] File metadata normalization
+- [ ] Extraction and ingestion tests
+- [ ] RAG integration validation
+
+### Data Analyst Agent foundation
+
+Goal: introduce controlled data analysis and database validation workflows that can collaborate with the QA Agent.
+
+- [ ] Database schema representation
+- [ ] Table and column metadata
+- [ ] Natural-language-to-SQL request schema
+- [ ] Structured SQL generation
+- [ ] SQL explanation
+- [ ] Read-only query validation
+- [ ] Unsafe query blocking
+- [ ] Query execution abstraction
+- [ ] Result evidence schemas
+- [ ] Data Analyst Agent
+- [ ] QA Agent integration
+- [ ] Deterministic SQL and agent evaluation
 
 ---
 
