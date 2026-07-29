@@ -171,7 +171,8 @@ def build_data_analyst_agent_descriptor() -> SpecializedAgentDescriptor:
         endpoint="/data-analysis/agent/run",
         metadata={
             "agent_type": "domain_agent",
-            "runtime_integration": "adapter_pending",
+            "runtime_integration": "generic_tool_adapter",
+            "tool_name": "data_analysis.agent.run",
             "execution_mode": "controlled_in_memory_sqlite",
             "future_extensions": [
                 "generic_agent_runtime_adapter",

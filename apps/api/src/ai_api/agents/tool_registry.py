@@ -123,6 +123,75 @@ DEFAULT_TOOL_DEFINITIONS = [
             "requires_llm": True,
         },
     ),
+    ToolDefinition(
+        name="data_analysis.agent.run",
+        description=(
+            "Run the Data Analyst Agent for natural-language SQL analysis, "
+            "read-only validation, controlled execution and evidence generation."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "objective": {
+                    "type": "string",
+                    "description": "Objetivo ou pergunta de análise de dados.",
+                },
+                "database_schema": {
+                    "type": "object",
+                    "description": "Schema do banco com tabelas e colunas disponíveis.",
+                },
+                "table_data": {
+                    "type": "array",
+                    "description": "Dados controlados usados para execução em memória.",
+                },
+                "language": {
+                    "type": "string",
+                    "description": "Idioma esperado para a resposta.",
+                },
+                "max_rows": {
+                    "type": "integer",
+                    "description": "Quantidade máxima de linhas retornadas.",
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Metadados opcionais da execução.",
+                },
+            },
+            "required": ["objective", "database_schema"],
+        },
+        output_schema={
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "description": "Status final do Data Analyst Agent.",
+                },
+                "answer": {
+                    "type": "string",
+                    "description": "Resposta final em linguagem natural.",
+                },
+                "workflow": {
+                    "type": "object",
+                    "description": "Workflow SQL completo com geração, execução e validação.",
+                },
+                "evidence": {
+                    "type": "object",
+                    "description": "Evidência da consulta executada, quando disponível.",
+                },
+                "trace": {
+                    "type": "array",
+                    "description": "Trace de execução do agente.",
+                },
+            },
+        },
+        metadata={
+            "category": "data_analysis",
+            "safe_by_default": True,
+            "requires_llm": True,
+            "specialized_agent": "data-analyst-agent-v1",
+            "execution_mode": "controlled_in_memory_sqlite",
+        },
+    ),
 ]
 
 

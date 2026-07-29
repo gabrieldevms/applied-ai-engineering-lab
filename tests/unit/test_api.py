@@ -749,10 +749,11 @@ def test_agents_tools_endpoint_should_list_available_tools() -> None:
         for tool in body["tools"]
     ]
 
-    assert body["total_tools"] == 3
+    assert body["total_tools"] == 4
     assert "rag.retrieve" in tool_names
     assert "rag.answer" in tool_names
     assert "requirements.analyze" in tool_names
+    assert "data_analysis.agent.run" in tool_names
     assert body["metadata"]["registry"] == "agent-tool-registry-v1"
 
 

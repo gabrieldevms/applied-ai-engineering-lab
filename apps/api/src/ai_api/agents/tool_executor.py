@@ -6,18 +6,23 @@ from typing import Any, Protocol
 from ai_api.agents.exceptions import ToolExecutionError
 from ai_api.agents.schemas import ToolExecutionResponse
 from ai_api.agents.tool_registry import ToolRegistry
-from ai_api.rag import RetrievalRequest, RetrievalService
+from ai_api.data_analysis import (
+    DataAnalystAgentRequest,
+    DataAnalystAgentService,
+    get_data_analyst_agent_service,
+)
 from ai_api.llm import FakeLLMProvider
+from ai_api.rag import RetrievalRequest, RetrievalService
+from ai_api.rag.answer_generation import RAGAnswerService
+from ai_api.rag.fake_responses import DEFAULT_RAG_ANSWER_RESPONSE
+from ai_api.rag.schemas import RAGAnswerRequest
+from ai_api.rag.semantic_search import SemanticSearchService
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
 )
 from ai_api.requirements.retry import RetryConfig
 from ai_api.requirements.schemas import RequirementAnalysisRequest
 from ai_api.requirements.services import RequirementAnalyzerService
-from ai_api.rag.answer_generation import RAGAnswerService
-from ai_api.rag.fake_responses import DEFAULT_RAG_ANSWER_RESPONSE
-from ai_api.rag.schemas import RAGAnswerRequest
-from ai_api.rag.semantic_search import SemanticSearchService
 
 
 class ToolHandler(Protocol):
@@ -49,7 +54,7 @@ class RAGRetrieveTool:
         )
 
         return response.model_dump(mode="json")
-    
+
 
 class RequirementAnalysisTool:
     tool_name = "requirements.analyze"
@@ -103,7 +108,28 @@ class RAGAnswerTool:
         )
 
         return response.model_dump(mode="json")
-    
+
+
+class DataAnalystAgentTool:
+    tool_name = "data_analysis.agent.run"
+
+    def __init__(
+        self,
+        agent_service: DataAnalystAgentService | None = None,
+    ) -> None:
+        self.agent_service = (
+            agent_service
+            if agent_service is not None
+            else get_data_analyst_agent_service()
+        )
+
+    def execute(self, arguments: Mapping[str, Any]) -> dict[str, Any]:
+        payload = DataAnalystAgentRequest.model_validate(arguments)
+
+        response = self.agent_service.run(payload)
+
+        return response.model_dump(mode="json")
+
 
 class ToolExecutionService:
     def __init__(
@@ -117,6 +143,7 @@ class ToolExecutionService:
             RAGRetrieveTool.tool_name: RAGRetrieveTool(),
             RequirementAnalysisTool.tool_name: RequirementAnalysisTool(),
             RAGAnswerTool.tool_name: RAGAnswerTool(),
+            DataAnalystAgentTool.tool_name: DataAnalystAgentTool(),
         }
 
         self.handlers = dict(
@@ -175,6 +202,10 @@ class ToolExecutionService:
                     "requires_llm",
                     False,
                 ),
+                "specialized_agent": tool_definition.metadata.get(
+                    "specialized_agent",
+                    "",
+                ),
             },
         )
 
@@ -183,19 +214,25 @@ class ToolExecutionService:
         tool_name: str,
         arguments: Mapping[str, Any],
     ) -> str:
-        safe_tool_name = re.sub(r"[^a-zA-Z0-9]+", "-", tool_name).strip("-")
+        safe_tool_name = re.sub(
+            r"[^a-zA-Z0-9]+",
+            "-",
+            tool_name,
+        ).strip("-")
+
         arguments_payload = json.dumps(
             arguments,
             sort_keys=True,
             ensure_ascii=False,
             default=str,
         )
+
         arguments_hash = hashlib.sha256(
             arguments_payload.encode("utf-8")
         ).hexdigest()[:12]
 
         return f"tool-execution-{safe_tool_name}-{arguments_hash}"
-    
+
     def has_handler(self, tool_name: str) -> bool:
         cleaned_tool_name = tool_name.strip()
 

@@ -38,7 +38,8 @@ def test_specialized_agent_registry_should_describe_data_analyst_agent() -> None
     assert "natural_language_to_sql" in capability_names
     assert "read_only_sql_safety" in capability_names
     assert "controlled_query_execution" in capability_names
-    assert agent.metadata["runtime_integration"] == "adapter_pending"
+    assert agent.metadata["runtime_integration"] == "generic_tool_adapter"
+    assert agent.metadata["tool_name"] == "data_analysis.agent.run"
     assert "nosql_data_source_abstraction" in agent.metadata["future_extensions"]
 
 
