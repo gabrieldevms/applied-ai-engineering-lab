@@ -90,6 +90,9 @@ from ai_api.agents import (
     AgentEvaluationService,
 )
 from ai_api.data_analysis import (
+    DataAnalystAgentEvaluationRequest,
+    DataAnalystAgentEvaluationResponse,
+    DataAnalystAgentEvaluationService,
     DataAnalystAgentRequest,
     DataAnalystAgentResponse,
     DataAnalystAgentService,
@@ -104,6 +107,7 @@ from ai_api.data_analysis import (
     SQLWorkflowRequest,
     SQLWorkflowResponse,
     SQLiteReadOnlyQueryExecutor,
+    get_data_analyst_agent_evaluation_service,
     get_data_analyst_agent_service,
     get_data_analyst_sql_generation_service,
     get_data_analyst_sql_workflow_service,
@@ -467,6 +471,17 @@ def run_data_analyst_agent(
     ],
 ) -> DataAnalystAgentResponse:
     return service.run(payload)
+
+
+@app.post("/data-analysis/agent/evaluate", response_model=DataAnalystAgentEvaluationResponse,)
+def evaluate_data_analyst_agent(
+    payload: DataAnalystAgentEvaluationRequest,
+    service: Annotated[
+        DataAnalystAgentEvaluationService,
+        Depends(get_data_analyst_agent_evaluation_service),
+    ],
+) -> DataAnalystAgentEvaluationResponse:
+    return service.evaluate(payload)
 
 
 @app.post("/rag/chunk", response_model=DocumentChunkingResponse)
