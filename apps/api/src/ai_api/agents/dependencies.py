@@ -67,3 +67,9 @@ def get_qa_agent_service():
     return QAAgentService(
         agent_runtime=get_agent_runtime(),
     )
+
+
+def get_qa_agent_evaluation_service():
+    from ai_api.agents.qa_evaluation import QAAgentEvaluationService
+
+    return QAAgentEvaluationService()
