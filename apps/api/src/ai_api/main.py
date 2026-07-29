@@ -89,6 +89,13 @@ from ai_api.agents import (
     AgentEvaluationResponse,
     AgentEvaluationService,
 )
+from ai_api.data_analysis import (
+    DataAnalystSQLGenerationService,
+    NaturalLanguageSQLRequest,
+    SQLGenerationError,
+    SQLGenerationResponse,
+    get_data_analyst_sql_generation_service,
+)
 
 
 logging.basicConfig(
@@ -126,6 +133,29 @@ async def log_requests(
     )
 
     return response
+
+
+@app.exception_handler(SQLGenerationError)
+async def sql_generation_exception_handler(
+    request: Request,
+    exc: SQLGenerationError,
+) -> JSONResponse:
+    logger.warning(
+        "SQL generation error on %s %s: %s",
+        request.method,
+        request.url.path,
+        str(exc),
+    )
+
+    return JSONResponse(
+        status_code=502,
+        content={
+            "error": {
+                "type": "sql_generation_error",
+                "message": str(exc),
+            }
+        },
+    )
 
 
 @app.exception_handler(ToolExecutionError)
@@ -358,6 +388,20 @@ def analyze_requirement(
         requirement_text=payload.requirement_text,
         language=payload.language,
     )
+
+
+@app.post(
+    "/data-analysis/sql/generate",
+    response_model=SQLGenerationResponse,
+)
+def generate_sql(
+    payload: NaturalLanguageSQLRequest,
+    service: Annotated[
+        DataAnalystSQLGenerationService,
+        Depends(get_data_analyst_sql_generation_service),
+    ],
+) -> SQLGenerationResponse:
+    return service.generate(payload)
 
 
 @app.post("/rag/chunk", response_model=DocumentChunkingResponse)

@@ -123,3 +123,13 @@ class SQLValidationResponse(BaseModel):
     normalized_sql: str
     violations: list[SQLSafetyViolation] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SQLGenerationResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: SQLValidationStatus
+    request: NaturalLanguageSQLRequest
+    candidate: SQLGenerationCandidate
+    validation: SQLValidationResponse
+    metadata: dict[str, Any] = Field(default_factory=dict)
