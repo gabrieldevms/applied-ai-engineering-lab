@@ -23,8 +23,8 @@ For a detailed review of the completed agents module, see:
 | M1 — AI API Base                   | ✅ Completed    | FastAPI, schemas, tests, Docker, CI, logging and error handling                    |
 | M2 — LLM Engineering               | ✅ Completed    | Providers, prompts, structured outputs, retries, fallback and requirement analysis |
 | M3 — RAG Knowledge Assistant       | ✅ Completed    | Ingestion, chunking, embeddings, retrieval, answers, citations and evaluation      |
-| M4 — AI Agents                     | 🚧 In progress | Runtime, tools, execution, planning, QA Agent and safety controls                  |
-| M5 — MCP QA Server                 | ⏳ Planned      | MCP tools focused on QA and software engineering                                   |
+| M4 — AI Agents                     | ✅ Completed  | Runtime, tools, execution, planning, QA Agent and safety controls                  |
+| M5 — MCP QA Server                 | 🚧 In progress    | MCP tools focused on QA and software engineering                                   |
 | M6 — Multi-Agent QA Copilot        | ⏳ Planned      | Specialized QA agents and orchestration                                            |
 | M7 — Evaluation and LLMOps         | ⏳ Planned      | Evaluation pipelines, observability, cost and latency tracking                     |
 | M8 — Cloud, Security and Portfolio | ⏳ Planned      | Deployment, security, governance and portfolio presentation                        |
