@@ -1,5 +1,6 @@
 from ai_api.config import get_settings
 from ai_api.data_analysis.agent import DataAnalystAgentService
+from ai_api.data_analysis.evaluation import DataAnalystAgentEvaluationService
 from ai_api.data_analysis.fake_responses import (
     DEFAULT_SQL_GENERATION_RESPONSE_JSON,
 )
@@ -39,3 +40,7 @@ def get_data_analyst_agent_service() -> DataAnalystAgentService:
     return DataAnalystAgentService(
         sql_workflow_service=get_data_analyst_sql_workflow_service(),
     )
+
+
+def get_data_analyst_agent_evaluation_service() -> DataAnalystAgentEvaluationService:
+    return DataAnalystAgentEvaluationService()
