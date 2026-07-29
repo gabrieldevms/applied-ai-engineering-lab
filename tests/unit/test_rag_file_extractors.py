@@ -1,8 +1,9 @@
 import pytest
-
 from ai_api.rag.exceptions import TextExtractionError
 from ai_api.rag.file_extractors import (
+    CSVFileExtractor,
     DOCXFileExtractor,
+    ExcelFileExtractor,
     FileExtractorRegistry,
     PDFFileExtractor,
     Utf8TextFileExtractor,
@@ -46,11 +47,13 @@ def test_file_extractor_registry_should_register_default_extensions() -> None:
     registry = FileExtractorRegistry()
 
     assert registry.supported_extensions == (
+        ".csv",
         ".docx",
         ".markdown",
         ".md",
         ".pdf",
         ".txt",
+        ".xlsx",
     )
 
 
@@ -60,10 +63,14 @@ def test_file_extractor_registry_should_resolve_extension_case_insensitively() -
     markdown_extractor = registry.get_for_filename("NOTES.MD")
     pdf_extractor = registry.get_for_filename("REPORT.PDF")
     docx_extractor = registry.get_for_filename("REQUIREMENT.DOCX")
+    csv_extractor = registry.get_for_filename("DATA.CSV")
+    excel_extractor = registry.get_for_filename("REPORT.XLSX")
 
     assert isinstance(markdown_extractor, Utf8TextFileExtractor)
     assert isinstance(pdf_extractor, PDFFileExtractor)
     assert isinstance(docx_extractor, DOCXFileExtractor)
+    assert isinstance(csv_extractor, CSVFileExtractor)
+    assert isinstance(excel_extractor, ExcelFileExtractor)
 
 
 def test_text_extraction_service_should_use_injected_custom_extractor() -> None:
