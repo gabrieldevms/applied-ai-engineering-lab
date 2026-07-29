@@ -200,3 +200,9 @@ All notable changes to this project will be documented in this file.
 - Unit and API tests for agent evaluation
 - Multi-step agent execution now returns evaluation results
 - Agent execution logs now include evaluation completion events
+- M4 AI Agents module review documentation
+- Consolidated documentation for agent runtime, planning, tools, approval, safety, logs and evaluation
+- Pre-M5 roadmap for file ingestion expansion and the Data Analyst Agent foundation
+- Marked M4 — AI Agents as completed
+- Updated the project status and next milestone to File Ingestion Expansion
+- Consolidated README agent capabilities, endpoints and current limitations
