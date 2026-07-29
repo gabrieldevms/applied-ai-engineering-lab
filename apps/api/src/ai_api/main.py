@@ -116,6 +116,10 @@ from ai_api.data_analysis import (
     get_data_analyst_sql_workflow_service,
     get_sql_query_executor,
 )
+from ai_api.agents.dependencies import (
+    get_agent_runtime,
+    get_tool_execution_service,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -654,15 +658,17 @@ def retrieve_context(
 @app.post("/agents/run", response_model=AgentRunResponse)
 def run_agent(
     payload: AgentRunRequest,
+    runtime: Annotated[
+        AgentRuntime,
+        Depends(get_agent_runtime),
+    ],
 ) -> AgentRunResponse:
-    agent_runtime = AgentRuntime()
-
-    return agent_runtime.run(
+    return runtime.run(
         objective=payload.objective,
         context=payload.context,
         max_steps=payload.max_steps,
-        metadata=payload.metadata,
         tool_calls=payload.tool_calls,
+        metadata=payload.metadata,
     )
 
 
@@ -683,13 +689,18 @@ def list_specialized_agents(
     return registry.to_response()
 
 
-@app.post("/agents/tools/execute", response_model=ToolExecutionResponse)
-def execute_agent_tool(
+@app.post(
+    "/agents/tools/execute",
+    response_model=ToolExecutionResponse,
+)
+def execute_tool(
     payload: ToolExecutionRequest,
+    service: Annotated[
+        ToolExecutionService,
+        Depends(get_tool_execution_service),
+    ],
 ) -> ToolExecutionResponse:
-    tool_execution_service = ToolExecutionService()
-
-    return tool_execution_service.execute(
+    return service.execute(
         tool_name=payload.tool_name,
         arguments=payload.arguments,
         metadata=payload.metadata,

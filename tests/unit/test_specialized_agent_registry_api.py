@@ -47,7 +47,4 @@ def test_specialized_agents_endpoint_should_include_data_analyst_capabilities() 
     assert data_analyst_agent["endpoint"] == "/data-analysis/agent/run"
     assert "natural_language_to_sql" in capability_names
     assert "controlled_query_execution" in capability_names
-    assert (
-        data_analyst_agent["metadata"]["runtime_integration"]
-        == "adapter_pending"
-    )
+    assert (data_analyst_agent["metadata"]["runtime_integration"] == "generic_tool_adapter")

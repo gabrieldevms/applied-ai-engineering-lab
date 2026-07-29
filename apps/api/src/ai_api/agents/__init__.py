@@ -45,6 +45,7 @@ from ai_api.agents.tool_executor import (
     ToolHandler,
     RequirementAnalysisTool,
     RAGAnswerTool,
+    DataAnalystAgentTool,
 )
 from ai_api.agents.tool_registry import ToolRegistry
 from ai_api.agents.qa_agent import QAAgentService
@@ -59,6 +60,8 @@ from ai_api.agents.dependencies import (
     get_agent_tool_selection_service,
     get_agent_multi_step_execution_service,
     get_agent_execution_log_service,
+    get_agent_runtime,
+    get_tool_execution_service,
 )
 from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.multi_step_execution import AgentMultiStepExecutionService
@@ -159,4 +162,7 @@ __all__ = [
     "SpecializedAgentRegistryResponse",
     "SpecializedAgentStatus",
     "get_specialized_agent_registry",
+    "DataAnalystAgentTool",
+    "get_agent_runtime",
+    "get_tool_execution_service",
 ]

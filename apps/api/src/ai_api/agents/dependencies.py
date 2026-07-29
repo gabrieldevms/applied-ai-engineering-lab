@@ -1,9 +1,11 @@
+from ai_api.agents.runtime import AgentRuntime
 from ai_api.agents.fake_responses import DEFAULT_AGENT_PLAN_RESPONSE_JSON
 from ai_api.agents.planning import AgentPlanningService
 from ai_api.config import get_settings
 from ai_api.llm.factory import build_llm_provider
 from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.multi_step_execution import AgentMultiStepExecutionService
+from ai_api.agents.tool_executor import ToolExecutionService
 from ai_api.agents.execution_logs import (
     AgentExecutionLogService,
     FileAgentExecutionLogStore,
@@ -46,4 +48,14 @@ def get_agent_execution_log_service() -> AgentExecutionLogService:
         log_store=FileAgentExecutionLogStore(
             file_path=settings.agent_execution_log_path,
         ),
+    )
+
+
+def get_tool_execution_service() -> ToolExecutionService:
+    return ToolExecutionService()
+
+
+def get_agent_runtime() -> AgentRuntime:
+    return AgentRuntime(
+        tool_execution_service=get_tool_execution_service(),
     )

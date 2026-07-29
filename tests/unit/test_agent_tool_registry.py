@@ -9,10 +9,13 @@ def test_tool_registry_should_load_default_tools() -> None:
     tools = registry.list_tools()
     tool_names = [tool.name for tool in tools]
 
-    assert registry.count() == 3
-    assert "rag.retrieve" in tool_names
-    assert "rag.answer" in tool_names
-    assert "requirements.analyze" in tool_names
+    assert registry.count() == 4
+    assert tool_names == [
+        "data_analysis.agent.run",
+        "rag.answer",
+        "rag.retrieve",
+        "requirements.analyze",
+    ]
 
 
 def test_tool_registry_should_get_tool_by_name() -> None:
