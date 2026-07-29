@@ -118,6 +118,10 @@ from ai_api.data_analysis import (
     get_data_analyst_sql_generation_service,
     get_data_analyst_sql_workflow_service,
     get_sql_query_executor,
+    SQLRegressionSuiteRequest,
+    SQLRegressionSuiteResponse,
+    SQLWorkflowRegressionService,
+    get_sql_workflow_regression_service,
 )
 from ai_api.agents.dependencies import (
     get_agent_runtime,
@@ -472,6 +476,20 @@ def run_sql_workflow(
     ],
 ) -> SQLWorkflowResponse:
     return service.run(payload)
+
+
+@app.post(
+    "/data-analysis/sql/regression/run",
+    response_model=SQLRegressionSuiteResponse,
+)
+def run_sql_workflow_regression_suite(
+    payload: SQLRegressionSuiteRequest,
+    service: Annotated[
+        SQLWorkflowRegressionService,
+        Depends(get_sql_workflow_regression_service),
+    ],
+) -> SQLRegressionSuiteResponse:
+    return service.run_suite(payload)
 
 
 @app.post("/data-analysis/agent/run", response_model=DataAnalystAgentResponse,)

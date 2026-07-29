@@ -11,6 +11,7 @@ from ai_api.data_analysis.dependencies import (
     get_data_analyst_sql_generation_service,
     get_data_analyst_sql_workflow_service,
     get_sql_query_executor,
+    get_sql_workflow_regression_service,
 )
 from ai_api.data_analysis.evaluation import (
     DataAnalystAgentEvaluationMetric,
@@ -49,6 +50,17 @@ from ai_api.data_analysis.services import (
 )
 from ai_api.data_analysis.sql_execution import SQLiteReadOnlyQueryExecutor
 from ai_api.data_analysis.sql_safety import ReadOnlySQLValidator
+from ai_api.data_analysis.sql_regression import (
+    SQLRegressionCheckResult,
+    SQLRegressionCheckStatus,
+    SQLRegressionExpectedResult,
+    SQLRegressionScenario,
+    SQLRegressionScenarioResult,
+    SQLRegressionScenarioStatus,
+    SQLRegressionSuiteRequest,
+    SQLRegressionSuiteResponse,
+    SQLWorkflowRegressionService,
+)
 
 __all__ = [
     "DataAnalystAgentEvaluationMetric",
@@ -90,4 +102,14 @@ __all__ = [
     "get_data_analyst_sql_generation_service",
     "get_data_analyst_sql_workflow_service",
     "get_sql_query_executor",
+    "SQLRegressionCheckResult",
+    "SQLRegressionCheckStatus",
+    "SQLRegressionExpectedResult",
+    "SQLRegressionScenario",
+    "SQLRegressionScenarioResult",
+    "SQLRegressionScenarioStatus",
+    "SQLRegressionSuiteRequest",
+    "SQLRegressionSuiteResponse",
+    "SQLWorkflowRegressionService",
+    "get_sql_workflow_regression_service",
 ]

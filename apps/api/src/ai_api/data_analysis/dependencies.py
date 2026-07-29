@@ -44,3 +44,13 @@ def get_data_analyst_agent_service() -> DataAnalystAgentService:
 
 def get_data_analyst_agent_evaluation_service() -> DataAnalystAgentEvaluationService:
     return DataAnalystAgentEvaluationService()
+
+
+def get_sql_workflow_regression_service():
+    from ai_api.data_analysis.sql_regression import (
+        SQLWorkflowRegressionService,
+    )
+
+    return SQLWorkflowRegressionService(
+        workflow_service=get_data_analyst_sql_workflow_service(),
+    )
