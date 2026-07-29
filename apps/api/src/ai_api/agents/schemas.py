@@ -1,7 +1,7 @@
 from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from ai_api.rag.schemas import SemanticSearchDocument
-
+from ai_api.data_analysis.schemas import DatabaseSchema, DatabaseTableData
 
 AgentRunStatus = Literal["completed", "failed"]
 AgentStepStatus = Literal["completed", "failed", "skipped"]
@@ -179,6 +179,43 @@ class ToolExecutionResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class QAAgentDataValidationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    objective: str | None = Field(
+        default=None,
+        description=(
+            "Optional data analysis objective. When omitted, the QA Agent "
+            "will derive the objective from the requirement text."
+        ),
+    )
+    database_schema: DatabaseSchema
+    table_data: list[DatabaseTableData] = Field(default_factory=list)
+    max_rows: int = Field(
+        default=100,
+        ge=1,
+        le=1000,
+        description="Maximum number of rows returned by data validation.",
+    )
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("objective")
+    @classmethod
+    def objective_cannot_be_blank(
+        cls,
+        value: str | None,
+    ) -> str | None:
+        if value is None:
+            return value
+
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("objective cannot be blank")
+
+        return cleaned_value
+
+
 class QAAgentRunRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -190,6 +227,13 @@ class QAAgentRunRequest(BaseModel):
         default_factory=list,
         max_length=20,
         description="Optional documents used as supporting knowledge.",
+    )
+    data_validation: QAAgentDataValidationRequest | None = Field(
+        default=None,
+        description=(
+            "Optional data validation request executed through the "
+            "Data Analyst Agent capability."
+        ),
     )
     language: str = Field(
         default="pt-BR",
@@ -214,7 +258,7 @@ class QAAgentRunRequest(BaseModel):
         le=1000,
     )
     max_steps: int = Field(
-        default=5,
+        default=6,
         ge=3,
         le=10,
         description="Maximum number of agent execution steps.",
@@ -249,6 +293,7 @@ class QAAgentRunResponse(BaseModel):
     final_answer: str
     requirement_analysis: dict[str, Any] = Field(default_factory=dict)
     retrieved_context: dict[str, Any] | None = None
+    data_validation: dict[str, Any] | None = None
     steps: list[AgentStep]
     metadata: dict[str, Any] = Field(default_factory=dict)
 

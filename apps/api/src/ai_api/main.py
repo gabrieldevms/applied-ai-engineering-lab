@@ -119,6 +119,7 @@ from ai_api.data_analysis import (
 from ai_api.agents.dependencies import (
     get_agent_runtime,
     get_tool_execution_service,
+    get_qa_agent_service,
 )
 
 logging.basicConfig(
@@ -710,12 +711,15 @@ def execute_tool(
 @app.post("/agents/qa/run", response_model=QAAgentRunResponse)
 def run_qa_agent(
     payload: QAAgentRunRequest,
+    qa_agent_service: Annotated[
+        QAAgentService,
+        Depends(get_qa_agent_service),
+    ],
 ) -> QAAgentRunResponse:
-    qa_agent_service = QAAgentService()
-
     return qa_agent_service.run(
         requirement_text=payload.requirement_text,
         knowledge_documents=payload.knowledge_documents,
+        data_validation=payload.data_validation,
         language=payload.language,
         top_k=payload.top_k,
         chunk_size=payload.chunk_size,

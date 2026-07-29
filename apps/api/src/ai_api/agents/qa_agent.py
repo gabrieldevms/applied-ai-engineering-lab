@@ -2,6 +2,7 @@ from ai_api.agents.runtime import AgentRuntime
 from ai_api.agents.schemas import (
     AgentRunResponse,
     AgentToolCall,
+    QAAgentDataValidationRequest,
     QAAgentRunResponse,
 )
 from ai_api.rag.schemas import SemanticSearchDocument
@@ -18,11 +19,12 @@ class QAAgentService:
         self,
         requirement_text: str,
         knowledge_documents: list[SemanticSearchDocument] | None = None,
+        data_validation: QAAgentDataValidationRequest | None = None,
         language: str = "pt-BR",
         top_k: int = 3,
         chunk_size: int = 800,
         chunk_overlap: int = 120,
-        max_steps: int = 5,
+        max_steps: int = 6,
         metadata: dict | None = None,
     ) -> QAAgentRunResponse:
         cleaned_requirement = requirement_text.strip()
@@ -34,6 +36,7 @@ class QAAgentService:
         tool_calls = self._build_tool_calls(
             requirement_text=cleaned_requirement,
             knowledge_documents=documents,
+            data_validation=data_validation,
             language=language,
             top_k=top_k,
             chunk_size=chunk_size,
@@ -41,14 +44,22 @@ class QAAgentService:
         )
 
         agent_run = self.agent_runtime.run(
-            objective="Analisar requisito de software com foco em qualidade, riscos e cenários de teste.",
-            context=self._build_context(documents),
+            objective=(
+                "Analisar requisito de software com foco em qualidade, "
+                "riscos, cenários de teste e evidências de dados quando "
+                "aplicável."
+            ),
+            context=self._build_context(
+                knowledge_documents=documents,
+                data_validation=data_validation,
+            ),
             max_steps=max_steps,
             metadata={
                 **(metadata or {}),
                 "agent_type": "qa-agent-v1",
                 "language": language,
                 "knowledge_documents": len(documents),
+                "data_validation_requested": data_validation is not None,
                 "requested_tools": [
                     tool_call.tool_name
                     for tool_call in tool_calls
@@ -69,6 +80,10 @@ class QAAgentService:
                 agent_run=agent_run,
                 tool_name="rag.retrieve",
             ),
+            data_validation=self._extract_optional_tool_output(
+                agent_run=agent_run,
+                tool_name="data_analysis.agent.run",
+            ),
             steps=agent_run.steps,
             metadata={
                 **agent_run.metadata,
@@ -80,6 +95,7 @@ class QAAgentService:
         self,
         requirement_text: str,
         knowledge_documents: list[SemanticSearchDocument],
+        data_validation: QAAgentDataValidationRequest | None,
         language: str,
         top_k: int,
         chunk_size: int,
@@ -120,19 +136,70 @@ class QAAgentService:
             )
         )
 
+        if data_validation is not None:
+            objective = (
+                data_validation.objective
+                or (
+                    "Validar dados relacionados ao seguinte requisito: "
+                    f"{requirement_text}"
+                )
+            )
+
+            tool_calls.append(
+                AgentToolCall(
+                    tool_name="data_analysis.agent.run",
+                    arguments={
+                        "objective": objective,
+                        "database_schema": (
+                            data_validation.database_schema.model_dump(
+                                mode="json"
+                            )
+                        ),
+                        "table_data": [
+                            table_data.model_dump(mode="json")
+                            for table_data in data_validation.table_data
+                        ],
+                        "language": language,
+                        "max_rows": data_validation.max_rows,
+                        "metadata": {
+                            **data_validation.metadata,
+                            "requested_by": "qa-agent-v1",
+                            "source": "qa_agent_data_validation",
+                        },
+                    },
+                    metadata={
+                        "reason": (
+                            "validate data evidence using the Data Analyst Agent"
+                        ),
+                    },
+                )
+            )
+
         return tool_calls
 
     def _build_context(
         self,
         knowledge_documents: list[SemanticSearchDocument],
+        data_validation: QAAgentDataValidationRequest | None,
     ) -> str | None:
-        if not knowledge_documents:
+        context_parts: list[str] = []
+
+        if knowledge_documents:
+            context_parts.append(
+                "Documentos de apoio foram fornecidos para recuperação de "
+                "contexto antes da análise de qualidade."
+            )
+
+        if data_validation is not None:
+            context_parts.append(
+                "Uma validação de dados foi solicitada e será executada "
+                "por meio do Data Analyst Agent."
+            )
+
+        if not context_parts:
             return None
 
-        return (
-            "Documentos de apoio foram fornecidos para recuperação de contexto "
-            "antes da análise de qualidade."
-        )
+        return " ".join(context_parts)
 
     def _extract_tool_output(
         self,
