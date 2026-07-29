@@ -7,10 +7,10 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** Pre-M5 Applied AI Extensions  
-**Latest completed milestone:** File ingestion expansion  
-**Next milestone:** Data Analyst Agent foundation  
+**Latest completed milestone:** SQL Workflow Regression Dataset  
+**Next milestone:** M5 — MCP QA Server  
 
-The project currently provides a tested foundation for LLM Engineering, RAG, controlled AI agent workflows and multi-format file ingestion for software quality scenarios.
+The project currently provides a tested foundation for LLM Engineering, RAG, controlled AI agent workflows, multi-format file ingestion, QA-oriented agents, controlled data analysis workflows and deterministic evaluation capabilities.
 
 For detailed reviews, see:
 
@@ -23,8 +23,10 @@ For detailed reviews, see:
 | M1 — AI API Base                   | ✅ Completed    | FastAPI, schemas, tests, Docker, CI, logging and error handling                    |
 | M2 — LLM Engineering               | ✅ Completed    | Providers, prompts, structured outputs, retries, fallback and requirement analysis |
 | M3 — RAG Knowledge Assistant       | ✅ Completed    | Ingestion, chunking, embeddings, retrieval, answers, citations and evaluation      |
-| M4 — AI Agents                     | ✅ Completed  | Runtime, tools, execution, planning, QA Agent and safety controls                  |
-| M5 — MCP QA Server                 | 🚧 In progress    | MCP tools focused on QA and software engineering                                   |
+| M4 — AI Agents                     | ✅ Completed    | Runtime, tools, execution, planning, QA Agent and safety controls                  |
+| Pre-M5 — File Ingestion Expansion  | ✅ Completed    | Multi-format text extraction and structured table extraction                       |
+| Pre-M5 — Data Analyst Agent        | ✅ Completed    | SQL generation, read-only validation, controlled execution and evaluation          |
+| M5 — MCP QA Server                 | ⏳ Next         | MCP tools focused on QA and software engineering                                   |
 | M6 — Multi-Agent QA Copilot        | ⏳ Planned      | Specialized QA agents and orchestration                                            |
 | M7 — Evaluation and LLMOps         | ⏳ Planned      | Evaluation pipelines, observability, cost and latency tracking                     |
 | M8 — Cloud, Security and Portfolio | ⏳ Planned      | Deployment, security, governance and portfolio presentation                        |
@@ -95,7 +97,7 @@ The RAG foundation currently supports:
 
 * raw text ingestion;
 * text file ingestion;
-* `.txt`, `.md` and `.markdown` extraction;
+* `.txt`, `.md`, `.markdown`, `.pdf`, `.docx`, `.csv` and `.xlsx` text extraction;
 * configurable document chunking;
 * stable document identifiers;
 * chunk and source metadata;
@@ -107,6 +109,8 @@ The RAG foundation currently supports:
 * LLM-based answer generation;
 * source citations;
 * deterministic RAG evaluation.
+* structured table extraction for CSV, XLSX and DOCX files;
+* dedicated text and table extraction endpoints.
 
 ### File Ingestion
 
@@ -141,17 +145,20 @@ The RAG foundation currently supports:
 
 The Tool Registry currently describes:
 
-| Tool                   | Registered | Executable | Purpose                                           |
-| ---------------------- | ---------: | ---------: | ------------------------------------------------- |
-| `rag.retrieve`         |          ✅ |          ✅ | Retrieve relevant document chunks                 |
-| `requirements.analyze` |          ✅ |          ✅ | Analyze software requirements                     |
-| `rag.answer`           |          ✅ |          ✅ | Generate a grounded answer from retrieved context |
+| Tool                      | Registered | Executable | Purpose                                           |
+| ------------------------- | ---------: | ---------: | ------------------------------------------------- |
+| `rag.retrieve`            |          ✅ |          ✅ | Retrieve relevant document chunks                 |
+| `requirements.analyze`    |          ✅ |          ✅ | Analyze software requirements                     |
+| `rag.answer`              |          ✅ |          ✅ | Generate a grounded answer from retrieved context |
+| `data_analysis.agent.run` |          ✅ |          ✅ | Run the Data Analyst Agent as a specialized tool  |
 
 Tool execution is centralized in the `ToolExecutionService`. The service validates the requested tool against the registry and only allows tools with explicit execution handlers.
 
+The `data_analysis.agent.run` tool allows the generic Agent Runtime and the QA Agent to execute controlled data analysis workflows through the Data Analyst Agent.
+
 ### QA Agent
 
-The project includes an initial specialized QA Agent that coordinates existing tools around software quality workflows.
+The project includes a specialized QA Agent that coordinates existing tools around software quality workflows.
 
 The QA Agent currently supports:
 
@@ -159,8 +166,32 @@ The QA Agent currently supports:
 * optional supporting knowledge documents;
 * RAG retrieval when documents are provided;
 * requirement analysis through the agent tool execution layer;
+* optional data validation through the Data Analyst Agent;
+* automatic data validation selection;
+* data validation modes: `auto`, `required` and `disabled`;
 * structured QA-oriented output;
-* full execution trace.
+* data validation evidence when applicable;
+* full execution trace;
+* deterministic QA Agent evaluation.
+
+### Data Analyst Agent
+
+The project includes a specialized Data Analyst Agent for controlled data validation workflows.
+
+The Data Analyst Agent currently supports:
+
+* database schema representation;
+* table and column metadata;
+* natural-language SQL generation;
+* structured SQL parsing;
+* read-only SQL safety validation;
+* unsafe SQL blocking;
+* controlled in-memory SQLite execution;
+* SQL workflow generation and execution;
+* query result evidence;
+* deterministic Data Analyst Agent evaluation;
+* execution through the generic Agent Runtime as `data_analysis.agent.run`;
+* SQL workflow regression scenarios.
 
 ## Architecture
 
@@ -172,6 +203,7 @@ flowchart TB
     API --> Requirements[Requirement Analysis]
     API --> RAG[RAG Services]
     API --> Agents[Agent Runtime]
+    API --> DataAnalysis[Data Analysis Services]
 
     Requirements --> LLM[LLM Provider Abstraction]
     RAG --> LLM
@@ -194,6 +226,23 @@ flowchart TB
     Registry --> Executor[Tool Execution Service]
     Executor --> RetrieveTool[rag.retrieve]
     Executor --> RequirementTool[requirements.analyze]
+    Executor --> RAGAnswerTool[rag.answer]
+    Executor --> DataAnalystTool[data_analysis.agent.run]
+
+    Agents --> QAAgent[QA Agent]
+    QAAgent --> RequirementTool
+    QAAgent --> RetrieveTool
+    QAAgent --> DataAnalystTool
+
+    DataAnalystTool --> DataAnalystAgent[Data Analyst Agent]
+    DataAnalystAgent --> SQLGeneration[SQL Generation]
+    DataAnalystAgent --> SQLSafety[Read-Only SQL Validation]
+    DataAnalystAgent --> SQLExecution[Controlled SQLite Execution]
+    DataAnalystAgent --> SQLEvidence[Query Evidence]
+
+    DataAnalysis --> SQLGeneration
+    DataAnalysis --> SQLSafety
+    DataAnalysis --> SQLExecution
 ```
 
 The architecture intentionally separates:
@@ -256,6 +305,19 @@ http://127.0.0.1:8000/docs
 | `GET` | `/agents/logs` | List persisted agent execution log events |
 | `GET` | `/agents/logs/{run_id}` | List execution log events for a specific run |
 | `POST` | `/agents/evaluate` | Evaluate an agent execution using deterministic quality checks |
+| `GET` | `/agents/specialized` | List specialized agents |
+| `POST` | `/agents/qa/evaluate` | Evaluate a QA Agent response using deterministic quality checks |
+
+### Data Analysis
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/data-analysis/sql/generate` | Generate a SQL candidate from a natural-language question |
+| `POST` | `/data-analysis/sql/execute` | Execute a read-only SQL query in controlled in-memory SQLite |
+| `POST` | `/data-analysis/sql/run` | Generate, validate and execute a SQL workflow |
+| `POST` | `/data-analysis/agent/run` | Run the specialized Data Analyst Agent |
+| `POST` | `/data-analysis/agent/evaluate` | Evaluate a Data Analyst Agent response |
+| `POST` | `/data-analysis/sql/regression/run` | Run SQL workflow regression scenarios |
 
 ## Technology Stack
 
@@ -500,7 +562,14 @@ The test suite covers areas such as:
 * agent runtime;
 * tool registry;
 * tool execution;
-* agent tool calling.
+* agent tool calling;* specialized QA Agent;
+* Data Analyst Agent;
+* SQL safety validation;
+* controlled SQL execution;
+* QA Agent data validation selection;
+* QA Agent evaluation with data evidence;
+* Data Analyst Agent evaluation;
+* SQL workflow regression scenarios.
 
 ## Continuous Integration
 
@@ -523,43 +592,48 @@ The current CI workflow:
 - scanned PDFs and OCR are not supported;
 - legacy `.doc` and `.xls` files are not supported;
 - structured table extraction does not yet infer semantic column types;
-- structured table extraction is not yet connected to a Data Analyst Agent;
 - embeddings and vector storage still use deterministic local implementations intended for development and testing;
+- SQL execution is currently limited to controlled in-memory SQLite;
+- external database connectors are not implemented yet;
+- NoSQL data source support is not implemented yet;
 - execution logs are persisted locally as JSONL files instead of a production database;
 - agent approval is policy-based and synchronous;
 - there is no external human approval interface yet;
 - agent evaluation is currently deterministic and rule-based;
+- LLM-as-judge evaluation is not implemented yet;
 - authentication, authorization and multi-user isolation are not implemented;
-- the project does not yet provide a deployed frontend.
+- the project does not yet provide a deployed frontend;
+- MCP server capabilities are not implemented yet.
 
-These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
+These limitations define the boundary between the implemented foundation and the upcoming MCP, orchestration, evaluation and production capabilities.
 
-## Next Milestone: Data Analyst Agent Foundation
+## Next Milestone: M5 — MCP QA Server
 
-The next milestone will introduce the foundation for controlled data analysis and database validation workflows.
+The next milestone will introduce a Model Context Protocol server focused on QA and software engineering workflows.
 
 Planned capabilities include:
 
-- database schema representation;
-- table and column metadata;
-- natural-language-to-SQL request schema;
-- structured SQL generation;
-- SQL explanation;
-- read-only query validation;
-- unsafe query blocking;
-- query result evidence schemas;
-- initial Data Analyst Agent workflow.
+- MCP server foundation;
+- MCP tool definitions;
+- Requirement Analysis MCP tool;
+- RAG Retrieval MCP tool;
+- QA Agent MCP tool;
+- Data Analyst Agent MCP tool;
+- SQL Regression MCP tool;
+- local MCP client validation;
+- MCP usage documentation.
 
-This milestone will connect the project more directly to QA scenarios involving database validation, business rules and test evidence.
+This milestone will allow external AI clients and agents to call selected project capabilities through standardized MCP tools instead of only using HTTP endpoints.
 
 The planned short-term implementation order is:
 
 ```text
-File ingestion expansion
-  ↓
-Data Analyst Agent foundation
-  ↓
 M5 — MCP QA Server
+  ↓
+M6 — Multi-Agent QA Copilot
+  ↓
+M7 — Evaluation and LLMOps
+```
 
 ## Engineering Approach
 

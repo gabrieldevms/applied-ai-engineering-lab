@@ -5,15 +5,17 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** Pre-M5 Applied AI Extensions  
-**Latest completed milestone:** File ingestion expansion  
-**Next milestone:** Data Analyst Agent foundation  
+**Latest completed milestone:** SQL workflow regression dataset  
+**Next milestone:** M5 — MCP QA Server  
 
 The short-term implementation order is:
 
 ```text
-Data Analyst Agent foundation
-  ↓
 M5 — MCP QA Server
+  ↓
+M6 — Multi-Agent QA Copilot
+  ↓
+M7 — Evaluation and LLMOps
 ```
 
 | Module                             | Status      |
@@ -23,7 +25,7 @@ M5 — MCP QA Server
 | M2 — LLM Engineering               | Completed   |
 | M3 — RAG Knowledge Assistant       | Completed   |
 | M4 — AI Agents                     | Completed   |
-| M5 — MCP QA Server                 | Planned     |
+| M5 — MCP QA Server                 | Next        |
 | M6 — Multi-Agent QA Copilot        | Planned     |
 | M7 — Evaluation and LLMOps         | Planned     |
 | M8 — Cloud, Security and Portfolio | Planned     |
@@ -189,7 +191,7 @@ Detailed review:
 
 ## Pre-M5 Applied AI Extensions
 
-These extensions will improve the practical usefulness of the platform before MCP integration.
+These extensions improve the practical usefulness of the platform before MCP integration.
 
 ### File ingestion expansion
 
@@ -204,38 +206,71 @@ Goal: support real-world business and technical documents in RAG and agent workf
 - [x] Extraction and ingestion tests
 - [x] RAG integration validation
 
+Detailed review:
+
+- [File Ingestion Expansion Review](docs/study-notes/05-file-ingestion-expansion-review.md)
+
 ### Data Analyst Agent foundation
 
 Goal: introduce controlled data analysis and database validation workflows that can collaborate with the QA Agent.
 
-- [ ] Database schema representation
-- [ ] Table and column metadata
-- [ ] Natural-language-to-SQL request schema
-- [ ] Structured SQL generation
-- [ ] SQL explanation
-- [ ] Read-only query validation
-- [ ] Unsafe query blocking
-- [ ] Query execution abstraction
-- [ ] Result evidence schemas
-- [ ] Data Analyst Agent
-- [ ] QA Agent integration
-- [ ] Deterministic SQL and agent evaluation
+- [x] Database schema representation
+- [x] Table and column metadata
+- [x] Natural-language-to-SQL request schema
+- [x] Structured SQL generation
+- [x] SQL explanation
+- [x] Read-only query validation
+- [x] Unsafe query blocking
+- [x] Query execution abstraction
+- [x] Controlled in-memory SQLite execution
+- [x] Result evidence schemas
+- [x] SQL generate + execute workflow
+- [x] Data Analyst Agent
+- [x] Data Analyst Agent evaluation
+- [x] SQL workflow regression dataset
+
+### QA Agent and Data Analyst integration
+
+Goal: allow QA workflows to use controlled data validation when requirements depend on database-like evidence.
+
+- [x] Specialized Agent Registry
+- [x] Data Analyst Agent tool adapter
+- [x] `data_analysis.agent.run` tool registration
+- [x] QA Agent integration with the Data Analyst Agent
+- [x] Optional QA Agent data validation
+- [x] Automatic data validation selection
+- [x] Data validation modes: `auto`, `required` and `disabled`
+- [x] QA Agent evaluation with data evidence
+- [x] Tool trace validation for QA/data workflows
+
+Current limitations:
+
+- [ ] External database connectors
+- [ ] Database credentials management
+- [ ] Query cost estimation
+- [ ] Persistent SQL regression dataset files
+- [ ] NoSQL data source abstraction
+- [ ] LLM-based tool selection
+- [ ] LLM-as-judge evaluation
 
 ---
 
 ## M5 — MCP QA Server
 
-**Goal:** Expose QA and software engineering capabilities through the Model Context Protocol.
+**Goal:** Expose selected QA and software engineering capabilities through the Model Context Protocol.
 
 * [ ] MCP server setup
-* [ ] MCP resource and tool definitions
-* [ ] Requirement Analysis Tool
-* [ ] Test Case Generation Tool
-* [ ] Playwright Review Tool
-* [ ] Documentation Search Tool
-* [ ] MCP client integration
+* [ ] MCP tool and resource definitions
+* [ ] Requirement Analysis MCP tool
+* [ ] RAG Retrieval MCP tool
+* [ ] RAG Answer MCP tool
+* [ ] QA Agent MCP tool
+* [ ] Data Analyst Agent MCP tool
+* [ ] SQL Workflow Regression MCP tool
+* [ ] MCP client validation
 * [ ] MCP tool tests
 * [ ] MCP security boundaries
+* [ ] MCP usage documentation
 
 ---
 
@@ -329,6 +364,10 @@ Reliable LLM integration
 Document-based RAG assistant
         ↓
 Tool-using QA Agent
+        ↓
+Controlled Data Analyst Agent
+        ↓
+QA and Data Agent integration
         ↓
 MCP QA Server
         ↓
