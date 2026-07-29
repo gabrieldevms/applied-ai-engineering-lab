@@ -206,3 +206,9 @@ All notable changes to this project will be documented in this file.
 - Marked M4 — AI Agents as completed
 - Updated the project status and next milestone to File Ingestion Expansion
 - Consolidated README agent capabilities, endpoints and current limitations
+- File Ingestion Expansion review documentation
+- Multi-format file ingestion documentation for TXT, Markdown, PDF, DOCX, CSV and XLSX
+- Structured table extraction documentation for CSV, XLSX and DOCX tables
+- Marked File Ingestion Expansion as completed
+- Updated the next milestone to Data Analyst Agent foundation
+- Updated README supported file ingestion capabilities and limitations

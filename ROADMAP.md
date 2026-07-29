@@ -4,16 +4,13 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-**Current module:** M4 — AI Agents  
-**Module status:** Completed  
-**Latest milestone:** Agent evaluation completed  
-**Next milestone:** File ingestion expansion  
+**Current module:** Pre-M5 Applied AI Extensions  
+**Latest completed milestone:** File ingestion expansion  
+**Next milestone:** Data Analyst Agent foundation  
 
 The short-term implementation order is:
 
 ```text
-File ingestion expansion
-  ↓
 Data Analyst Agent foundation
   ↓
 M5 — MCP QA Server
@@ -198,14 +195,14 @@ These extensions will improve the practical usefulness of the platform before MC
 
 Goal: support real-world business and technical documents in RAG and agent workflows.
 
-- [ ] PDF text extraction
-- [ ] DOCX text extraction
-- [ ] CSV ingestion
-- [ ] Excel and spreadsheet ingestion
-- [ ] Structured table extraction
-- [ ] File metadata normalization
-- [ ] Extraction and ingestion tests
-- [ ] RAG integration validation
+- [x] PDF text extraction
+- [x] DOCX text extraction
+- [x] CSV ingestion
+- [x] Excel and spreadsheet ingestion
+- [x] Structured table extraction
+- [x] File metadata normalization
+- [x] Extraction and ingestion tests
+- [x] RAG integration validation
 
 ### Data Analyst Agent foundation
 

@@ -6,16 +6,16 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 
 ## Project Status
 
-**Current module:** M4 — AI Agents  
-**Module status:** Completed  
-**Latest milestone:** Agent evaluation completed  
-**Next milestone:** File ingestion expansion  
+**Current module:** Pre-M5 Applied AI Extensions  
+**Latest completed milestone:** File ingestion expansion  
+**Next milestone:** Data Analyst Agent foundation  
 
-The project currently provides a tested foundation for LLM Engineering, RAG and controlled AI agent workflows applied to software quality scenarios.
+The project currently provides a tested foundation for LLM Engineering, RAG, controlled AI agent workflows and multi-format file ingestion for software quality scenarios.
 
-For a detailed review of the completed agents module, see:
+For detailed reviews, see:
 
 - [M4 — AI Agents Module Review](docs/study-notes/04-ai-agents-module-review.md)
+- [File Ingestion Expansion Review](docs/study-notes/05-file-ingestion-expansion-review.md)
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -107,6 +107,17 @@ The RAG foundation currently supports:
 * LLM-based answer generation;
 * source citations;
 * deterministic RAG evaluation.
+
+### File Ingestion
+
+- extensible file extractor registry;
+- normalized text extraction for TXT and Markdown;
+- PDF text extraction;
+- DOCX paragraph and table text extraction;
+- CSV text extraction with delimiter detection;
+- Excel text extraction by sheet;
+- structured table extraction for CSV, XLSX and DOCX tables;
+- dedicated `/rag/extract-text` and `/rag/extract-tables` extraction paths.
 
 ### AI Agent Foundation
 
@@ -221,6 +232,7 @@ http://127.0.0.1:8000/docs
 | Method | Endpoint            | Description                                        |
 | ------ | ------------------- | -------------------------------------------------- |
 | `POST` | `/rag/extract-text` | Extract normalized text from a supported file      |
+| `POST` | `/rag/extract-tables` | Extract structured tables from CSV, XLSX and DOCX files |
 | `POST` | `/rag/chunk`        | Split document text into configurable chunks       |
 | `POST` | `/rag/ingest`       | Ingest raw text and generate document metadata     |
 | `POST` | `/rag/ingest-file`  | Extract, ingest and chunk an uploaded file         |
@@ -507,7 +519,11 @@ The current CI workflow:
 
 ## Current Limitations
 
-- supported ingestion formats are currently limited and will be expanded to PDF, DOCX, CSV and spreadsheets;
+- PDF extraction depends on text being extractable from the PDF;
+- scanned PDFs and OCR are not supported;
+- legacy `.doc` and `.xls` files are not supported;
+- structured table extraction does not yet infer semantic column types;
+- structured table extraction is not yet connected to a Data Analyst Agent;
 - embeddings and vector storage still use deterministic local implementations intended for development and testing;
 - execution logs are persisted locally as JSONL files instead of a production database;
 - agent approval is policy-based and synchronous;
@@ -518,19 +534,23 @@ The current CI workflow:
 
 These limitations define the boundary between the implemented foundation and the upcoming agent capabilities.
 
-## Next Milestone: File Ingestion Expansion
+## Next Milestone: Data Analyst Agent Foundation
 
-The next milestone will expand the document ingestion pipeline beyond plain text and Markdown.
+The next milestone will introduce the foundation for controlled data analysis and database validation workflows.
 
-Planned formats include:
+Planned capabilities include:
 
-- PDF;
-- DOCX;
-- CSV;
-- Excel and spreadsheet files;
-- structured table extraction.
+- database schema representation;
+- table and column metadata;
+- natural-language-to-SQL request schema;
+- structured SQL generation;
+- SQL explanation;
+- read-only query validation;
+- unsafe query blocking;
+- query result evidence schemas;
+- initial Data Analyst Agent workflow.
 
-This expansion will make the RAG pipeline and future agents more useful with real-world business and QA documentation.
+This milestone will connect the project more directly to QA scenarios involving database validation, business rules and test evidence.
 
 The planned short-term implementation order is:
 
