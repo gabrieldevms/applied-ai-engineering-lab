@@ -164,7 +164,9 @@ def test_qa_agent_should_analyze_requirement_without_knowledge_documents() -> No
     assert response.status == "completed"
     assert response.metadata["agent_type"] == "qa-agent-v1"
     assert response.metadata["knowledge_documents"] == 0
-    assert response.metadata["data_validation_requested"] is False
+    assert response.metadata["data_validation_available"] is False
+    assert response.metadata["data_validation_selected"] is False
+    assert response.metadata["data_validation_mode"] == "not_provided"
     assert response.requirement_analysis["summary"]
     assert response.retrieved_context is None
     assert response.data_validation is None
@@ -208,7 +210,9 @@ def test_qa_agent_should_retrieve_context_and_analyze_requirement() -> None:
 
     assert response.status == "completed"
     assert response.metadata["knowledge_documents"] == 2
-    assert response.metadata["data_validation_requested"] is False
+    assert response.metadata["data_validation_available"] is False
+    assert response.metadata["data_validation_selected"] is False
+    assert response.metadata["data_validation_mode"] == "not_provided"
     assert response.retrieved_context is not None
     assert response.retrieved_context["total_retrieved_chunks"] == 1
     assert response.requirement_analysis["summary"]
@@ -231,7 +235,11 @@ def test_qa_agent_should_run_data_validation_when_requested() -> None:
     )
 
     assert response.status == "completed"
-    assert response.metadata["data_validation_requested"] is True
+    assert response.data_validation_selection is not None
+    assert response.data_validation_selection["decision"] == "selected"
+    assert response.metadata["data_validation_available"] is True
+    assert response.metadata["data_validation_selected"] is True
+    assert response.metadata["data_validation_mode"] == "auto"
     assert response.requirement_analysis["summary"]
     assert response.data_validation is not None
     assert response.data_validation["status"] == "completed"
@@ -254,6 +262,11 @@ def test_qa_agent_should_run_data_validation_when_requested() -> None:
 
     assert "tool_call:requirements.analyze" in step_names
     assert "tool_call:data_analysis.agent.run" in step_names
+    assert response.data_validation_selection is not None
+    assert response.data_validation_selection["decision"] == "selected"
+    assert response.metadata["data_validation_available"] is True
+    assert response.metadata["data_validation_selected"] is True
+    assert response.metadata["data_validation_mode"] == "auto"
 
 
 def test_qa_agent_should_reject_blank_requirement() -> None:
@@ -261,3 +274,64 @@ def test_qa_agent_should_reject_blank_requirement() -> None:
 
     with pytest.raises(ValueError, match="requirement_text cannot be blank"):
         service.run(requirement_text="   ")
+
+
+def test_qa_agent_should_skip_data_validation_when_auto_selection_does_not_match() -> None:
+    service = _build_qa_agent_service_with_data_analyst_fake()
+
+    response = service.run(
+        requirement_text=(
+            "Como usuário, quero alterar o tema visual da aplicação "
+            "para modo escuro."
+        ),
+        data_validation=_build_data_validation_request(),
+        language="pt-BR",
+        max_steps=6,
+    )
+
+    assert response.status == "completed"
+    assert response.data_validation_selection is not None
+    assert response.data_validation_selection["decision"] == "skipped"
+    assert response.data_validation is None
+    assert response.metadata["data_validation_available"] is True
+    assert response.metadata["data_validation_selected"] is False
+    assert response.metadata["data_validation_mode"] == "auto"
+
+    step_names = [
+        step.name
+        for step in response.steps
+    ]
+
+    assert "tool_call:requirements.analyze" in step_names
+    assert "tool_call:data_analysis.agent.run" not in step_names
+
+
+def test_qa_agent_should_run_data_validation_when_mode_is_required() -> None:
+    service = _build_qa_agent_service_with_data_analyst_fake()
+    data_validation = _build_data_validation_request()
+    data_validation.mode = "required"
+
+    response = service.run(
+        requirement_text=(
+            "Como usuário, quero alterar o tema visual da aplicação "
+            "para modo escuro."
+        ),
+        data_validation=data_validation,
+        language="pt-BR",
+        max_steps=6,
+    )
+
+    assert response.status == "completed"
+    assert response.data_validation_selection is not None
+    assert response.data_validation_selection["decision"] == "selected"
+    assert response.data_validation is not None
+    assert response.metadata["data_validation_available"] is True
+    assert response.metadata["data_validation_selected"] is True
+    assert response.metadata["data_validation_mode"] == "required"
+
+    step_names = [
+        step.name
+        for step in response.steps
+    ]
+
+    assert "tool_call:data_analysis.agent.run" in step_names

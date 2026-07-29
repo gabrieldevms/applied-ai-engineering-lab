@@ -1,3 +1,7 @@
+from ai_api.agents.qa_data_validation_selection import (
+    QADataValidationSelectionResult,
+    QADataValidationSelector,
+)
 from ai_api.agents.runtime import AgentRuntime
 from ai_api.agents.schemas import (
     AgentRunResponse,
@@ -12,8 +16,13 @@ class QAAgentService:
     def __init__(
         self,
         agent_runtime: AgentRuntime | None = None,
+        data_validation_selector: QADataValidationSelector | None = None,
     ) -> None:
         self.agent_runtime = agent_runtime or AgentRuntime()
+        self.data_validation_selector = (
+            data_validation_selector
+            or QADataValidationSelector()
+        )
 
     def run(
         self,
@@ -33,10 +42,25 @@ class QAAgentService:
         if not cleaned_requirement:
             raise ValueError("requirement_text cannot be blank")
 
+        data_validation_selection = self._select_data_validation(
+            requirement_text=cleaned_requirement,
+            data_validation=data_validation,
+        )
+
+        selected_data_validation = (
+            data_validation
+            if (
+                data_validation is not None
+                and data_validation_selection is not None
+                and data_validation_selection.decision == "selected"
+            )
+            else None
+        )
+
         tool_calls = self._build_tool_calls(
             requirement_text=cleaned_requirement,
             knowledge_documents=documents,
-            data_validation=data_validation,
+            data_validation=selected_data_validation,
             language=language,
             top_k=top_k,
             chunk_size=chunk_size,
@@ -51,7 +75,8 @@ class QAAgentService:
             ),
             context=self._build_context(
                 knowledge_documents=documents,
-                data_validation=data_validation,
+                data_validation=selected_data_validation,
+                data_validation_selection=data_validation_selection,
             ),
             max_steps=max_steps,
             metadata={
@@ -59,7 +84,15 @@ class QAAgentService:
                 "agent_type": "qa-agent-v1",
                 "language": language,
                 "knowledge_documents": len(documents),
-                "data_validation_requested": data_validation is not None,
+                "data_validation_available": data_validation is not None,
+                "data_validation_selected": (
+                    selected_data_validation is not None
+                ),
+                "data_validation_mode": (
+                    data_validation.mode
+                    if data_validation is not None
+                    else "not_provided"
+                ),
                 "requested_tools": [
                     tool_call.tool_name
                     for tool_call in tool_calls
@@ -80,6 +113,11 @@ class QAAgentService:
                 agent_run=agent_run,
                 tool_name="rag.retrieve",
             ),
+            data_validation_selection=(
+                data_validation_selection.model_dump(mode="json")
+                if data_validation_selection is not None
+                else None
+            ),
             data_validation=self._extract_optional_tool_output(
                 agent_run=agent_run,
                 tool_name="data_analysis.agent.run",
@@ -89,6 +127,34 @@ class QAAgentService:
                 **agent_run.metadata,
                 "qa_agent": "qa-agent-v1",
             },
+        )
+
+    def _select_data_validation(
+        self,
+        requirement_text: str,
+        data_validation: QAAgentDataValidationRequest | None,
+    ) -> QADataValidationSelectionResult | None:
+        if data_validation is None:
+            return None
+
+        if data_validation.mode == "disabled":
+            return QADataValidationSelectionResult(
+                decision="skipped",
+                reason="Data validation was disabled by request mode.",
+                matched_signals=[],
+                confidence=1.0,
+            )
+
+        if data_validation.mode == "required":
+            return QADataValidationSelectionResult(
+                decision="selected",
+                reason="Data validation was selected because request mode is required.",
+                matched_signals=["required_mode"],
+                confidence=1.0,
+            )
+
+        return self.data_validation_selector.select(
+            requirement_text=requirement_text,
         )
 
     def _build_tool_calls(
@@ -165,6 +231,7 @@ class QAAgentService:
                             **data_validation.metadata,
                             "requested_by": "qa-agent-v1",
                             "source": "qa_agent_data_validation",
+                            "selection_mode": data_validation.mode,
                         },
                     },
                     metadata={
@@ -181,6 +248,7 @@ class QAAgentService:
         self,
         knowledge_documents: list[SemanticSearchDocument],
         data_validation: QAAgentDataValidationRequest | None,
+        data_validation_selection: QADataValidationSelectionResult | None,
     ) -> str | None:
         context_parts: list[str] = []
 
@@ -190,9 +258,15 @@ class QAAgentService:
                 "contexto antes da análise de qualidade."
             )
 
+        if data_validation_selection is not None:
+            context_parts.append(
+                "A seleção de validação de dados foi avaliada com decisão: "
+                f"{data_validation_selection.decision}."
+            )
+
         if data_validation is not None:
             context_parts.append(
-                "Uma validação de dados foi solicitada e será executada "
+                "Uma validação de dados foi selecionada e será executada "
                 "por meio do Data Analyst Agent."
             )
 

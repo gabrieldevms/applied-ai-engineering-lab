@@ -179,6 +179,13 @@ class ToolExecutionResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+QAAgentDataValidationMode = Literal[
+    "auto",
+    "required",
+    "disabled",
+]
+
+
 class QAAgentDataValidationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -187,6 +194,13 @@ class QAAgentDataValidationRequest(BaseModel):
         description=(
             "Optional data analysis objective. When omitted, the QA Agent "
             "will derive the objective from the requirement text."
+        ),
+    )
+    mode: QAAgentDataValidationMode = Field(
+        default="auto",
+        description=(
+            "Controls whether data validation should be automatically selected, "
+            "always required or disabled."
         ),
     )
     database_schema: DatabaseSchema
@@ -293,6 +307,7 @@ class QAAgentRunResponse(BaseModel):
     final_answer: str
     requirement_analysis: dict[str, Any] = Field(default_factory=dict)
     retrieved_context: dict[str, Any] | None = None
+    data_validation_selection: dict[str, Any] | None = None
     data_validation: dict[str, Any] | None = None
     steps: list[AgentStep]
     metadata: dict[str, Any] = Field(default_factory=dict)
