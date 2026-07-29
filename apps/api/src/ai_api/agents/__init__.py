@@ -76,6 +76,14 @@ from ai_api.agents.execution_logs import (
 )
 from ai_api.agents.safety import AgentSafetyService
 from ai_api.agents.evaluation import AgentEvaluationService
+from ai_api.agents.specialized_registry import (
+    SpecializedAgentCapability,
+    SpecializedAgentDescriptor,
+    SpecializedAgentRegistry,
+    SpecializedAgentRegistryResponse,
+    SpecializedAgentStatus,
+    get_specialized_agent_registry,
+)
 
 __all__ = [
     "AgentRunRequest",
@@ -145,4 +153,10 @@ __all__ = [
     "AgentEvaluationResponse",
     "AgentEvaluationService",
     "AgentEvaluationStatus",
+    "SpecializedAgentCapability",
+    "SpecializedAgentDescriptor",
+    "SpecializedAgentRegistry",
+    "SpecializedAgentRegistryResponse",
+    "SpecializedAgentStatus",
+    "get_specialized_agent_registry",
 ]
