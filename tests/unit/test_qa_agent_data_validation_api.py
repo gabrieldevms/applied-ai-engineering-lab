@@ -42,6 +42,7 @@ def _build_request_body() -> dict:
         "max_steps": 6,
         "data_validation": {
             "objective": "Validar o saldo final por conta.",
+            "mode": "auto",
             "database_schema": {
                 "name": "qa_database",
                 "description": "Database used for QA validation.",
@@ -159,7 +160,11 @@ def test_qa_agent_endpoint_should_run_data_validation_capability() -> None:
     body = response.json()
 
     assert body["status"] == "completed"
-    assert body["metadata"]["data_validation_requested"] is True
+    assert body["data_validation_selection"] is not None
+    assert body["data_validation_selection"]["decision"] == "selected"
+    assert body["metadata"]["data_validation_available"] is True
+    assert body["metadata"]["data_validation_selected"] is True
+    assert body["metadata"]["data_validation_mode"] == "auto"
     assert body["requirement_analysis"]["summary"]
     assert body["data_validation"] is not None
     assert body["data_validation"]["status"] == "completed"
@@ -178,3 +183,8 @@ def test_qa_agent_endpoint_should_run_data_validation_capability() -> None:
 
     assert "tool_call:requirements.analyze" in step_names
     assert "tool_call:data_analysis.agent.run" in step_names
+    assert body["data_validation_selection"] is not None
+    assert body["data_validation_selection"]["decision"] == "selected"
+    assert body["metadata"]["data_validation_available"] is True
+    assert body["metadata"]["data_validation_selected"] is True
+    assert body["metadata"]["data_validation_mode"] == "auto"

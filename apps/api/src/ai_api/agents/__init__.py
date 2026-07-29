@@ -39,6 +39,7 @@ from ai_api.agents.schemas import (
     AgentEvaluationResponse,
     AgentEvaluationStatus,
     QAAgentDataValidationRequest,
+    QAAgentDataValidationMode,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -88,6 +89,11 @@ from ai_api.agents.specialized_registry import (
     SpecializedAgentRegistryResponse,
     SpecializedAgentStatus,
     get_specialized_agent_registry,
+)
+from ai_api.agents.qa_data_validation_selection import (
+    QADataValidationDecision,
+    QADataValidationSelectionResult,
+    QADataValidationSelector,
 )
 
 __all__ = [
@@ -169,4 +175,8 @@ __all__ = [
     "get_tool_execution_service",
     "QAAgentDataValidationRequest",
     "get_qa_agent_service",
+    "QADataValidationDecision",
+    "QADataValidationSelectionResult",
+    "QADataValidationSelector",
+    "QAAgentDataValidationMode",
 ]
