@@ -59,3 +59,11 @@ def get_agent_runtime() -> AgentRuntime:
     return AgentRuntime(
         tool_execution_service=get_tool_execution_service(),
     )
+
+
+def get_qa_agent_service():
+    from ai_api.agents.qa_agent import QAAgentService
+
+    return QAAgentService(
+        agent_runtime=get_agent_runtime(),
+    )

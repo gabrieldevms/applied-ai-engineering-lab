@@ -38,6 +38,7 @@ from ai_api.agents.schemas import (
     AgentEvaluationRequest,
     AgentEvaluationResponse,
     AgentEvaluationStatus,
+    QAAgentDataValidationRequest,
 )
 from ai_api.agents.tool_executor import (
     RAGRetrieveTool,
@@ -62,6 +63,7 @@ from ai_api.agents.dependencies import (
     get_agent_execution_log_service,
     get_agent_runtime,
     get_tool_execution_service,
+    get_qa_agent_service,
 )
 from ai_api.agents.tool_selection import AgentToolSelectionService
 from ai_api.agents.multi_step_execution import AgentMultiStepExecutionService
@@ -165,4 +167,6 @@ __all__ = [
     "DataAnalystAgentTool",
     "get_agent_runtime",
     "get_tool_execution_service",
+    "QAAgentDataValidationRequest",
+    "get_qa_agent_service",
 ]

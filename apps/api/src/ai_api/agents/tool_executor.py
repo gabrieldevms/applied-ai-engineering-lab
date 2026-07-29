@@ -146,11 +146,10 @@ class ToolExecutionService:
             DataAnalystAgentTool.tool_name: DataAnalystAgentTool(),
         }
 
-        self.handlers = dict(
-            default_handlers
-            if handlers is None
-            else handlers
-        )
+        self.handlers = dict(default_handlers)
+
+        if handlers is not None:
+            self.handlers.update(handlers)
 
     def execute(
         self,
