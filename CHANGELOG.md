@@ -212,3 +212,40 @@ All notable changes to this project will be documented in this file.
 - Marked File Ingestion Expansion as completed
 - Updated the next milestone to Data Analyst Agent foundation
 - Updated README supported file ingestion capabilities and limitations
+- Data Analyst Agent foundation
+- Database schema representation for data analysis workflows
+- Table and column metadata schemas
+- Natural-language-to-SQL request schemas
+- Structured SQL generation workflow
+- SQL explanation and assumptions in generated SQL responses
+- Read-only SQL validation for generated and submitted queries
+- Unsafe SQL blocking for write, destructive and administrative commands
+- Controlled in-memory SQLite query execution
+- SQL query result evidence schemas
+- SQL generate, validate and execute workflow
+- Data Analyst Agent runtime wrapper
+- Data Analyst Agent API endpoint
+- Data Analyst Agent deterministic evaluation
+- Data Analyst Agent evaluation API endpoint
+- Specialized Agent Registry
+- Specialized agent descriptors for QA Agent and Data Analyst Agent
+- Data Analyst Agent tool adapter as `data_analysis.agent.run`
+- Tool Registry support for `data_analysis.agent.run`
+- Generic Agent Runtime support for executing the Data Analyst Agent through tool calls
+- QA Agent data validation capability
+- Optional QA Agent data validation through the Data Analyst Agent
+- Automatic QA Agent data validation selection
+- QA Agent data validation modes: `auto`, `required` and `disabled`
+- QA Agent data validation selection metadata
+- QA Agent response support for data validation evidence
+- QA Agent deterministic evaluation with data evidence
+- QA Agent evaluation API endpoint
+- SQL workflow regression dataset runner
+- SQL regression scenario schemas
+- SQL regression suite request and response schemas
+- SQL workflow regression API endpoint
+- Regression checks for workflow status, row count, expected columns and expected rows
+- Updated README project status before M5
+- Updated ROADMAP status before M5
+- Marked Pre-M5 Data Analyst Agent and QA/Data Agent integration work as completed
+- Updated the next milestone to M5 — MCP QA Server
