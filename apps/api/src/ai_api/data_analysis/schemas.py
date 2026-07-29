@@ -12,6 +12,11 @@ SQLExecutionStatus = Literal[
     "blocked",
 ]
 
+SQLWorkflowStatus = Literal[
+    "executed",
+    "blocked",
+]
+
 
 class DatabaseColumn(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -208,4 +213,35 @@ class SQLExecutionResponse(BaseModel):
     row_count: int = Field(ge=0)
     truncated: bool = False
     evidence: SQLQueryEvidence
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SQLWorkflowRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    question: str = Field(min_length=1)
+    database_schema: DatabaseSchema
+    table_data: list[DatabaseTableData] = Field(default_factory=list)
+    language: str = "pt-BR"
+    max_rows: int = Field(default=100, ge=1, le=1000)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("question", "language")
+    @classmethod
+    def text_fields_cannot_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+
+        if not cleaned_value:
+            raise ValueError("value cannot be blank")
+
+        return cleaned_value
+
+
+class SQLWorkflowResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: SQLWorkflowStatus
+    generation: SQLGenerationResponse
+    execution: SQLExecutionResponse | None = None
+    evidence: SQLQueryEvidence | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
