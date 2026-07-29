@@ -91,14 +91,18 @@ from ai_api.agents import (
 )
 from ai_api.data_analysis import (
     DataAnalystSQLGenerationService,
+    DataAnalystSQLWorkflowService,
     NaturalLanguageSQLRequest,
     SQLExecutionError,
     SQLExecutionRequest,
     SQLExecutionResponse,
     SQLGenerationError,
     SQLGenerationResponse,
+    SQLWorkflowRequest,
+    SQLWorkflowResponse,
     SQLiteReadOnlyQueryExecutor,
     get_data_analyst_sql_generation_service,
+    get_data_analyst_sql_workflow_service,
     get_sql_query_executor,
 )
 
@@ -438,6 +442,17 @@ def execute_sql(
     ],
 ) -> SQLExecutionResponse:
     return executor.execute(payload)
+
+
+@app.post("/data-analysis/sql/run", response_model=SQLWorkflowResponse,)
+def run_sql_workflow(
+    payload: SQLWorkflowRequest,
+    service: Annotated[
+        DataAnalystSQLWorkflowService,
+        Depends(get_data_analyst_sql_workflow_service),
+    ],
+) -> SQLWorkflowResponse:
+    return service.run(payload)
 
 
 @app.post("/rag/chunk", response_model=DocumentChunkingResponse)

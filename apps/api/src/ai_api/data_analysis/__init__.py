@@ -1,5 +1,6 @@
 from ai_api.data_analysis.dependencies import (
     get_data_analyst_sql_generation_service,
+    get_data_analyst_sql_workflow_service,
     get_sql_query_executor,
 )
 from ai_api.data_analysis.exceptions import (
@@ -22,8 +23,14 @@ from ai_api.data_analysis.schemas import (
     SQLSafetyViolation,
     SQLValidationResponse,
     SQLValidationStatus,
+    SQLWorkflowRequest,
+    SQLWorkflowResponse,
+    SQLWorkflowStatus,
 )
-from ai_api.data_analysis.services import DataAnalystSQLGenerationService
+from ai_api.data_analysis.services import (
+    DataAnalystSQLGenerationService,
+    DataAnalystSQLWorkflowService,
+)
 from ai_api.data_analysis.sql_execution import SQLiteReadOnlyQueryExecutor
 from ai_api.data_analysis.sql_safety import ReadOnlySQLValidator
 
@@ -33,6 +40,7 @@ __all__ = [
     "DatabaseTable",
     "DatabaseTableData",
     "DataAnalystSQLGenerationService",
+    "DataAnalystSQLWorkflowService",
     "NaturalLanguageSQLRequest",
     "ReadOnlySQLValidator",
     "SQLExecutionError",
@@ -47,7 +55,11 @@ __all__ = [
     "SQLSafetyViolation",
     "SQLValidationResponse",
     "SQLValidationStatus",
+    "SQLWorkflowRequest",
+    "SQLWorkflowResponse",
+    "SQLWorkflowStatus",
     "SQLiteReadOnlyQueryExecutor",
     "get_data_analyst_sql_generation_service",
+    "get_data_analyst_sql_workflow_service",
     "get_sql_query_executor",
 ]
