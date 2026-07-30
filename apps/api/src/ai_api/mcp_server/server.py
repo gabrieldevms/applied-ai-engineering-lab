@@ -2,9 +2,11 @@ from typing import Any
 from fastmcp import FastMCP
 from ai_api.mcp_server.tools import (
     analyze_requirement_tool,
+    answer_with_rag_tool,
     get_project_status_tool,
     list_agent_tools_tool,
     list_specialized_agents_tool,
+    retrieve_rag_context_tool,
 )
 
 
@@ -38,6 +40,44 @@ def analyze_requirement(
     return analyze_requirement_tool(
         requirement_text=requirement_text,
         language=language,
+    )
+
+
+@mcp.tool()
+def retrieve_rag_context(
+    query: str,
+    documents: list[dict[str, Any]],
+    top_k: int = 3,
+    chunk_size: int = 800,
+    chunk_overlap: int = 120,
+) -> dict[str, Any]:
+    """Retrieve relevant RAG context from provided documents."""
+    return retrieve_rag_context_tool(
+        query=query,
+        documents=documents,
+        top_k=top_k,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+    )
+
+
+@mcp.tool()
+def answer_with_rag(
+    query: str,
+    documents: list[dict[str, Any]],
+    language: str = "pt-BR",
+    top_k: int = 3,
+    chunk_size: int = 800,
+    chunk_overlap: int = 120,
+) -> dict[str, Any]:
+    """Generate a grounded answer using RAG over provided documents."""
+    return answer_with_rag_tool(
+        query=query,
+        documents=documents,
+        language=language,
+        top_k=top_k,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
     )
 
 
