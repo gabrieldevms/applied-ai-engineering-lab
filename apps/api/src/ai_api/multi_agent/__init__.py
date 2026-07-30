@@ -32,6 +32,7 @@ from ai_api.multi_agent.schemas import (
     MultiAgentTraceStep,
 )
 from ai_api.multi_agent.services import MultiAgentQACopilotService
+from ai_api.multi_agent.report_generation import MultiAgentFinalReportGenerator
 
 __all__ = [
     "MultiAgentArtifact",
@@ -64,4 +65,5 @@ __all__ = [
     "build_default_multi_agent_communication_contracts",
     "build_default_multi_agent_roles",
     "get_multi_agent_qa_copilot_service",
+    "MultiAgentFinalReportGenerator",
 ]

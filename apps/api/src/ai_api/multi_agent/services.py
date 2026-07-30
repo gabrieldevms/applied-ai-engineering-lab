@@ -3,6 +3,7 @@ from ai_api.multi_agent.conflict_handling import MultiAgentConflictDetector
 from ai_api.multi_agent.contracts import MultiAgentCommunicationContractValidator
 from ai_api.multi_agent.failure_handling import MultiAgentFailureHandler
 from ai_api.multi_agent.roles import build_default_multi_agent_roles
+from ai_api.multi_agent.report_generation import MultiAgentFinalReportGenerator
 from ai_api.multi_agent.schemas import (
     MultiAgentArtifact,
     MultiAgentConflictAnalysisResponse,
@@ -26,6 +27,7 @@ class MultiAgentQACopilotService:
         contract_validator: MultiAgentCommunicationContractValidator | None = None,
         failure_handler: MultiAgentFailureHandler | None = None,
         conflict_detector: MultiAgentConflictDetector | None = None,
+        report_generator: MultiAgentFinalReportGenerator | None = None,
     ) -> None:
         self.roles = roles if roles is not None else build_default_multi_agent_roles()
         self.contract_validator = (
@@ -42,6 +44,11 @@ class MultiAgentQACopilotService:
             conflict_detector
             if conflict_detector is not None
             else MultiAgentConflictDetector()
+        )
+        self.report_generator = (
+            report_generator
+            if report_generator is not None
+            else MultiAgentFinalReportGenerator()
         )
 
     def run(
@@ -119,10 +126,11 @@ class MultiAgentQACopilotService:
 
         contract_validation = self.contract_validator.validate(shared_state)
         conflict_analysis = self.conflict_detector.detect(shared_state)
-        final_report = self._build_final_report(
+        final_report = self.report_generator.generate(
             shared_state=shared_state,
             failures=failures,
             conflict_analysis=conflict_analysis,
+            contract_validation_status=contract_validation.status,
         )
         response_status = self._resolve_status(
             task_results=task_results,

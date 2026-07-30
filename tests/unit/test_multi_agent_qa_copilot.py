@@ -76,6 +76,12 @@ def test_multi_agent_qa_copilot_should_execute_full_foundation_flow() -> None:
     assert response.final_report.automation_strategy
     assert response.final_report.review_notes
     assert response.final_report.next_steps
+    assert response.final_report.metadata["source"] == (
+        "multi-agent-final-report-generator-v1"
+    )
+    assert response.final_report.metadata["quality_gate"] == "approved"
+    assert response.final_report.metadata["contract_validation_status"] == "passed"
+    assert response.final_report.metadata["conflict_analysis_status"] == "passed"
 
     assert response.metadata["execution_mode"] == "deterministic_foundation"
     assert response.metadata["agent_count"] == 6
@@ -113,6 +119,7 @@ def test_multi_agent_qa_copilot_should_support_limited_agent_execution() -> None
     assert response.contract_validation is not None
     assert response.contract_validation.status == "failed"
     assert response.contract_validation.failed_contracts > 0
+    assert response.final_report.metadata["quality_gate"] == "requires_review"
 
 
 def test_multi_agent_qa_copilot_should_use_default_objective_when_not_provided() -> None:
