@@ -157,6 +157,10 @@ from ai_api.evals import (
     PromptRegressionSuiteService,
     get_prompt_regression_evaluation_service,
     get_prompt_regression_suite_service,
+    AIEvaluationReportAggregationRequest,
+    AIEvaluationReportAggregationResponse,
+    AIEvaluationReportAggregationService,
+    get_ai_evaluation_report_aggregation_service,
 )
 
 logging.basicConfig(
@@ -1008,3 +1012,14 @@ def run_prompt_regression_suite(
     ],
 ) -> PromptRegressionRunResponse:
     return service.run(payload)
+
+
+@app.post("/evals/reports/aggregate", response_model=AIEvaluationReportAggregationResponse,)
+def aggregate_ai_evaluation_report(
+    payload: AIEvaluationReportAggregationRequest,
+    service: Annotated[
+        AIEvaluationReportAggregationService,
+        Depends(get_ai_evaluation_report_aggregation_service),
+    ],
+) -> AIEvaluationReportAggregationResponse:
+    return service.aggregate(payload)

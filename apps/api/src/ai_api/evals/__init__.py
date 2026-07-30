@@ -1,4 +1,5 @@
 from ai_api.evals.dependencies import (
+    get_ai_evaluation_report_aggregation_service,
     get_golden_evaluation_dataset_runner_service,
     get_golden_evaluation_dataset_service,
     get_golden_evaluation_dataset_validation_service,
@@ -11,8 +12,14 @@ from ai_api.evals.prompt_regression import (
     PromptRegressionSuiteService,
     build_default_prompt_regression_suite,
 )
+from ai_api.evals.reporting import AIEvaluationReportAggregationService
 from ai_api.evals.runner import GoldenEvaluationDatasetRunnerService
 from ai_api.evals.schemas import (
+    AIEvaluationReportAggregationRequest,
+    AIEvaluationReportAggregationResponse,
+    AIEvaluationReportSection,
+    AIEvaluationReportSectionName,
+    AIEvaluationReportStatus,
     EvaluationDatasetRunStatus,
     EvaluationDatasetValidationMetric,
     EvaluationDatasetValidationResponse,
@@ -44,6 +51,12 @@ from ai_api.evals.services import (
 )
 
 __all__ = [
+    "AIEvaluationReportAggregationRequest",
+    "AIEvaluationReportAggregationResponse",
+    "AIEvaluationReportAggregationService",
+    "AIEvaluationReportSection",
+    "AIEvaluationReportSectionName",
+    "AIEvaluationReportStatus",
     "EvaluationDatasetRunStatus",
     "EvaluationDatasetValidationMetric",
     "EvaluationDatasetValidationResponse",
@@ -75,6 +88,7 @@ __all__ = [
     "PromptRegressionSuiteService",
     "build_default_golden_evaluation_dataset",
     "build_default_prompt_regression_suite",
+    "get_ai_evaluation_report_aggregation_service",
     "get_golden_evaluation_dataset_runner_service",
     "get_golden_evaluation_dataset_service",
     "get_golden_evaluation_dataset_validation_service",
