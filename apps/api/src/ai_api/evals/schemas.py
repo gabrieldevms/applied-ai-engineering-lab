@@ -1373,3 +1373,130 @@ class AIRetrievalQualitySummaryResponse(BaseModel):
     operation_coverage: dict[str, int] = Field(default_factory=dict)
     risks: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AIAgentExecutionMetricStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+AIAgentRunStatus = Literal[
+    "completed",
+    "partial",
+    "failed",
+    "blocked",
+    "cancelled",
+]
+
+
+class AIAgentExecutionRecordRequest(BaseModel):
+    component: AIUsageComponent = "agent"
+    operation: str = Field(..., min_length=1)
+    agent_name: str = Field(..., min_length=1)
+    run_status: AIAgentRunStatus
+    duration_ms: float | None = Field(default=None, ge=0.0)
+    step_count: int = Field(default=0, ge=0)
+    successful_step_count: int = Field(default=0, ge=0)
+    failed_step_count: int = Field(default=0, ge=0)
+    tool_call_count: int = Field(default=0, ge=0)
+    successful_tool_call_count: int = Field(default=0, ge=0)
+    failed_tool_call_count: int = Field(default=0, ge=0)
+    retry_count: int = Field(default=0, ge=0)
+    fallback_count: int = Field(default=0, ge=0)
+    error_count: int = Field(default=0, ge=0)
+    human_approval_request_count: int = Field(default=0, ge=0)
+    human_approval_granted_count: int = Field(default=0, ge=0)
+    max_duration_ms: float | None = Field(default=None, ge=0.0)
+    max_failed_steps: int = Field(default=0, ge=0)
+    max_failed_tool_calls: int = Field(default=0, ge=0)
+    max_error_count: int = Field(default=0, ge=0)
+    min_quality_score: float = Field(default=0.7, ge=0.0, le=1.0)
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("operation", "agent_name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class AIAgentExecutionRecord(BaseModel):
+    record_id: str
+    component: AIUsageComponent
+    operation: str
+    agent_name: str
+    run_status: AIAgentRunStatus
+    status: AIAgentExecutionMetricStatus
+    duration_ms: float | None = None
+    step_count: int
+    successful_step_count: int
+    failed_step_count: int
+    tool_call_count: int
+    successful_tool_call_count: int
+    failed_tool_call_count: int
+    retry_count: int
+    fallback_count: int
+    error_count: int
+    human_approval_request_count: int
+    human_approval_granted_count: int
+    step_success_rate: float | None = None
+    tool_success_rate: float | None = None
+    human_approval_rate: float | None = None
+    quality_score: float | None = None
+    max_duration_ms: float | None = None
+    max_failed_steps: int
+    max_failed_tool_calls: int
+    max_error_count: int
+    min_quality_score: float
+    risks: list[str] = Field(default_factory=list)
+    recorded_at: str
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIAgentExecutionRecordsResponse(BaseModel):
+    records: list[AIAgentExecutionRecord] = Field(default_factory=list)
+    count: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIAgentExecutionSummaryRequest(BaseModel):
+    records: list[AIAgentExecutionRecord] | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIAgentExecutionSummaryResponse(BaseModel):
+    record_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    total_steps: int
+    total_successful_steps: int
+    total_failed_steps: int
+    total_tool_calls: int
+    total_successful_tool_calls: int
+    total_failed_tool_calls: int
+    total_retries: int
+    total_fallbacks: int
+    total_errors: int
+    total_human_approval_requests: int
+    total_human_approvals_granted: int
+    average_duration_ms: float | None = None
+    average_step_success_rate: float | None = None
+    average_tool_success_rate: float | None = None
+    average_human_approval_rate: float | None = None
+    average_quality_score: float | None = None
+    component_coverage: dict[str, int] = Field(default_factory=dict)
+    agent_coverage: dict[str, int] = Field(default_factory=dict)
+    operation_coverage: dict[str, int] = Field(default_factory=dict)
+    run_status_coverage: dict[str, int] = Field(default_factory=dict)
+    risks: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
