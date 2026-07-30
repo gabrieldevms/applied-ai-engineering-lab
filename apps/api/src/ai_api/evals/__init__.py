@@ -25,6 +25,8 @@ from ai_api.evals.dependencies import (
     get_tool_calling_evaluation_suite_service,
     get_multi_agent_copilot_regression_evaluation_service,
     get_multi_agent_copilot_regression_suite_service,
+    get_llm_as_judge_evaluation_service,
+    get_llm_as_judge_evaluation_suite_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
@@ -123,6 +125,18 @@ from ai_api.evals.schemas import (
     MultiAgentCopilotRegressionRunResponse,
     MultiAgentCopilotRegressionRunStatus,
     MultiAgentCopilotRegressionSuite,
+    LLMAsJudgeEvaluationCase,
+    LLMAsJudgeEvaluationCaseResult,
+    LLMAsJudgeEvaluationCheck,
+    LLMAsJudgeEvaluationRunRequest,
+    LLMAsJudgeEvaluationRunResponse,
+    LLMAsJudgeEvaluationSuite,
+    LLMAsJudgeEvaluationTarget,
+    LLMAsJudgeExpectation,
+    LLMAsJudgeOutput,
+    LLMAsJudgeRubricItem,
+    LLMAsJudgeRunStatus,
+    LLMAsJudgeVerdict,
 )
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -134,6 +148,11 @@ from ai_api.evals.multi_agent_regression import (
     build_default_multi_agent_copilot_regression_suite,
 )
 from ai_api.evals.telemetry import EvaluationTelemetryService
+from ai_api.evals.llm_as_judge import (
+    LLMAsJudgeEvaluationService,
+    LLMAsJudgeEvaluationSuiteService,
+    build_default_llm_as_judge_evaluation_suite,
+)
 
 __all__ = [
     "AIEvaluationReportAggregationRequest",
@@ -258,4 +277,21 @@ __all__ = [
     "build_default_multi_agent_copilot_regression_suite",
     "get_multi_agent_copilot_regression_evaluation_service",
     "get_multi_agent_copilot_regression_suite_service",
+    "LLMAsJudgeEvaluationCase",
+    "LLMAsJudgeEvaluationCaseResult",
+    "LLMAsJudgeEvaluationCheck",
+    "LLMAsJudgeEvaluationRunRequest",
+    "LLMAsJudgeEvaluationRunResponse",
+    "LLMAsJudgeEvaluationService",
+    "LLMAsJudgeEvaluationSuite",
+    "LLMAsJudgeEvaluationSuiteService",
+    "LLMAsJudgeEvaluationTarget",
+    "LLMAsJudgeExpectation",
+    "LLMAsJudgeOutput",
+    "LLMAsJudgeRubricItem",
+    "LLMAsJudgeRunStatus",
+    "LLMAsJudgeVerdict",
+    "build_default_llm_as_judge_evaluation_suite",
+    "get_llm_as_judge_evaluation_service",
+    "get_llm_as_judge_evaluation_suite_service",
 ]

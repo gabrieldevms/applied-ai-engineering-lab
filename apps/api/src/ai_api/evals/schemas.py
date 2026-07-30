@@ -328,6 +328,7 @@ EvaluationTelemetryEventType = Literal[
     "agent_regression_run",
     "tool_calling_evaluation_run",
     "multi_agent_copilot_regression_run",
+    "llm_as_judge_evaluation_run",
     "scenario_run",
     "prompt_regression_run",
     "report_aggregation",
@@ -961,4 +962,162 @@ class MultiAgentCopilotRegressionRunResponse(BaseModel):
     warning_count: int
     failed_count: int
     results: list[MultiAgentCopilotRegressionCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+LLMAsJudgeVerdict = Literal[
+    "pass",
+    "warning",
+    "fail",
+]
+
+LLMAsJudgeRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+LLMAsJudgeEvaluationTarget = Literal[
+    "requirement_analysis",
+    "rag_answer",
+    "agent_output",
+    "multi_agent_final_report",
+    "tool_calling",
+]
+
+
+class LLMAsJudgeRubricItem(BaseModel):
+    name: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    weight: float = Field(default=1.0, ge=0.0)
+    passing_score: float = Field(default=0.7, ge=0.0, le=1.0)
+
+    @field_validator("name", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class LLMAsJudgeOutput(BaseModel):
+    verdict: LLMAsJudgeVerdict
+    score: float = Field(..., ge=0.0, le=1.0)
+    rationale: str = Field(..., min_length=1)
+    criteria_scores: dict[str, float] = Field(default_factory=dict)
+    strengths: list[str] = Field(default_factory=list)
+    weaknesses: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("rationale")
+    @classmethod
+    def validate_rationale(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("rationale must not be blank")
+
+        return normalized_value
+
+
+class LLMAsJudgeExpectation(BaseModel):
+    allowed_verdicts: list[LLMAsJudgeVerdict] = Field(
+        default_factory=lambda: ["pass"]
+    )
+    min_score: float = Field(default=0.8, ge=0.0, le=1.0)
+    required_rationale_markers: list[str] = Field(default_factory=list)
+    forbidden_rationale_markers: list[str] = Field(default_factory=list)
+    required_criteria: list[str] = Field(default_factory=list)
+    require_strengths: bool = False
+    require_weaknesses: bool = False
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMAsJudgeEvaluationCase(BaseModel):
+    id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    evaluation_target: LLMAsJudgeEvaluationTarget
+    input_payload: dict[str, Any]
+    candidate_output: str | dict[str, Any]
+    rubric: list[LLMAsJudgeRubricItem] = Field(default_factory=list)
+    judge_output: LLMAsJudgeOutput | None = None
+    expectations: LLMAsJudgeExpectation = Field(
+        default_factory=LLMAsJudgeExpectation
+    )
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("id", "name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+    @field_validator("input_payload")
+    @classmethod
+    def validate_input_payload(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if not value:
+            raise ValueError("input_payload must not be empty")
+
+        return value
+
+
+class LLMAsJudgeEvaluationSuite(BaseModel):
+    name: str = Field(..., min_length=1)
+    version: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    cases: list[LLMAsJudgeEvaluationCase] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "version", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class LLMAsJudgeEvaluationCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMAsJudgeEvaluationCaseResult(BaseModel):
+    case_id: str
+    case_name: str
+    evaluation_target: LLMAsJudgeEvaluationTarget
+    status: LLMAsJudgeRunStatus
+    checks: list[LLMAsJudgeEvaluationCheck] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMAsJudgeEvaluationRunRequest(BaseModel):
+    suite: LLMAsJudgeEvaluationSuite | None = None
+    case_ids: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMAsJudgeEvaluationRunResponse(BaseModel):
+    status: LLMAsJudgeRunStatus
+    suite_name: str
+    suite_version: str
+    case_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    average_score: float | None = None
+    results: list[LLMAsJudgeEvaluationCaseResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
