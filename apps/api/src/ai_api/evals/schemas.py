@@ -1174,3 +1174,104 @@ class CIEvaluationPipelineRunResponse(BaseModel):
     should_fail_ci: bool
     stages: list[CIEvaluationPipelineStageResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AIUsageProvider = Literal[
+    "openai",
+    "ollama",
+    "anthropic",
+    "google",
+    "fake",
+    "unknown",
+]
+
+AIUsageComponent = Literal[
+    "api",
+    "evaluation",
+    "llm",
+    "rag",
+    "agent",
+    "multi_agent",
+    "tool",
+    "mcp",
+]
+
+
+class AIUsageRecordRequest(BaseModel):
+    provider: AIUsageProvider = "unknown"
+    model_name: str = Field(..., min_length=1)
+    component: AIUsageComponent
+    operation: str = Field(..., min_length=1)
+    prompt_tokens: int = Field(default=0, ge=0)
+    completion_tokens: int = Field(default=0, ge=0)
+    embedding_tokens: int = Field(default=0, ge=0)
+    total_tokens: int | None = Field(default=None, ge=0)
+    input_cost_per_1k_tokens_usd: float | None = Field(default=None, ge=0.0)
+    output_cost_per_1k_tokens_usd: float | None = Field(default=None, ge=0.0)
+    embedding_cost_per_1k_tokens_usd: float | None = Field(default=None, ge=0.0)
+    total_cost_usd: float | None = Field(default=None, ge=0.0)
+    currency: str = "USD"
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("model_name", "operation", "currency")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class AIUsageRecord(BaseModel):
+    record_id: str
+    provider: AIUsageProvider
+    model_name: str
+    component: AIUsageComponent
+    operation: str
+    prompt_tokens: int
+    completion_tokens: int
+    embedding_tokens: int
+    total_tokens: int
+    input_cost_per_1k_tokens_usd: float | None = None
+    output_cost_per_1k_tokens_usd: float | None = None
+    embedding_cost_per_1k_tokens_usd: float | None = None
+    input_cost_usd: float | None = None
+    output_cost_usd: float | None = None
+    embedding_cost_usd: float | None = None
+    total_cost_usd: float | None = None
+    currency: str = "USD"
+    recorded_at: str
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIUsageRecordsResponse(BaseModel):
+    records: list[AIUsageRecord] = Field(default_factory=list)
+    count: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIUsageSummaryRequest(BaseModel):
+    records: list[AIUsageRecord] | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIUsageSummaryResponse(BaseModel):
+    record_count: int
+    total_prompt_tokens: int
+    total_completion_tokens: int
+    total_embedding_tokens: int
+    total_tokens: int
+    total_cost_usd: float | None = None
+    average_cost_usd: float | None = None
+    provider_coverage: dict[str, int] = Field(default_factory=dict)
+    model_coverage: dict[str, int] = Field(default_factory=dict)
+    component_coverage: dict[str, int] = Field(default_factory=dict)
+    operation_coverage: dict[str, int] = Field(default_factory=dict)
+    risks: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)

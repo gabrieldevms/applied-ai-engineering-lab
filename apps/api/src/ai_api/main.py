@@ -216,6 +216,13 @@ from ai_api.evals import (
     CIEvaluationPipelineRunResponse,
     CIEvaluationPipelineService,
     get_ci_evaluation_pipeline_service,
+    AIUsageRecord,
+    AIUsageRecordRequest,
+    AIUsageRecordsResponse,
+    AIUsageSummaryRequest,
+    AIUsageSummaryResponse,
+    AIUsageTrackingService,
+    get_ai_usage_tracking_service,
 )
 
 logging.basicConfig(
@@ -1420,3 +1427,54 @@ def run_ci_evaluation_pipeline(
             **payload.metadata,
         },
     )
+
+
+@app.post("/observability/usage/records", response_model=AIUsageRecord,)
+def record_ai_usage(
+    payload: AIUsageRecordRequest,
+    service: Annotated[
+        AIUsageTrackingService,
+        Depends(get_ai_usage_tracking_service),
+    ],
+) -> AIUsageRecord:
+    return service.record(payload)
+
+
+@app.get("/observability/usage/records", response_model=AIUsageRecordsResponse,)
+def list_ai_usage_records(
+    service: Annotated[
+        AIUsageTrackingService,
+        Depends(get_ai_usage_tracking_service),
+    ],
+    provider: str | None = None,
+    component: str | None = None,
+    model_name: str | None = None,
+    limit: int = 100,
+) -> AIUsageRecordsResponse:
+    return service.list_records(
+        provider=provider,
+        component=component,
+        model_name=model_name,
+        limit=limit,
+    )
+
+
+@app.post("/observability/usage/summary", response_model=AIUsageSummaryResponse,)
+def summarize_ai_usage(
+    payload: AIUsageSummaryRequest,
+    service: Annotated[
+        AIUsageTrackingService,
+        Depends(get_ai_usage_tracking_service),
+    ],
+) -> AIUsageSummaryResponse:
+    return service.summarize(payload)
+
+
+@app.get("/observability/usage/summary", response_model=AIUsageSummaryResponse,)
+def summarize_stored_ai_usage(
+    service: Annotated[
+        AIUsageTrackingService,
+        Depends(get_ai_usage_tracking_service),
+    ],
+) -> AIUsageSummaryResponse:
+    return service.summarize(AIUsageSummaryRequest())

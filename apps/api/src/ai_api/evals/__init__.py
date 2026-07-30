@@ -28,6 +28,7 @@ from ai_api.evals.dependencies import (
     get_llm_as_judge_evaluation_service,
     get_llm_as_judge_evaluation_suite_service,
     get_ci_evaluation_pipeline_service,
+    get_ai_usage_tracking_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
@@ -143,6 +144,13 @@ from ai_api.evals.schemas import (
     CIEvaluationPipelineStageName,
     CIEvaluationPipelineStageResult,
     CIEvaluationPipelineStatus,
+    AIUsageComponent,
+    AIUsageProvider,
+    AIUsageRecord,
+    AIUsageRecordRequest,
+    AIUsageRecordsResponse,
+    AIUsageSummaryRequest,
+    AIUsageSummaryResponse,
 )
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -160,6 +168,7 @@ from ai_api.evals.llm_as_judge import (
     build_default_llm_as_judge_evaluation_suite,
 )
 from ai_api.evals.ci_pipeline import CIEvaluationPipelineService
+from ai_api.evals.usage_tracking import AIUsageTrackingService
 
 __all__ = [
     "AIEvaluationReportAggregationRequest",
@@ -308,4 +317,13 @@ __all__ = [
     "CIEvaluationPipelineStageResult",
     "CIEvaluationPipelineStatus",
     "get_ci_evaluation_pipeline_service",
+    "AIUsageComponent",
+    "AIUsageProvider",
+    "AIUsageRecord",
+    "AIUsageRecordRequest",
+    "AIUsageRecordsResponse",
+    "AIUsageSummaryRequest",
+    "AIUsageSummaryResponse",
+    "AIUsageTrackingService",
+    "get_ai_usage_tracking_service",
 ]
