@@ -134,6 +134,10 @@ from ai_api.multi_agent import (
     MultiAgentQACopilotResponse,
     MultiAgentQACopilotService,
     get_multi_agent_qa_copilot_service,
+    MultiAgentQACopilotEvaluationRequest,
+    MultiAgentQACopilotEvaluationResponse,
+    MultiAgentQACopilotEvaluationService,
+    get_multi_agent_qa_copilot_evaluation_service,
 )
 
 logging.basicConfig(
@@ -902,10 +906,7 @@ def list_agent_execution_logs_by_run_id(
     )
 
 
-@app.post(
-    "/multi-agent/qa-copilot/run",
-    response_model=MultiAgentQACopilotResponse,
-)
+@app.post("/multi-agent/qa-copilot/run", response_model=MultiAgentQACopilotResponse,)
 def run_multi_agent_qa_copilot(
     payload: MultiAgentQACopilotRequest,
     service: Annotated[
@@ -914,3 +915,14 @@ def run_multi_agent_qa_copilot(
     ],
 ) -> MultiAgentQACopilotResponse:
     return service.run(payload)
+
+
+@app.post("/multi-agent/qa-copilot/evaluate", response_model=MultiAgentQACopilotEvaluationResponse,)
+def evaluate_multi_agent_qa_copilot(
+    payload: MultiAgentQACopilotEvaluationRequest,
+    service: Annotated[
+        MultiAgentQACopilotEvaluationService,
+        Depends(get_multi_agent_qa_copilot_evaluation_service),
+    ],
+) -> MultiAgentQACopilotEvaluationResponse:
+    return service.evaluate(payload)
