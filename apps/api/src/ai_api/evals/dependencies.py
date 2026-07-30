@@ -1,6 +1,12 @@
 from ai_api.agents import ToolExecutionService, get_qa_agent_service
 from ai_api.data_analysis.dependencies import get_data_analyst_agent_service
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
+from ai_api.evals.llm_rag_evaluation import (
+    LLMOutputEvaluationService,
+    LLMOutputEvaluationSuiteService,
+    RAGRegressionEvaluationService,
+    RAGRegressionSuiteService,
+)
 from ai_api.evals.prompt_regression import (
     PromptRegressionEvaluationService,
     PromptRegressionSuiteService,
@@ -67,3 +73,19 @@ def get_evaluation_telemetry_instrumentation_service() -> (
     return EvaluationTelemetryInstrumentationService(
         telemetry_service=get_evaluation_telemetry_service(),
     )
+
+
+def get_llm_output_evaluation_suite_service() -> LLMOutputEvaluationSuiteService:
+    return LLMOutputEvaluationSuiteService()
+
+
+def get_llm_output_evaluation_service() -> LLMOutputEvaluationService:
+    return LLMOutputEvaluationService()
+
+
+def get_rag_regression_suite_service() -> RAGRegressionSuiteService:
+    return RAGRegressionSuiteService()
+
+
+def get_rag_regression_evaluation_service() -> RAGRegressionEvaluationService:
+    return RAGRegressionEvaluationService()

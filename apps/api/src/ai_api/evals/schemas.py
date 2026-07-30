@@ -323,6 +323,8 @@ class AIEvaluationReportAggregationResponse(BaseModel):
 EvaluationTelemetryEventType = Literal[
     "evaluation_run",
     "golden_dataset_run",
+    "llm_output_evaluation_run",
+    "rag_regression_run",
     "scenario_run",
     "prompt_regression_run",
     "report_aggregation",
@@ -422,4 +424,211 @@ class EvaluationTelemetrySummaryResponse(BaseModel):
     event_type_coverage: dict[str, int] = Field(default_factory=dict)
     component_coverage: dict[str, int] = Field(default_factory=dict)
     risks: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+LLMOutputEvaluationRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+LLMOutputFormat = Literal[
+    "text",
+    "json",
+]
+
+RAGRegressionRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+
+class LLMOutputEvaluationExpectation(BaseModel):
+    expected_status: str | None = None
+    required_output_markers: list[str] = Field(default_factory=list)
+    forbidden_output_markers: list[str] = Field(default_factory=list)
+    required_json_keys: list[str] = Field(default_factory=list)
+    min_output_length: int = Field(default=0, ge=0)
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMOutputEvaluationCase(BaseModel):
+    id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    component_name: str = Field(..., min_length=1)
+    output_format: LLMOutputFormat = "json"
+    input_payload: dict[str, Any]
+    actual_output: str | dict[str, Any]
+    expectations: LLMOutputEvaluationExpectation = Field(
+        default_factory=LLMOutputEvaluationExpectation
+    )
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("id", "name", "component_name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+    @field_validator("input_payload")
+    @classmethod
+    def validate_input_payload(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if not value:
+            raise ValueError("input_payload must not be empty")
+
+        return value
+
+
+class LLMOutputEvaluationSuite(BaseModel):
+    name: str = Field(..., min_length=1)
+    version: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    cases: list[LLMOutputEvaluationCase] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "version", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class LLMOutputEvaluationCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMOutputEvaluationCaseResult(BaseModel):
+    case_id: str
+    case_name: str
+    component_name: str
+    status: LLMOutputEvaluationRunStatus
+    checks: list[LLMOutputEvaluationCheck] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMOutputEvaluationRunRequest(BaseModel):
+    suite: LLMOutputEvaluationSuite | None = None
+    case_ids: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMOutputEvaluationRunResponse(BaseModel):
+    status: LLMOutputEvaluationRunStatus
+    suite_name: str
+    suite_version: str
+    case_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    results: list[LLMOutputEvaluationCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RAGRegressionExpectation(BaseModel):
+    expected_status: str | None = None
+    required_answer_markers: list[str] = Field(default_factory=list)
+    forbidden_answer_markers: list[str] = Field(default_factory=list)
+    required_citation_sources: list[str] = Field(default_factory=list)
+    required_metadata_keys: list[str] = Field(default_factory=list)
+    min_retrieved_chunks: int = Field(default=0, ge=0)
+    require_citations: bool = True
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RAGRegressionCase(BaseModel):
+    id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    query: str = Field(..., min_length=1)
+    input_payload: dict[str, Any]
+    actual_output: dict[str, Any]
+    expectations: RAGRegressionExpectation = Field(
+        default_factory=RAGRegressionExpectation
+    )
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("id", "name", "query")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+    @field_validator("input_payload")
+    @classmethod
+    def validate_input_payload(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if not value:
+            raise ValueError("input_payload must not be empty")
+
+        return value
+
+
+class RAGRegressionSuite(BaseModel):
+    name: str = Field(..., min_length=1)
+    version: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    cases: list[RAGRegressionCase] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "version", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class RAGRegressionCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RAGRegressionCaseResult(BaseModel):
+    case_id: str
+    case_name: str
+    query: str
+    status: RAGRegressionRunStatus
+    checks: list[RAGRegressionCheck] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RAGRegressionRunRequest(BaseModel):
+    suite: RAGRegressionSuite | None = None
+    case_ids: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RAGRegressionRunResponse(BaseModel):
+    status: RAGRegressionRunStatus
+    suite_name: str
+    suite_version: str
+    case_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    results: list[RAGRegressionCaseResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)

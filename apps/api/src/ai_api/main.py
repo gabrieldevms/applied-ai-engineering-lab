@@ -170,6 +170,20 @@ from ai_api.evals import (
     get_evaluation_telemetry_service,
     EvaluationTelemetryInstrumentationService,
     get_evaluation_telemetry_instrumentation_service,
+    LLMOutputEvaluationRunRequest,
+    LLMOutputEvaluationRunResponse,
+    LLMOutputEvaluationService,
+    LLMOutputEvaluationSuite,
+    LLMOutputEvaluationSuiteService,
+    RAGRegressionEvaluationService,
+    RAGRegressionRunRequest,
+    RAGRegressionRunResponse,
+    RAGRegressionSuite,
+    RAGRegressionSuiteService,
+    get_llm_output_evaluation_service,
+    get_llm_output_evaluation_suite_service,
+    get_rag_regression_evaluation_service,
+    get_rag_regression_suite_service,
 )
 
 logging.basicConfig(
@@ -1139,3 +1153,73 @@ def summarize_stored_evaluation_telemetry(
     ],
 ) -> EvaluationTelemetrySummaryResponse:
     return service.summarize(EvaluationTelemetrySummaryRequest())
+
+
+@app.get("/evals/llm-output/suite", response_model=LLMOutputEvaluationSuite,)
+def get_llm_output_evaluation_suite(
+    service: Annotated[
+        LLMOutputEvaluationSuiteService,
+        Depends(get_llm_output_evaluation_suite_service),
+    ],
+) -> LLMOutputEvaluationSuite:
+    return service.get_default_suite()
+
+
+@app.post("/evals/llm-output/run", response_model=LLMOutputEvaluationRunResponse,)
+def run_llm_output_evaluation_suite(
+    payload: LLMOutputEvaluationRunRequest,
+    service: Annotated[
+        LLMOutputEvaluationService,
+        Depends(get_llm_output_evaluation_service),
+    ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
+) -> LLMOutputEvaluationRunResponse:
+    return instrumentation_service.instrument(
+        event_type="llm_output_evaluation_run",
+        component="evaluation",
+        source="api:/evals/llm-output/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_llm_output_evaluation_suite",
+            **payload.metadata,
+        },
+    )
+
+
+@app.get("/evals/rag-regression/suite", response_model=RAGRegressionSuite,)
+def get_rag_regression_suite(
+    service: Annotated[
+        RAGRegressionSuiteService,
+        Depends(get_rag_regression_suite_service),
+    ],
+) -> RAGRegressionSuite:
+    return service.get_default_suite()
+
+
+@app.post("/evals/rag-regression/run", response_model=RAGRegressionRunResponse,)
+def run_rag_regression_suite(
+    payload: RAGRegressionRunRequest,
+    service: Annotated[
+        RAGRegressionEvaluationService,
+        Depends(get_rag_regression_evaluation_service),
+    ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
+) -> RAGRegressionRunResponse:
+    return instrumentation_service.instrument(
+        event_type="rag_regression_run",
+        component="evaluation",
+        source="api:/evals/rag-regression/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_rag_regression_suite",
+            **payload.metadata,
+        },
+    )
