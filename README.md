@@ -406,8 +406,10 @@ http://127.0.0.1:8000/docs
 
 ### Multi-Agent QA Copilot
 
-| `POST` | `multi-agent/qa-copilot/run` |
-| `POST` | `multi-agent/qa-copilot/evaluate` |
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `multi-agent/qa-copilot/run` | Run Multi Agent QA Copilot |
+| `POST` | `multi-agent/qa-copilot/evaluate` |  Evaluate a Multi Agent QA Copilot response |
 
 ## Technology Stack
 

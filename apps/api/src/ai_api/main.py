@@ -139,6 +139,14 @@ from ai_api.multi_agent import (
     MultiAgentQACopilotEvaluationService,
     get_multi_agent_qa_copilot_evaluation_service,
 )
+from ai_api.evals import (
+    EvaluationDatasetValidationResponse,
+    GoldenEvaluationDataset,
+    GoldenEvaluationDatasetService,
+    GoldenEvaluationDatasetValidationService,
+    get_golden_evaluation_dataset_service,
+    get_golden_evaluation_dataset_validation_service,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -926,3 +934,43 @@ def evaluate_multi_agent_qa_copilot(
     ],
 ) -> MultiAgentQACopilotEvaluationResponse:
     return service.evaluate(payload)
+
+
+@app.get(
+    "/evals/golden-dataset",
+    response_model=GoldenEvaluationDataset,
+)
+def get_golden_evaluation_dataset(
+    service: Annotated[
+        GoldenEvaluationDatasetService,
+        Depends(get_golden_evaluation_dataset_service),
+    ],
+) -> GoldenEvaluationDataset:
+    return service.get_default_dataset()
+
+
+@app.get(
+    "/evals/golden-dataset/validation",
+    response_model=EvaluationDatasetValidationResponse,
+)
+def validate_default_golden_evaluation_dataset(
+    service: Annotated[
+        GoldenEvaluationDatasetValidationService,
+        Depends(get_golden_evaluation_dataset_validation_service),
+    ],
+) -> EvaluationDatasetValidationResponse:
+    return service.validate_default_dataset()
+
+
+@app.post(
+    "/evals/golden-dataset/validate",
+    response_model=EvaluationDatasetValidationResponse,
+)
+def validate_golden_evaluation_dataset(
+    payload: GoldenEvaluationDataset,
+    service: Annotated[
+        GoldenEvaluationDatasetValidationService,
+        Depends(get_golden_evaluation_dataset_validation_service),
+    ],
+) -> EvaluationDatasetValidationResponse:
+    return service.validate(payload)
