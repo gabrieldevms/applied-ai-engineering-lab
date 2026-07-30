@@ -146,6 +146,10 @@ from ai_api.evals import (
     GoldenEvaluationDatasetValidationService,
     get_golden_evaluation_dataset_service,
     get_golden_evaluation_dataset_validation_service,
+    GoldenEvaluationDatasetRunRequest,
+    GoldenEvaluationDatasetRunResponse,
+    GoldenEvaluationDatasetRunnerService,
+    get_golden_evaluation_dataset_runner_service,
 )
 
 logging.basicConfig(
@@ -936,10 +940,7 @@ def evaluate_multi_agent_qa_copilot(
     return service.evaluate(payload)
 
 
-@app.get(
-    "/evals/golden-dataset",
-    response_model=GoldenEvaluationDataset,
-)
+@app.get("/evals/golden-dataset", response_model=GoldenEvaluationDataset,)
 def get_golden_evaluation_dataset(
     service: Annotated[
         GoldenEvaluationDatasetService,
@@ -949,10 +950,7 @@ def get_golden_evaluation_dataset(
     return service.get_default_dataset()
 
 
-@app.get(
-    "/evals/golden-dataset/validation",
-    response_model=EvaluationDatasetValidationResponse,
-)
+@app.get("/evals/golden-dataset/validation", response_model=EvaluationDatasetValidationResponse,)
 def validate_default_golden_evaluation_dataset(
     service: Annotated[
         GoldenEvaluationDatasetValidationService,
@@ -962,10 +960,7 @@ def validate_default_golden_evaluation_dataset(
     return service.validate_default_dataset()
 
 
-@app.post(
-    "/evals/golden-dataset/validate",
-    response_model=EvaluationDatasetValidationResponse,
-)
+@app.post("/evals/golden-dataset/validate", response_model=EvaluationDatasetValidationResponse,)
 def validate_golden_evaluation_dataset(
     payload: GoldenEvaluationDataset,
     service: Annotated[
@@ -974,3 +969,14 @@ def validate_golden_evaluation_dataset(
     ],
 ) -> EvaluationDatasetValidationResponse:
     return service.validate(payload)
+
+
+@app.post("/evals/golden-dataset/run", response_model=GoldenEvaluationDatasetRunResponse,)
+def run_golden_evaluation_dataset(
+    payload: GoldenEvaluationDatasetRunRequest,
+    service: Annotated[
+        GoldenEvaluationDatasetRunnerService,
+        Depends(get_golden_evaluation_dataset_runner_service),
+    ],
+) -> GoldenEvaluationDatasetRunResponse:
+    return service.run(payload)
