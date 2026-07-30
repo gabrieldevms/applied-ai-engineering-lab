@@ -150,6 +150,13 @@ from ai_api.evals import (
     GoldenEvaluationDatasetRunResponse,
     GoldenEvaluationDatasetRunnerService,
     get_golden_evaluation_dataset_runner_service,
+    PromptRegressionEvaluationService,
+    PromptRegressionRunRequest,
+    PromptRegressionRunResponse,
+    PromptRegressionSuite,
+    PromptRegressionSuiteService,
+    get_prompt_regression_evaluation_service,
+    get_prompt_regression_suite_service,
 )
 
 logging.basicConfig(
@@ -979,4 +986,25 @@ def run_golden_evaluation_dataset(
         Depends(get_golden_evaluation_dataset_runner_service),
     ],
 ) -> GoldenEvaluationDatasetRunResponse:
+    return service.run(payload)
+
+
+@app.get("/evals/prompt-regression/suite", response_model=PromptRegressionSuite,)
+def get_prompt_regression_suite(
+    service: Annotated[
+        PromptRegressionSuiteService,
+        Depends(get_prompt_regression_suite_service),
+    ],
+) -> PromptRegressionSuite:
+    return service.get_default_suite()
+
+
+@app.post("/evals/prompt-regression/run", response_model=PromptRegressionRunResponse,)
+def run_prompt_regression_suite(
+    payload: PromptRegressionRunRequest,
+    service: Annotated[
+        PromptRegressionEvaluationService,
+        Depends(get_prompt_regression_evaluation_service),
+    ],
+) -> PromptRegressionRunResponse:
     return service.run(payload)

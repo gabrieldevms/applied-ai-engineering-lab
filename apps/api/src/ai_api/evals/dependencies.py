@@ -1,5 +1,9 @@
 from ai_api.agents import ToolExecutionService, get_qa_agent_service
 from ai_api.data_analysis.dependencies import get_data_analyst_agent_service
+from ai_api.evals.prompt_regression import (
+    PromptRegressionEvaluationService,
+    PromptRegressionSuiteService,
+)
 from ai_api.evals.runner import GoldenEvaluationDatasetRunnerService
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -29,3 +33,13 @@ def get_golden_evaluation_dataset_runner_service() -> (
         data_analyst_agent_service=get_data_analyst_agent_service(),
         multi_agent_qa_copilot_service=get_multi_agent_qa_copilot_service(),
     )
+
+
+def get_prompt_regression_suite_service() -> PromptRegressionSuiteService:
+    return PromptRegressionSuiteService()
+
+
+def get_prompt_regression_evaluation_service() -> (
+    PromptRegressionEvaluationService
+):
+    return PromptRegressionEvaluationService()
