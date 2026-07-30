@@ -1,5 +1,11 @@
 from ai_api.agents import ToolExecutionService, get_qa_agent_service
 from ai_api.data_analysis.dependencies import get_data_analyst_agent_service
+from ai_api.evals.agent_tool_evaluation import (
+    AgentRegressionEvaluationService,
+    AgentRegressionSuiteService,
+    ToolCallingEvaluationService,
+    ToolCallingEvaluationSuiteService,
+)
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
 from ai_api.evals.llm_rag_evaluation import (
     LLMOutputEvaluationService,
@@ -89,3 +95,19 @@ def get_rag_regression_suite_service() -> RAGRegressionSuiteService:
 
 def get_rag_regression_evaluation_service() -> RAGRegressionEvaluationService:
     return RAGRegressionEvaluationService()
+
+
+def get_agent_regression_suite_service() -> AgentRegressionSuiteService:
+    return AgentRegressionSuiteService()
+
+
+def get_agent_regression_evaluation_service() -> AgentRegressionEvaluationService:
+    return AgentRegressionEvaluationService()
+
+
+def get_tool_calling_evaluation_suite_service() -> ToolCallingEvaluationSuiteService:
+    return ToolCallingEvaluationSuiteService()
+
+
+def get_tool_calling_evaluation_service() -> ToolCallingEvaluationService:
+    return ToolCallingEvaluationService()
