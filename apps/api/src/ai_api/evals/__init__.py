@@ -23,6 +23,8 @@ from ai_api.evals.dependencies import (
     get_rag_regression_suite_service,
     get_tool_calling_evaluation_service,
     get_tool_calling_evaluation_suite_service,
+    get_multi_agent_copilot_regression_evaluation_service,
+    get_multi_agent_copilot_regression_suite_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
@@ -113,10 +115,23 @@ from ai_api.evals.schemas import (
     ToolCallingEvaluationRunResponse,
     ToolCallingEvaluationRunStatus,
     ToolCallingEvaluationSuite,
+    MultiAgentCopilotRegressionCase,
+    MultiAgentCopilotRegressionCaseResult,
+    MultiAgentCopilotRegressionCheck,
+    MultiAgentCopilotRegressionExpectation,
+    MultiAgentCopilotRegressionRunRequest,
+    MultiAgentCopilotRegressionRunResponse,
+    MultiAgentCopilotRegressionRunStatus,
+    MultiAgentCopilotRegressionSuite,
 )
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
     GoldenEvaluationDatasetValidationService,
+)
+from ai_api.evals.multi_agent_regression import (
+    MultiAgentCopilotRegressionEvaluationService,
+    MultiAgentCopilotRegressionSuiteService,
+    build_default_multi_agent_copilot_regression_suite,
 )
 from ai_api.evals.telemetry import EvaluationTelemetryService
 
@@ -230,4 +245,17 @@ __all__ = [
     "get_rag_regression_suite_service",
     "get_tool_calling_evaluation_service",
     "get_tool_calling_evaluation_suite_service",
+    "MultiAgentCopilotRegressionCase",
+    "MultiAgentCopilotRegressionCaseResult",
+    "MultiAgentCopilotRegressionCheck",
+    "MultiAgentCopilotRegressionEvaluationService",
+    "MultiAgentCopilotRegressionExpectation",
+    "MultiAgentCopilotRegressionRunRequest",
+    "MultiAgentCopilotRegressionRunResponse",
+    "MultiAgentCopilotRegressionRunStatus",
+    "MultiAgentCopilotRegressionSuite",
+    "MultiAgentCopilotRegressionSuiteService",
+    "build_default_multi_agent_copilot_regression_suite",
+    "get_multi_agent_copilot_regression_evaluation_service",
+    "get_multi_agent_copilot_regression_suite_service",
 ]

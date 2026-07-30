@@ -327,6 +327,7 @@ EvaluationTelemetryEventType = Literal[
     "rag_regression_run",
     "agent_regression_run",
     "tool_calling_evaluation_run",
+    "multi_agent_copilot_regression_run",
     "scenario_run",
     "prompt_regression_run",
     "report_aggregation",
@@ -853,4 +854,111 @@ class ToolCallingEvaluationRunResponse(BaseModel):
     warning_count: int
     failed_count: int
     results: list[ToolCallingEvaluationCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+MultiAgentCopilotRegressionRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+
+class MultiAgentCopilotRegressionExpectation(BaseModel):
+    expected_status: str | None = None
+    expected_quality_gate: str | None = None
+    expected_contract_status: str | None = None
+    expected_conflict_status: str | None = None
+    required_roles: list[str] = Field(default_factory=list)
+    required_artifacts: list[str] = Field(default_factory=list)
+    required_final_report_sections: list[str] = Field(default_factory=list)
+    required_metadata_keys: list[str] = Field(default_factory=list)
+    min_trace_steps: int = Field(default=0, ge=0)
+    min_task_results: int = Field(default=0, ge=0)
+    require_data_validation_evidence: bool = False
+    forbidden_error_markers: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentCopilotRegressionCase(BaseModel):
+    id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    copilot_name: str = Field(..., min_length=1)
+    input_payload: dict[str, Any]
+    actual_output: dict[str, Any]
+    expectations: MultiAgentCopilotRegressionExpectation = Field(
+        default_factory=MultiAgentCopilotRegressionExpectation
+    )
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("id", "name", "copilot_name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+    @field_validator("input_payload")
+    @classmethod
+    def validate_input_payload(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if not value:
+            raise ValueError("input_payload must not be empty")
+
+        return value
+
+
+class MultiAgentCopilotRegressionSuite(BaseModel):
+    name: str = Field(..., min_length=1)
+    version: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    cases: list[MultiAgentCopilotRegressionCase] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "version", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class MultiAgentCopilotRegressionCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentCopilotRegressionCaseResult(BaseModel):
+    case_id: str
+    case_name: str
+    copilot_name: str
+    status: MultiAgentCopilotRegressionRunStatus
+    checks: list[MultiAgentCopilotRegressionCheck] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentCopilotRegressionRunRequest(BaseModel):
+    suite: MultiAgentCopilotRegressionSuite | None = None
+    case_ids: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentCopilotRegressionRunResponse(BaseModel):
+    status: MultiAgentCopilotRegressionRunStatus
+    suite_name: str
+    suite_version: str
+    case_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    results: list[MultiAgentCopilotRegressionCaseResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
