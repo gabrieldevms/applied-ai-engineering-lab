@@ -30,7 +30,10 @@ from ai_api.evals.multi_agent_regression import (
     MultiAgentCopilotRegressionEvaluationService,
     MultiAgentCopilotRegressionSuiteService,
 )
-
+from ai_api.evals.llm_as_judge import (
+    LLMAsJudgeEvaluationService,
+    LLMAsJudgeEvaluationSuiteService,
+)
 
 _evaluation_telemetry_service = EvaluationTelemetryService()
 
@@ -127,3 +130,13 @@ def get_multi_agent_copilot_regression_evaluation_service() -> (
     MultiAgentCopilotRegressionEvaluationService
 ):
     return MultiAgentCopilotRegressionEvaluationService()
+
+
+def get_llm_as_judge_evaluation_suite_service() -> (
+    LLMAsJudgeEvaluationSuiteService
+):
+    return LLMAsJudgeEvaluationSuiteService()
+
+
+def get_llm_as_judge_evaluation_service() -> LLMAsJudgeEvaluationService:
+    return LLMAsJudgeEvaluationService()

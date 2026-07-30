@@ -205,6 +205,13 @@ from ai_api.evals import (
     MultiAgentCopilotRegressionSuiteService,
     get_multi_agent_copilot_regression_evaluation_service,
     get_multi_agent_copilot_regression_suite_service,
+    LLMAsJudgeEvaluationRunRequest,
+    LLMAsJudgeEvaluationRunResponse,
+    LLMAsJudgeEvaluationService,
+    LLMAsJudgeEvaluationSuite,
+    LLMAsJudgeEvaluationSuiteService,
+    get_llm_as_judge_evaluation_service,
+    get_llm_as_judge_evaluation_suite_service,
 )
 
 logging.basicConfig(
@@ -1346,6 +1353,41 @@ def run_multi_agent_copilot_regression_suite(
         run_id=payload.metadata.get("run_id"),
         metadata={
             "operation": "run_multi_agent_copilot_regression_suite",
+            **payload.metadata,
+        },
+    )
+
+
+@app.get("/evals/llm-as-judge/suite", response_model=LLMAsJudgeEvaluationSuite,)
+def get_llm_as_judge_evaluation_suite(
+    service: Annotated[
+        LLMAsJudgeEvaluationSuiteService,
+        Depends(get_llm_as_judge_evaluation_suite_service),
+    ],
+) -> LLMAsJudgeEvaluationSuite:
+    return service.get_default_suite()
+
+
+@app.post("/evals/llm-as-judge/run", response_model=LLMAsJudgeEvaluationRunResponse,)
+def run_llm_as_judge_evaluation_suite(
+    payload: LLMAsJudgeEvaluationRunRequest,
+    service: Annotated[
+        LLMAsJudgeEvaluationService,
+        Depends(get_llm_as_judge_evaluation_service),
+    ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
+) -> LLMAsJudgeEvaluationRunResponse:
+    return instrumentation_service.instrument(
+        event_type="llm_as_judge_evaluation_run",
+        component="evaluation",
+        source="api:/evals/llm-as-judge/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_llm_as_judge_evaluation_suite",
             **payload.metadata,
         },
     )
