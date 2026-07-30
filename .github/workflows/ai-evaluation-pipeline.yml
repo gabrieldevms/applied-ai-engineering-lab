@@ -1,4 +1,4 @@
-name: M7 Evaluation Pipeline
+name: AI Evaluation Pipeline
 
 on:
   pull_request:
@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  m7-evaluation-pipeline:
-    name: M7 deterministic evaluation pipeline
+  ai-evaluation-pipeline:
+    name: Deterministic AI evaluation pipeline
     runs-on: ubuntu-latest
 
     env:
@@ -35,11 +35,11 @@ jobs:
       - name: Run unit tests
         run: uv run pytest
 
-      - name: Run M7 evaluation pipeline
-        run: uv run python scripts/run_m7_evaluation_pipeline.py --fail-on-warning
+      - name: Run AI evaluation pipeline
+        run: uv run python scripts/run_ai_evaluation_pipeline.py --fail-on-warning
 
-      - name: Upload M7 evaluation report
+      - name: Upload AI evaluation report
         uses: actions/upload-artifact@v4
         with:
-          name: m7-evaluation-pipeline-report
-          path: .data/m7-evaluation-pipeline-report.json
+          name: ai-evaluation-pipeline-report
+          path: .data/ai-evaluation-pipeline-report.json
