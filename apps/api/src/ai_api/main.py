@@ -237,6 +237,13 @@ from ai_api.evals import (
     AIAgentExecutionSummaryResponse,
     AIAgentExecutionTelemetryService,
     get_ai_agent_execution_telemetry_service,
+    AIMultiAgentExecutionRecord,
+    AIMultiAgentExecutionRecordRequest,
+    AIMultiAgentExecutionRecordsResponse,
+    AIMultiAgentExecutionSummaryRequest,
+    AIMultiAgentExecutionSummaryResponse,
+    AIMultiAgentExecutionTelemetryService,
+    get_ai_multi_agent_execution_telemetry_service,
 )
 
 logging.basicConfig(
@@ -1598,3 +1605,58 @@ def summarize_stored_ai_agent_execution(
     ],
 ) -> AIAgentExecutionSummaryResponse:
     return service.summarize(AIAgentExecutionSummaryRequest())
+
+
+@app.post("/observability/multi-agent-execution/records", response_model=AIMultiAgentExecutionRecord,)
+def record_ai_multi_agent_execution(
+    payload: AIMultiAgentExecutionRecordRequest,
+    service: Annotated[
+        AIMultiAgentExecutionTelemetryService,
+        Depends(get_ai_multi_agent_execution_telemetry_service),
+    ],
+) -> AIMultiAgentExecutionRecord:
+    return service.record(payload)
+
+
+@app.get("/observability/multi-agent-execution/records", response_model=AIMultiAgentExecutionRecordsResponse,)
+def list_ai_multi_agent_execution_records(
+    service: Annotated[
+        AIMultiAgentExecutionTelemetryService,
+        Depends(get_ai_multi_agent_execution_telemetry_service),
+    ],
+    component: str | None = None,
+    workflow_name: str | None = None,
+    operation: str | None = None,
+    status: str | None = None,
+    run_status: str | None = None,
+    limit: int = 100,
+) -> AIMultiAgentExecutionRecordsResponse:
+    return service.list_records(
+        component=component,
+        workflow_name=workflow_name,
+        operation=operation,
+        status=status,
+        run_status=run_status,
+        limit=limit,
+    )
+
+
+@app.post("/observability/multi-agent-execution/summary", response_model=AIMultiAgentExecutionSummaryResponse,)
+def summarize_ai_multi_agent_execution(
+    payload: AIMultiAgentExecutionSummaryRequest,
+    service: Annotated[
+        AIMultiAgentExecutionTelemetryService,
+        Depends(get_ai_multi_agent_execution_telemetry_service),
+    ],
+) -> AIMultiAgentExecutionSummaryResponse:
+    return service.summarize(payload)
+
+
+@app.get("/observability/multi-agent-execution/summary", response_model=AIMultiAgentExecutionSummaryResponse,)
+def summarize_stored_ai_multi_agent_execution(
+    service: Annotated[
+        AIMultiAgentExecutionTelemetryService,
+        Depends(get_ai_multi_agent_execution_telemetry_service),
+    ],
+) -> AIMultiAgentExecutionSummaryResponse:
+    return service.summarize(AIMultiAgentExecutionSummaryRequest())

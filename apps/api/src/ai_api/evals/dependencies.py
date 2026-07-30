@@ -38,6 +38,9 @@ from ai_api.evals.ci_pipeline import CIEvaluationPipelineService
 from ai_api.evals.usage_tracking import AIUsageTrackingService
 from ai_api.evals.retrieval_quality import AIRetrievalQualityTelemetryService
 from ai_api.evals.agent_execution_metrics import AIAgentExecutionTelemetryService
+from ai_api.evals.multi_agent_execution_metrics import (
+    AIMultiAgentExecutionTelemetryService,
+)
 
 _evaluation_telemetry_service = EvaluationTelemetryService()
 
@@ -46,6 +49,8 @@ _ai_usage_tracking_service = AIUsageTrackingService()
 _ai_retrieval_quality_telemetry_service = AIRetrievalQualityTelemetryService()
 
 _ai_agent_execution_telemetry_service = AIAgentExecutionTelemetryService()
+
+_ai_multi_agent_execution_telemetry_service = AIMultiAgentExecutionTelemetryService()
 
 
 def get_golden_evaluation_dataset_service() -> GoldenEvaluationDatasetService:
@@ -170,3 +175,9 @@ def get_ai_agent_execution_telemetry_service() -> (
     AIAgentExecutionTelemetryService
 ):
     return _ai_agent_execution_telemetry_service
+
+
+def get_ai_multi_agent_execution_telemetry_service() -> (
+    AIMultiAgentExecutionTelemetryService
+):
+    return _ai_multi_agent_execution_telemetry_service

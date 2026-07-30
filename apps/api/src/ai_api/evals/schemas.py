@@ -1500,3 +1500,201 @@ class AIAgentExecutionSummaryResponse(BaseModel):
     run_status_coverage: dict[str, int] = Field(default_factory=dict)
     risks: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AIMultiAgentExecutionMetricStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+AIMultiAgentRunStatus = Literal[
+    "completed",
+    "partial",
+    "failed",
+    "blocked",
+    "cancelled",
+]
+
+
+class AIMultiAgentExecutionRecordRequest(BaseModel):
+    component: AIUsageComponent = "multi_agent"
+    operation: str = Field(..., min_length=1)
+    workflow_name: str = Field(..., min_length=1)
+    run_status: AIMultiAgentRunStatus
+    duration_ms: float | None = Field(default=None, ge=0.0)
+
+    agent_count: int = Field(default=0, ge=0)
+    completed_agent_count: int = Field(default=0, ge=0)
+    failed_agent_count: int = Field(default=0, ge=0)
+    skipped_agent_count: int = Field(default=0, ge=0)
+
+    task_count: int = Field(default=0, ge=0)
+    successful_task_count: int = Field(default=0, ge=0)
+    failed_task_count: int = Field(default=0, ge=0)
+
+    artifact_count: int = Field(default=0, ge=0)
+    expected_min_artifacts: int = Field(default=0, ge=0)
+
+    handoff_count: int = Field(default=0, ge=0)
+    failed_handoff_count: int = Field(default=0, ge=0)
+
+    contract_check_count: int = Field(default=0, ge=0)
+    passed_contract_check_count: int = Field(default=0, ge=0)
+    failed_contract_check_count: int = Field(default=0, ge=0)
+
+    conflict_count: int = Field(default=0, ge=0)
+    critical_conflict_count: int = Field(default=0, ge=0)
+
+    failure_count: int = Field(default=0, ge=0)
+    error_count: int = Field(default=0, ge=0)
+
+    final_report_section_count: int = Field(default=0, ge=0)
+    expected_min_final_report_sections: int = Field(default=0, ge=0)
+
+    data_validation_evidence_count: int = Field(default=0, ge=0)
+    require_data_validation_evidence: bool = False
+
+    retry_count: int = Field(default=0, ge=0)
+    fallback_count: int = Field(default=0, ge=0)
+
+    max_duration_ms: float | None = Field(default=None, ge=0.0)
+    max_failed_agents: int = Field(default=0, ge=0)
+    max_failed_tasks: int = Field(default=0, ge=0)
+    max_failed_handoffs: int = Field(default=0, ge=0)
+    max_failed_contract_checks: int = Field(default=0, ge=0)
+    max_critical_conflicts: int = Field(default=0, ge=0)
+    max_failures: int = Field(default=0, ge=0)
+    max_errors: int = Field(default=0, ge=0)
+    min_quality_score: float = Field(default=0.7, ge=0.0, le=1.0)
+
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("operation", "workflow_name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class AIMultiAgentExecutionRecord(BaseModel):
+    record_id: str
+    component: AIUsageComponent
+    operation: str
+    workflow_name: str
+    run_status: AIMultiAgentRunStatus
+    status: AIMultiAgentExecutionMetricStatus
+    duration_ms: float | None = None
+
+    agent_count: int
+    completed_agent_count: int
+    failed_agent_count: int
+    skipped_agent_count: int
+    task_count: int
+    successful_task_count: int
+    failed_task_count: int
+    artifact_count: int
+    expected_min_artifacts: int
+    handoff_count: int
+    failed_handoff_count: int
+    contract_check_count: int
+    passed_contract_check_count: int
+    failed_contract_check_count: int
+    conflict_count: int
+    critical_conflict_count: int
+    failure_count: int
+    error_count: int
+    final_report_section_count: int
+    expected_min_final_report_sections: int
+    data_validation_evidence_count: int
+    require_data_validation_evidence: bool
+    retry_count: int
+    fallback_count: int
+
+    agent_success_rate: float | None = None
+    task_success_rate: float | None = None
+    handoff_success_rate: float | None = None
+    contract_success_rate: float | None = None
+    artifact_coverage_score: float | None = None
+    final_report_coverage_score: float | None = None
+    data_validation_score: float | None = None
+    quality_score: float | None = None
+
+    max_duration_ms: float | None = None
+    max_failed_agents: int
+    max_failed_tasks: int
+    max_failed_handoffs: int
+    max_failed_contract_checks: int
+    max_critical_conflicts: int
+    max_failures: int
+    max_errors: int
+    min_quality_score: float
+
+    risks: list[str] = Field(default_factory=list)
+    recorded_at: str
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIMultiAgentExecutionRecordsResponse(BaseModel):
+    records: list[AIMultiAgentExecutionRecord] = Field(default_factory=list)
+    count: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIMultiAgentExecutionSummaryRequest(BaseModel):
+    records: list[AIMultiAgentExecutionRecord] | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIMultiAgentExecutionSummaryResponse(BaseModel):
+    record_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+
+    total_agents: int
+    total_completed_agents: int
+    total_failed_agents: int
+    total_skipped_agents: int
+    total_tasks: int
+    total_successful_tasks: int
+    total_failed_tasks: int
+    total_artifacts: int
+    total_handoffs: int
+    total_failed_handoffs: int
+    total_contract_checks: int
+    total_passed_contract_checks: int
+    total_failed_contract_checks: int
+    total_conflicts: int
+    total_critical_conflicts: int
+    total_failures: int
+    total_errors: int
+    total_final_report_sections: int
+    total_data_validation_evidence: int
+    total_retries: int
+    total_fallbacks: int
+
+    average_duration_ms: float | None = None
+    average_agent_success_rate: float | None = None
+    average_task_success_rate: float | None = None
+    average_handoff_success_rate: float | None = None
+    average_contract_success_rate: float | None = None
+    average_artifact_coverage_score: float | None = None
+    average_final_report_coverage_score: float | None = None
+    average_data_validation_score: float | None = None
+    average_quality_score: float | None = None
+
+    component_coverage: dict[str, int] = Field(default_factory=dict)
+    workflow_coverage: dict[str, int] = Field(default_factory=dict)
+    operation_coverage: dict[str, int] = Field(default_factory=dict)
+    run_status_coverage: dict[str, int] = Field(default_factory=dict)
+    risks: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
