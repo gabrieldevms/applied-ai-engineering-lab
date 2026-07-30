@@ -161,6 +161,13 @@ from ai_api.evals import (
     AIEvaluationReportAggregationResponse,
     AIEvaluationReportAggregationService,
     get_ai_evaluation_report_aggregation_service,
+    EvaluationTelemetryEvent,
+    EvaluationTelemetryEventsResponse,
+    EvaluationTelemetryRecordRequest,
+    EvaluationTelemetryService,
+    EvaluationTelemetrySummaryRequest,
+    EvaluationTelemetrySummaryResponse,
+    get_evaluation_telemetry_service,
 )
 
 logging.basicConfig(
@@ -1023,3 +1030,54 @@ def aggregate_ai_evaluation_report(
     ],
 ) -> AIEvaluationReportAggregationResponse:
     return service.aggregate(payload)
+
+
+@app.post("/evals/telemetry/events", response_model=EvaluationTelemetryEvent,)
+def record_evaluation_telemetry_event(
+    payload: EvaluationTelemetryRecordRequest,
+    service: Annotated[
+        EvaluationTelemetryService,
+        Depends(get_evaluation_telemetry_service),
+    ],
+) -> EvaluationTelemetryEvent:
+    return service.record(payload)
+
+
+@app.get("/evals/telemetry/events", response_model=EvaluationTelemetryEventsResponse,)
+def list_evaluation_telemetry_events(
+    service: Annotated[
+        EvaluationTelemetryService,
+        Depends(get_evaluation_telemetry_service),
+    ],
+    event_type: str | None = None,
+    component: str | None = None,
+    status: str | None = None,
+    limit: int = 100,
+) -> EvaluationTelemetryEventsResponse:
+    return service.list_events(
+        event_type=event_type,
+        component=component,
+        status=status,
+        limit=limit,
+    )
+
+
+@app.post("/evals/telemetry/summary", response_model=EvaluationTelemetrySummaryResponse,)
+def summarize_evaluation_telemetry(
+    payload: EvaluationTelemetrySummaryRequest,
+    service: Annotated[
+        EvaluationTelemetryService,
+        Depends(get_evaluation_telemetry_service),
+    ],
+) -> EvaluationTelemetrySummaryResponse:
+    return service.summarize(payload)
+
+
+@app.get("/evals/telemetry/summary", response_model=EvaluationTelemetrySummaryResponse,)
+def summarize_stored_evaluation_telemetry(
+    service: Annotated[
+        EvaluationTelemetryService,
+        Depends(get_evaluation_telemetry_service),
+    ],
+) -> EvaluationTelemetrySummaryResponse:
+    return service.summarize(EvaluationTelemetrySummaryRequest())

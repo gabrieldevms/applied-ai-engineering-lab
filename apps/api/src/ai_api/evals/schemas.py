@@ -318,3 +318,108 @@ class AIEvaluationReportAggregationResponse(BaseModel):
     sections: list[AIEvaluationReportSection] = Field(default_factory=list)
     recommendations: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+EvaluationTelemetryEventType = Literal[
+    "evaluation_run",
+    "golden_dataset_run",
+    "scenario_run",
+    "prompt_regression_run",
+    "report_aggregation",
+    "copilot_evaluation",
+    "llm_call",
+    "rag_retrieval",
+    "agent_run",
+    "multi_agent_run",
+    "tool_call",
+    "mcp_tool_call",
+]
+
+EvaluationTelemetryComponent = Literal[
+    "api",
+    "evaluation",
+    "llm",
+    "rag",
+    "agent",
+    "multi_agent",
+    "tool",
+    "mcp",
+]
+
+EvaluationTelemetryStatus = Literal[
+    "started",
+    "completed",
+    "warning",
+    "failed",
+    "skipped",
+]
+
+
+class EvaluationTelemetryRecordRequest(BaseModel):
+    event_type: EvaluationTelemetryEventType
+    component: EvaluationTelemetryComponent
+    status: EvaluationTelemetryStatus
+    source: str = Field(..., min_length=1)
+    started_at: str | None = None
+    finished_at: str | None = None
+    duration_ms: float | None = Field(default=None, ge=0.0)
+    score: float | None = Field(default=None, ge=0.0, le=1.0)
+    run_id: str | None = None
+    scenario_id: str | None = None
+    case_id: str | None = None
+    error_message: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("source")
+    @classmethod
+    def validate_source(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("source must not be blank")
+
+        return normalized_value
+
+
+class EvaluationTelemetryEvent(BaseModel):
+    event_id: str
+    event_type: EvaluationTelemetryEventType
+    component: EvaluationTelemetryComponent
+    status: EvaluationTelemetryStatus
+    source: str
+    recorded_at: str
+    started_at: str | None = None
+    finished_at: str | None = None
+    duration_ms: float | None = Field(default=None, ge=0.0)
+    score: float | None = Field(default=None, ge=0.0, le=1.0)
+    run_id: str | None = None
+    scenario_id: str | None = None
+    case_id: str | None = None
+    error_message: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class EvaluationTelemetryEventsResponse(BaseModel):
+    events: list[EvaluationTelemetryEvent] = Field(default_factory=list)
+    count: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class EvaluationTelemetrySummaryRequest(BaseModel):
+    events: list[EvaluationTelemetryEvent] | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class EvaluationTelemetrySummaryResponse(BaseModel):
+    status: AIEvaluationReportStatus
+    event_count: int
+    completed_count: int
+    warning_count: int
+    failed_count: int
+    skipped_count: int
+    average_score: float | None = None
+    average_duration_ms: float | None = None
+    event_type_coverage: dict[str, int] = Field(default_factory=dict)
+    component_coverage: dict[str, int] = Field(default_factory=dict)
+    risks: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)

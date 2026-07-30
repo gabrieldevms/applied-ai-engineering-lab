@@ -10,8 +10,12 @@ from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
     GoldenEvaluationDatasetValidationService,
 )
+from ai_api.evals.telemetry import EvaluationTelemetryService
 from ai_api.multi_agent import get_multi_agent_qa_copilot_service
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
+
+
+_evaluation_telemetry_service = EvaluationTelemetryService()
 
 
 def get_golden_evaluation_dataset_service() -> GoldenEvaluationDatasetService:
@@ -50,3 +54,7 @@ def get_ai_evaluation_report_aggregation_service() -> (
     AIEvaluationReportAggregationService
 ):
     return AIEvaluationReportAggregationService()
+
+
+def get_evaluation_telemetry_service() -> EvaluationTelemetryService:
+    return _evaluation_telemetry_service

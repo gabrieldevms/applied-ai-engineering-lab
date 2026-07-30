@@ -348,8 +348,10 @@ Goal: continuously evaluate, observe and improve the behavior of LLM, RAG and ag
 
 ### Evaluation
 
-- [ ] Prompt regression tests
-- [ ] Golden evaluation dataset
+- [x] Golden evaluation dataset
+- [x] Golden evaluation dataset runner
+- [x] Prompt regression tests foundation
+- [x] AI evaluation report aggregation
 - [ ] LLM output evaluation suite
 - [ ] RAG regression evaluation suite
 - [ ] Agent regression evaluation suite

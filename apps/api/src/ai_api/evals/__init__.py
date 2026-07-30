@@ -1,5 +1,6 @@
 from ai_api.evals.dependencies import (
     get_ai_evaluation_report_aggregation_service,
+    get_evaluation_telemetry_service,
     get_golden_evaluation_dataset_runner_service,
     get_golden_evaluation_dataset_service,
     get_golden_evaluation_dataset_validation_service,
@@ -32,6 +33,14 @@ from ai_api.evals.schemas import (
     EvaluationScenarioRunResult,
     EvaluationScenarioRunStatus,
     EvaluationScenarioType,
+    EvaluationTelemetryComponent,
+    EvaluationTelemetryEvent,
+    EvaluationTelemetryEventsResponse,
+    EvaluationTelemetryEventType,
+    EvaluationTelemetryRecordRequest,
+    EvaluationTelemetryStatus,
+    EvaluationTelemetrySummaryRequest,
+    EvaluationTelemetrySummaryResponse,
     GoldenEvaluationDataset,
     GoldenEvaluationDatasetRunRequest,
     GoldenEvaluationDatasetRunResponse,
@@ -49,6 +58,7 @@ from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
     GoldenEvaluationDatasetValidationService,
 )
+from ai_api.evals.telemetry import EvaluationTelemetryService
 
 __all__ = [
     "AIEvaluationReportAggregationRequest",
@@ -69,6 +79,15 @@ __all__ = [
     "EvaluationScenarioRunResult",
     "EvaluationScenarioRunStatus",
     "EvaluationScenarioType",
+    "EvaluationTelemetryComponent",
+    "EvaluationTelemetryEvent",
+    "EvaluationTelemetryEventsResponse",
+    "EvaluationTelemetryEventType",
+    "EvaluationTelemetryRecordRequest",
+    "EvaluationTelemetryService",
+    "EvaluationTelemetryStatus",
+    "EvaluationTelemetrySummaryRequest",
+    "EvaluationTelemetrySummaryResponse",
     "GoldenEvaluationDataset",
     "GoldenEvaluationDatasetRunRequest",
     "GoldenEvaluationDatasetRunResponse",
@@ -89,6 +108,7 @@ __all__ = [
     "build_default_golden_evaluation_dataset",
     "build_default_prompt_regression_suite",
     "get_ai_evaluation_report_aggregation_service",
+    "get_evaluation_telemetry_service",
     "get_golden_evaluation_dataset_runner_service",
     "get_golden_evaluation_dataset_service",
     "get_golden_evaluation_dataset_validation_service",
