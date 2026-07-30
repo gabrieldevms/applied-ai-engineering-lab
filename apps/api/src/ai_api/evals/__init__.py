@@ -27,6 +27,7 @@ from ai_api.evals.dependencies import (
     get_multi_agent_copilot_regression_suite_service,
     get_llm_as_judge_evaluation_service,
     get_llm_as_judge_evaluation_suite_service,
+    get_ci_evaluation_pipeline_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
@@ -137,6 +138,11 @@ from ai_api.evals.schemas import (
     LLMAsJudgeRubricItem,
     LLMAsJudgeRunStatus,
     LLMAsJudgeVerdict,
+    CIEvaluationPipelineRunRequest,
+    CIEvaluationPipelineRunResponse,
+    CIEvaluationPipelineStageName,
+    CIEvaluationPipelineStageResult,
+    CIEvaluationPipelineStatus,
 )
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -153,6 +159,7 @@ from ai_api.evals.llm_as_judge import (
     LLMAsJudgeEvaluationSuiteService,
     build_default_llm_as_judge_evaluation_suite,
 )
+from ai_api.evals.ci_pipeline import CIEvaluationPipelineService
 
 __all__ = [
     "AIEvaluationReportAggregationRequest",
@@ -294,4 +301,11 @@ __all__ = [
     "build_default_llm_as_judge_evaluation_suite",
     "get_llm_as_judge_evaluation_service",
     "get_llm_as_judge_evaluation_suite_service",
+    "CIEvaluationPipelineRunRequest",
+    "CIEvaluationPipelineRunResponse",
+    "CIEvaluationPipelineService",
+    "CIEvaluationPipelineStageName",
+    "CIEvaluationPipelineStageResult",
+    "CIEvaluationPipelineStatus",
+    "get_ci_evaluation_pipeline_service",
 ]

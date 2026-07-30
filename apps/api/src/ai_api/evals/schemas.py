@@ -329,6 +329,7 @@ EvaluationTelemetryEventType = Literal[
     "tool_calling_evaluation_run",
     "multi_agent_copilot_regression_run",
     "llm_as_judge_evaluation_run",
+    "ci_evaluation_pipeline_run",
     "scenario_run",
     "prompt_regression_run",
     "report_aggregation",
@@ -1120,4 +1121,56 @@ class LLMAsJudgeEvaluationRunResponse(BaseModel):
     failed_count: int
     average_score: float | None = None
     results: list[LLMAsJudgeEvaluationCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+CIEvaluationPipelineStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+CIEvaluationPipelineStageName = Literal[
+    "golden_dataset_smoke",
+    "prompt_regression",
+    "llm_output_evaluation",
+    "rag_regression",
+    "agent_regression",
+    "tool_calling_evaluation",
+    "multi_agent_copilot_regression",
+    "llm_as_judge_evaluation",
+]
+
+
+class CIEvaluationPipelineStageResult(BaseModel):
+    name: CIEvaluationPipelineStageName
+    status: CIEvaluationPipelineStatus
+    score: float | None = Field(default=None, ge=0.0, le=1.0)
+    summary: str
+    output: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class CIEvaluationPipelineRunRequest(BaseModel):
+    include_golden_dataset_smoke: bool = True
+    include_prompt_regression: bool = True
+    include_llm_output_evaluation: bool = True
+    include_rag_regression: bool = True
+    include_agent_regression: bool = True
+    include_tool_calling_evaluation: bool = True
+    include_multi_agent_copilot_regression: bool = True
+    include_llm_as_judge_evaluation: bool = True
+    fail_on_warning: bool = False
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class CIEvaluationPipelineRunResponse(BaseModel):
+    status: CIEvaluationPipelineStatus
+    score: float | None = Field(default=None, ge=0.0, le=1.0)
+    stage_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    should_fail_ci: bool
+    stages: list[CIEvaluationPipelineStageResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
