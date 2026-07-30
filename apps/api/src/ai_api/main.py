@@ -223,6 +223,13 @@ from ai_api.evals import (
     AIUsageSummaryResponse,
     AIUsageTrackingService,
     get_ai_usage_tracking_service,
+    AIRetrievalQualityRecord,
+    AIRetrievalQualityRecordRequest,
+    AIRetrievalQualityRecordsResponse,
+    AIRetrievalQualitySummaryRequest,
+    AIRetrievalQualitySummaryResponse,
+    AIRetrievalQualityTelemetryService,
+    get_ai_retrieval_quality_telemetry_service,
 )
 
 logging.basicConfig(
@@ -1478,3 +1485,54 @@ def summarize_stored_ai_usage(
     ],
 ) -> AIUsageSummaryResponse:
     return service.summarize(AIUsageSummaryRequest())
+
+
+@app.post("/observability/retrieval-quality/records", response_model=AIRetrievalQualityRecord,)
+def record_ai_retrieval_quality(
+    payload: AIRetrievalQualityRecordRequest,
+    service: Annotated[
+        AIRetrievalQualityTelemetryService,
+        Depends(get_ai_retrieval_quality_telemetry_service),
+    ],
+) -> AIRetrievalQualityRecord:
+    return service.record(payload)
+
+
+@app.get("/observability/retrieval-quality/records", response_model=AIRetrievalQualityRecordsResponse,)
+def list_ai_retrieval_quality_records(
+    service: Annotated[
+        AIRetrievalQualityTelemetryService,
+        Depends(get_ai_retrieval_quality_telemetry_service),
+    ],
+    component: str | None = None,
+    operation: str | None = None,
+    status: str | None = None,
+    limit: int = 100,
+) -> AIRetrievalQualityRecordsResponse:
+    return service.list_records(
+        component=component,
+        operation=operation,
+        status=status,
+        limit=limit,
+    )
+
+
+@app.post("/observability/retrieval-quality/summary", response_model=AIRetrievalQualitySummaryResponse,)
+def summarize_ai_retrieval_quality(
+    payload: AIRetrievalQualitySummaryRequest,
+    service: Annotated[
+        AIRetrievalQualityTelemetryService,
+        Depends(get_ai_retrieval_quality_telemetry_service),
+    ],
+) -> AIRetrievalQualitySummaryResponse:
+    return service.summarize(payload)
+
+
+@app.get("/observability/retrieval-quality/summary", response_model=AIRetrievalQualitySummaryResponse,)
+def summarize_stored_ai_retrieval_quality(
+    service: Annotated[
+        AIRetrievalQualityTelemetryService,
+        Depends(get_ai_retrieval_quality_telemetry_service),
+    ],
+) -> AIRetrievalQualitySummaryResponse:
+    return service.summarize(AIRetrievalQualitySummaryRequest())

@@ -1275,3 +1275,101 @@ class AIUsageSummaryResponse(BaseModel):
     operation_coverage: dict[str, int] = Field(default_factory=dict)
     risks: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AIRetrievalQualityStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+
+class AIRetrievalQualityRecordRequest(BaseModel):
+    component: AIUsageComponent = "rag"
+    operation: str = Field(..., min_length=1)
+    query: str = Field(..., min_length=1)
+    requested_top_k: int | None = Field(default=None, ge=1)
+    retrieved_chunks_count: int = Field(default=0, ge=0)
+    relevant_chunks_count: int | None = Field(default=None, ge=0)
+    citation_count: int = Field(default=0, ge=0)
+    unique_source_count: int = Field(default=0, ge=0)
+    required_source_count: int | None = Field(default=None, ge=0)
+    matched_required_source_count: int | None = Field(default=None, ge=0)
+    min_similarity_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    max_similarity_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    average_similarity_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    expected_min_retrieved_chunks: int = Field(default=1, ge=0)
+    expected_min_citations: int = Field(default=0, ge=0)
+    min_quality_score: float = Field(default=0.7, ge=0.0, le=1.0)
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("operation", "query")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class AIRetrievalQualityRecord(BaseModel):
+    record_id: str
+    component: AIUsageComponent
+    operation: str
+    query: str
+    status: AIRetrievalQualityStatus
+    requested_top_k: int | None = None
+    retrieved_chunks_count: int
+    relevant_chunks_count: int | None = None
+    citation_count: int
+    unique_source_count: int
+    required_source_count: int | None = None
+    matched_required_source_count: int | None = None
+    precision_at_k: float | None = None
+    source_coverage_score: float | None = None
+    quality_score: float | None = None
+    min_similarity_score: float | None = None
+    max_similarity_score: float | None = None
+    average_similarity_score: float | None = None
+    expected_min_retrieved_chunks: int
+    expected_min_citations: int
+    min_quality_score: float
+    risks: list[str] = Field(default_factory=list)
+    recorded_at: str
+    run_id: str | None = None
+    trace_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIRetrievalQualityRecordsResponse(BaseModel):
+    records: list[AIRetrievalQualityRecord] = Field(default_factory=list)
+    count: int
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIRetrievalQualitySummaryRequest(BaseModel):
+    records: list[AIRetrievalQualityRecord] | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIRetrievalQualitySummaryResponse(BaseModel):
+    record_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    total_retrieved_chunks: int
+    total_relevant_chunks: int
+    total_citations: int
+    total_unique_sources: int
+    average_precision_at_k: float | None = None
+    average_source_coverage_score: float | None = None
+    average_quality_score: float | None = None
+    average_similarity_score: float | None = None
+    component_coverage: dict[str, int] = Field(default_factory=dict)
+    operation_coverage: dict[str, int] = Field(default_factory=dict)
+    risks: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)

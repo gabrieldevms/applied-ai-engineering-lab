@@ -36,10 +36,13 @@ from ai_api.evals.llm_as_judge import (
 )
 from ai_api.evals.ci_pipeline import CIEvaluationPipelineService
 from ai_api.evals.usage_tracking import AIUsageTrackingService
+from ai_api.evals.retrieval_quality import AIRetrievalQualityTelemetryService
 
 _evaluation_telemetry_service = EvaluationTelemetryService()
 
 _ai_usage_tracking_service = AIUsageTrackingService()
+
+_ai_retrieval_quality_telemetry_service = AIRetrievalQualityTelemetryService()
 
 
 def get_golden_evaluation_dataset_service() -> GoldenEvaluationDatasetService:
@@ -152,3 +155,9 @@ def get_ci_evaluation_pipeline_service() -> CIEvaluationPipelineService:
 
 def get_ai_usage_tracking_service() -> AIUsageTrackingService:
     return _ai_usage_tracking_service
+
+
+def get_ai_retrieval_quality_telemetry_service() -> (
+    AIRetrievalQualityTelemetryService
+):
+    return _ai_retrieval_quality_telemetry_service
