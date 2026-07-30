@@ -31,6 +31,10 @@ async def main() -> None:
     print("Specialized agents:")
     print(f"- Total agents: {specialized_agents.data['agent_count']}")
 
+    print()
+    print("M6 Copilot:")
+    print("- multi-agent-qa-copilot-v1")
+
     for agent in specialized_agents.data["agents"]:
         print(f"- {agent['name']}")
 

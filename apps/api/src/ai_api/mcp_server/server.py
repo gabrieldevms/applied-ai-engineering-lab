@@ -8,6 +8,7 @@ from ai_api.mcp_server.tools import (
     list_specialized_agents_tool,
     retrieve_rag_context_tool,
     run_data_analyst_agent_tool,
+    run_multi_agent_qa_copilot_tool,
     run_qa_agent_tool,
     run_sql_regression_suite_tool,
 )
@@ -126,6 +127,30 @@ def run_sql_regression_suite(
 ) -> dict[str, Any]:
     """Run SQL workflow regression scenarios and return deterministic checks."""
     return run_sql_regression_suite_tool(suite=suite)
+
+
+@mcp.tool()
+def run_multi_agent_qa_copilot(
+    requirement_text: str,
+    objective: str | None = None,
+    language: str = "pt-BR",
+    context: dict[str, Any] | None = None,
+    data_validation: dict[str, Any] | None = None,
+    max_agents: int = 6,
+    failure_strategy: str = "stop_on_failure",
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run the Multi-Agent QA Copilot workflow."""
+    return run_multi_agent_qa_copilot_tool(
+        requirement_text=requirement_text,
+        objective=objective,
+        language=language,
+        context=context,
+        data_validation=data_validation,
+        max_agents=max_agents,
+        failure_strategy=failure_strategy,
+        metadata=metadata,
+    )
 
 
 if __name__ == "__main__":

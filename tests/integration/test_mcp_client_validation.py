@@ -28,6 +28,7 @@ async def test_mcp_client_should_list_available_tools() -> None:
         "run_qa_agent",
         "run_data_analyst_agent",
         "run_sql_regression_suite",
+        "run_multi_agent_qa_copilot",
     }.issubset(tool_names)
 
 
@@ -37,11 +38,14 @@ async def test_mcp_client_should_call_project_status_tool() -> None:
         result = await client.call_tool("get_project_status", {})
 
     assert result.data["project"] == "applied-ai-engineering-lab"
-    assert result.data["status"] == "m5_mcp_qa_server_in_progress"
-    assert result.data["current_milestone"] == "M5 — MCP QA Server"
-    assert "SQL Workflow Regression Dataset" in result.data["completed_foundations"]
-    assert "run_sql_regression_suite" in result.data["available_mcp_tools"]
-
+    assert result.data["status"] == "m6_multi_agent_qa_copilot_in_progress"
+    assert result.data["current_milestone"] == "M6 — Multi-Agent QA Copilot"
+    assert "M5 MCP QA Server" in result.data["completed_foundations"]
+    assert "Multi-Agent Data Validation Integration" in (
+        result.data["completed_foundations"]
+    )
+    assert "run_multi_agent_qa_copilot" in result.data["available_mcp_tools"]
+    assert "multi-agent-qa-copilot-v1" in result.data["available_copilots"]
 
 @pytest.mark.anyio
 async def test_mcp_client_should_call_agent_tool_registry() -> None:
