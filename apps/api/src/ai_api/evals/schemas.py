@@ -29,6 +29,19 @@ EvaluationMetricStatus = Literal[
     "failed",
 ]
 
+EvaluationScenarioRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+    "skipped",
+]
+
+EvaluationDatasetRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
 
 class EvaluationExpectation(BaseModel):
     expected_status: str | None = None
@@ -102,4 +115,45 @@ class EvaluationDatasetValidationResponse(BaseModel):
     type_coverage: dict[str, int]
     missing_required_types: list[str] = Field(default_factory=list)
     metrics: list[EvaluationDatasetValidationMetric] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class EvaluationScenarioRunCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class EvaluationScenarioRunResult(BaseModel):
+    scenario_id: str
+    scenario_name: str
+    scenario_type: EvaluationScenarioType
+    priority: EvaluationScenarioPriority
+    status: EvaluationScenarioRunStatus
+    output: dict[str, Any] = Field(default_factory=dict)
+    checks: list[EvaluationScenarioRunCheck] = Field(default_factory=list)
+    error_message: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class GoldenEvaluationDatasetRunRequest(BaseModel):
+    dataset: GoldenEvaluationDataset | None = None
+    scenario_ids: list[str] = Field(default_factory=list)
+    scenario_types: list[EvaluationScenarioType] = Field(default_factory=list)
+    dry_run: bool = False
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class GoldenEvaluationDatasetRunResponse(BaseModel):
+    status: EvaluationDatasetRunStatus
+    dataset_name: str
+    dataset_version: str
+    scenario_count: int
+    executed_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    skipped_count: int
+    results: list[EvaluationScenarioRunResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
