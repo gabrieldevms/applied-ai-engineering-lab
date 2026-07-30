@@ -50,6 +50,18 @@ MultiAgentConflictSeverity = Literal[
     "critical",
 ]
 
+MultiAgentEvaluationStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+MultiAgentQualityGate = Literal[
+    "approved",
+    "requires_review",
+    "blocked",
+]
+
 
 class MultiAgentRoleDescriptor(BaseModel):
     name: MultiAgentRoleName
@@ -215,4 +227,32 @@ class MultiAgentQACopilotResponse(BaseModel):
     contract_validation: MultiAgentContractValidationResponse | None = None
     failures: list[MultiAgentFailureRecord] = Field(default_factory=list)
     conflict_analysis: MultiAgentConflictAnalysisResponse | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentEvaluationMetric(BaseModel):
+    name: str
+    status: MultiAgentEvaluationStatus
+    score: float = Field(..., ge=0.0, le=1.0)
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentQACopilotEvaluationRequest(BaseModel):
+    response: MultiAgentQACopilotResponse
+    expected_status: MultiAgentQACopilotStatus | None = None
+    expected_quality_gate: MultiAgentQualityGate | None = None
+    require_all_roles: bool = True
+    require_contracts_passed: bool = True
+    require_no_failures: bool = True
+    require_no_critical_conflicts: bool = True
+    require_final_report: bool = True
+    require_data_validation_evidence: bool = False
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentQACopilotEvaluationResponse(BaseModel):
+    status: MultiAgentEvaluationStatus
+    score: float = Field(..., ge=0.0, le=1.0)
+    metrics: list[MultiAgentEvaluationMetric] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)

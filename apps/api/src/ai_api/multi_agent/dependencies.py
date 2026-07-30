@@ -1,4 +1,5 @@
 from ai_api.data_analysis.dependencies import get_data_analyst_agent_service
+from ai_api.multi_agent.evaluation import MultiAgentQACopilotEvaluationService
 from ai_api.multi_agent.services import MultiAgentQACopilotService
 from ai_api.requirements.dependencies import get_requirement_analyzer_service
 
@@ -8,3 +9,9 @@ def get_multi_agent_qa_copilot_service() -> MultiAgentQACopilotService:
         requirement_analyzer_service=get_requirement_analyzer_service(),
         data_analyst_agent_service=get_data_analyst_agent_service(),
     )
+
+
+def get_multi_agent_qa_copilot_evaluation_service() -> (
+    MultiAgentQACopilotEvaluationService
+):
+    return MultiAgentQACopilotEvaluationService()
