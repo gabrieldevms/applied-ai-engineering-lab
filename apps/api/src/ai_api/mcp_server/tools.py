@@ -6,6 +6,8 @@ from ai_api.agents import (
     ToolRegistry,
     get_qa_agent_service,
 )
+from ai_api.data_analysis.agent import DataAnalystAgentRequest
+from ai_api.data_analysis.dependencies import get_data_analyst_agent_service
 from ai_api.requirements.dependencies import (
     get_requirement_analyzer_service,
 )
@@ -31,6 +33,7 @@ def get_project_status_tool() -> dict[str, Any]:
             "MCP Server Foundation",
             "Requirement Analysis MCP Tool",
             "RAG MCP Tools",
+            "QA Agent MCP Tool",
         ],
         "available_mcp_tools": [
             "get_project_status",
@@ -40,6 +43,7 @@ def get_project_status_tool() -> dict[str, Any]:
             "retrieve_rag_context",
             "answer_with_rag",
             "run_qa_agent",
+            "run_data_analyst_agent",
         ],
         "available_specialized_agents": [
             "qa-agent-v1",
@@ -178,6 +182,37 @@ def run_qa_agent_tool(
         qa_agent_service
         if qa_agent_service is not None
         else get_qa_agent_service()
+    )
+
+    response = selected_service.run(payload)
+
+    return response.model_dump(mode="json")
+
+
+def run_data_analyst_agent_tool(
+    objective: str,
+    database_schema: dict[str, Any],
+    table_data: list[dict[str, Any]],
+    language: str = "pt-BR",
+    max_rows: int = 100,
+    metadata: dict[str, Any] | None = None,
+    data_analyst_agent_service: Any | None = None,
+) -> dict[str, Any]:
+    payload = DataAnalystAgentRequest.model_validate(
+        {
+            "objective": objective,
+            "language": language,
+            "database_schema": database_schema,
+            "table_data": table_data,
+            "max_rows": max_rows,
+            "metadata": metadata or {},
+        }
+    )
+
+    selected_service = (
+        data_analyst_agent_service
+        if data_analyst_agent_service is not None
+        else get_data_analyst_agent_service()
     )
 
     response = selected_service.run(payload)

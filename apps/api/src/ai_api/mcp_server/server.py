@@ -7,6 +7,7 @@ from ai_api.mcp_server.tools import (
     list_agent_tools_tool,
     list_specialized_agents_tool,
     retrieve_rag_context_tool,
+    run_data_analyst_agent_tool,
     run_qa_agent_tool,
 )
 
@@ -95,6 +96,26 @@ def run_qa_agent(
         language=language,
         max_steps=max_steps,
         data_validation=data_validation,
+    )
+
+
+@mcp.tool()
+def run_data_analyst_agent(
+    objective: str,
+    database_schema: dict[str, Any],
+    table_data: list[dict[str, Any]],
+    language: str = "pt-BR",
+    max_rows: int = 100,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run the Data Analyst Agent with controlled read-only SQL execution."""
+    return run_data_analyst_agent_tool(
+        objective=objective,
+        database_schema=database_schema,
+        table_data=table_data,
+        language=language,
+        max_rows=max_rows,
+        metadata=metadata,
     )
 
 
