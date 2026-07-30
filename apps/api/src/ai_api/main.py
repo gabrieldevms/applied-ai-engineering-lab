@@ -244,6 +244,9 @@ from ai_api.evals import (
     AIMultiAgentExecutionSummaryResponse,
     AIMultiAgentExecutionTelemetryService,
     get_ai_multi_agent_execution_telemetry_service,
+    AIObservabilityDashboardResponse,
+    AIObservabilityDashboardService,
+    get_ai_observability_dashboard_service,
 )
 
 logging.basicConfig(
@@ -1660,3 +1663,13 @@ def summarize_stored_ai_multi_agent_execution(
     ],
 ) -> AIMultiAgentExecutionSummaryResponse:
     return service.summarize(AIMultiAgentExecutionSummaryRequest())
+
+
+@app.get("/observability/dashboard", response_model=AIObservabilityDashboardResponse,)
+def get_ai_observability_dashboard(
+    service: Annotated[
+        AIObservabilityDashboardService,
+        Depends(get_ai_observability_dashboard_service),
+    ],
+) -> AIObservabilityDashboardResponse:
+    return service.get_dashboard()

@@ -32,6 +32,7 @@ from ai_api.evals.dependencies import (
     get_ai_retrieval_quality_telemetry_service,
     get_ai_agent_execution_telemetry_service,
     get_ai_multi_agent_execution_telemetry_service,
+    get_ai_observability_dashboard_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
@@ -174,6 +175,10 @@ from ai_api.evals.schemas import (
     AIMultiAgentExecutionSummaryRequest,
     AIMultiAgentExecutionSummaryResponse,
     AIMultiAgentRunStatus,
+    AIObservabilityDashboardResponse,
+    AIObservabilityDashboardSection,
+    AIObservabilityDashboardSectionStatus,
+    AIObservabilityDashboardStatus,
 )
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -194,6 +199,7 @@ from ai_api.evals.ci_pipeline import CIEvaluationPipelineService
 from ai_api.evals.usage_tracking import AIUsageTrackingService
 from ai_api.evals.retrieval_quality import AIRetrievalQualityTelemetryService
 from ai_api.evals.agent_execution_metrics import AIAgentExecutionTelemetryService
+from ai_api.evals.observability_dashboard import AIObservabilityDashboardService
 from ai_api.evals.multi_agent_execution_metrics import (
     AIMultiAgentExecutionTelemetryService,
 )
@@ -380,4 +386,10 @@ __all__ = [
     "AIMultiAgentExecutionTelemetryService",
     "AIMultiAgentRunStatus",
     "get_ai_multi_agent_execution_telemetry_service",
+    "AIObservabilityDashboardResponse",
+    "AIObservabilityDashboardSection",
+    "AIObservabilityDashboardSectionStatus",
+    "AIObservabilityDashboardService",
+    "AIObservabilityDashboardStatus",
+    "get_ai_observability_dashboard_service",
 ]
