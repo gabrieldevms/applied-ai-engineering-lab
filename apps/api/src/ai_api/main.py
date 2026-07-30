@@ -198,6 +198,13 @@ from ai_api.evals import (
     get_agent_regression_suite_service,
     get_tool_calling_evaluation_service,
     get_tool_calling_evaluation_suite_service,
+    MultiAgentCopilotRegressionEvaluationService,
+    MultiAgentCopilotRegressionRunRequest,
+    MultiAgentCopilotRegressionRunResponse,
+    MultiAgentCopilotRegressionSuite,
+    MultiAgentCopilotRegressionSuiteService,
+    get_multi_agent_copilot_regression_evaluation_service,
+    get_multi_agent_copilot_regression_suite_service,
 )
 
 logging.basicConfig(
@@ -1304,6 +1311,41 @@ def run_tool_calling_evaluation_suite(
         run_id=payload.metadata.get("run_id"),
         metadata={
             "operation": "run_tool_calling_evaluation_suite",
+            **payload.metadata,
+        },
+    )
+
+
+@app.get("/evals/multi-agent-copilot-regression/suite", response_model=MultiAgentCopilotRegressionSuite,)
+def get_multi_agent_copilot_regression_suite(
+    service: Annotated[
+        MultiAgentCopilotRegressionSuiteService,
+        Depends(get_multi_agent_copilot_regression_suite_service),
+    ],
+) -> MultiAgentCopilotRegressionSuite:
+    return service.get_default_suite()
+
+
+@app.post("/evals/multi-agent-copilot-regression/run", response_model=MultiAgentCopilotRegressionRunResponse,)
+def run_multi_agent_copilot_regression_suite(
+    payload: MultiAgentCopilotRegressionRunRequest,
+    service: Annotated[
+        MultiAgentCopilotRegressionEvaluationService,
+        Depends(get_multi_agent_copilot_regression_evaluation_service),
+    ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
+) -> MultiAgentCopilotRegressionRunResponse:
+    return instrumentation_service.instrument(
+        event_type="multi_agent_copilot_regression_run",
+        component="evaluation",
+        source="api:/evals/multi-agent-copilot-regression/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_multi_agent_copilot_regression_suite",
             **payload.metadata,
         },
     )
