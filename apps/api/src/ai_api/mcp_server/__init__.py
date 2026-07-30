@@ -5,6 +5,7 @@ from ai_api.mcp_server.tools import (
     list_agent_tools_tool,
     list_specialized_agents_tool,
     retrieve_rag_context_tool,
+    run_qa_agent_tool,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "list_agent_tools_tool",
     "list_specialized_agents_tool",
     "retrieve_rag_context_tool",
+    "run_qa_agent_tool",
 ]
