@@ -29,6 +29,27 @@ MultiAgentContractValidationStatus = Literal[
     "failed",
 ]
 
+MultiAgentFailureStrategy = Literal[
+    "stop_on_failure",
+    "continue_on_failure",
+]
+
+MultiAgentFailureSeverity = Literal[
+    "recoverable",
+    "critical",
+]
+
+MultiAgentConflictAnalysisStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+MultiAgentConflictSeverity = Literal[
+    "warning",
+    "critical",
+]
+
 
 class MultiAgentRoleDescriptor(BaseModel):
     name: MultiAgentRoleName
@@ -84,6 +105,32 @@ class MultiAgentContractValidationResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class MultiAgentFailureRecord(BaseModel):
+    agent_name: MultiAgentRoleName
+    error_type: str
+    message: str
+    severity: MultiAgentFailureSeverity = "recoverable"
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentConflictRecord(BaseModel):
+    conflict_type: str
+    severity: MultiAgentConflictSeverity
+    artifact_name: str | None = None
+    involved_agents: list[MultiAgentRoleName] = Field(default_factory=list)
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentConflictAnalysisResponse(BaseModel):
+    status: MultiAgentConflictAnalysisStatus
+    conflict_count: int
+    warning_count: int
+    critical_count: int
+    conflicts: list[MultiAgentConflictRecord] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class MultiAgentSharedState(BaseModel):
     objective: str
     requirement_text: str
@@ -127,6 +174,7 @@ class MultiAgentQACopilotRequest(BaseModel):
     language: str = "pt-BR"
     context: dict[str, Any] = Field(default_factory=dict)
     max_agents: int = Field(default=6, ge=1, le=6)
+    failure_strategy: MultiAgentFailureStrategy = "stop_on_failure"
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("requirement_text")
@@ -163,4 +211,6 @@ class MultiAgentQACopilotResponse(BaseModel):
     final_report: MultiAgentFinalReport
     trace: list[MultiAgentTraceStep]
     contract_validation: MultiAgentContractValidationResponse | None = None
+    failures: list[MultiAgentFailureRecord] = Field(default_factory=list)
+    conflict_analysis: MultiAgentConflictAnalysisResponse | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
