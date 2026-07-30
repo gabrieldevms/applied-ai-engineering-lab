@@ -1,5 +1,6 @@
 from ai_api.agents import ToolExecutionService, get_qa_agent_service
 from ai_api.data_analysis.dependencies import get_data_analyst_agent_service
+from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
 from ai_api.evals.prompt_regression import (
     PromptRegressionEvaluationService,
     PromptRegressionSuiteService,
@@ -58,3 +59,11 @@ def get_ai_evaluation_report_aggregation_service() -> (
 
 def get_evaluation_telemetry_service() -> EvaluationTelemetryService:
     return _evaluation_telemetry_service
+
+
+def get_evaluation_telemetry_instrumentation_service() -> (
+    EvaluationTelemetryInstrumentationService
+):
+    return EvaluationTelemetryInstrumentationService(
+        telemetry_service=get_evaluation_telemetry_service(),
+    )

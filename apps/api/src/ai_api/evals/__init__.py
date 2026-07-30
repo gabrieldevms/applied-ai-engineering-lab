@@ -1,5 +1,6 @@
 from ai_api.evals.dependencies import (
     get_ai_evaluation_report_aggregation_service,
+    get_evaluation_telemetry_instrumentation_service,
     get_evaluation_telemetry_service,
     get_golden_evaluation_dataset_runner_service,
     get_golden_evaluation_dataset_service,
@@ -8,6 +9,7 @@ from ai_api.evals.dependencies import (
     get_prompt_regression_suite_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
+from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
 from ai_api.evals.prompt_regression import (
     PromptRegressionEvaluationService,
     PromptRegressionSuiteService,
@@ -83,6 +85,7 @@ __all__ = [
     "EvaluationTelemetryEvent",
     "EvaluationTelemetryEventsResponse",
     "EvaluationTelemetryEventType",
+    "EvaluationTelemetryInstrumentationService",
     "EvaluationTelemetryRecordRequest",
     "EvaluationTelemetryService",
     "EvaluationTelemetryStatus",
@@ -108,6 +111,7 @@ __all__ = [
     "build_default_golden_evaluation_dataset",
     "build_default_prompt_regression_suite",
     "get_ai_evaluation_report_aggregation_service",
+    "get_evaluation_telemetry_instrumentation_service",
     "get_evaluation_telemetry_service",
     "get_golden_evaluation_dataset_runner_service",
     "get_golden_evaluation_dataset_service",
