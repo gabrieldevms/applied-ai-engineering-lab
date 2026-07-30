@@ -9,6 +9,7 @@ from ai_api.mcp_server import (
     list_agent_tools_tool,
     list_specialized_agents_tool,
     retrieve_rag_context_tool,
+    run_data_analyst_agent_tool,
     run_qa_agent_tool,
 )
 from ai_api.requirements.fake_responses import (
@@ -67,6 +68,48 @@ class StubQAAgentService:
                 ],
                 "metadata": {
                     "source": "stub-qa-agent-service",
+                },
+            }
+        )
+
+
+class StubDataAnalystAgentService:
+    def __init__(self) -> None:
+        self.last_request: Any | None = None
+
+    def run(self, request: Any) -> StubQAAgentResponse:
+        self.last_request = request
+
+        return StubQAAgentResponse(
+            {
+                "status": "completed",
+                "agent_name": "data-analyst-agent-v1",
+                "objective": request.objective,
+                "answer": (
+                    "A análise foi concluída com sucesso. "
+                    "A consulta foi gerada, validada e executada."
+                ),
+                "workflow": {
+                    "status": "executed",
+                    "generated_sql": (
+                        "SELECT account_id, "
+                        "SUM(CASE WHEN transaction_type = 'Deposit' "
+                        "THEN amount ELSE -amount END) AS final_balance "
+                        "FROM transactions GROUP BY account_id"
+                    ),
+                },
+                "evidence": {
+                    "row_count": 2,
+                    "column_count": 2,
+                },
+                "trace": [
+                    {
+                        "step_name": "sql_workflow",
+                        "status": "completed",
+                    }
+                ],
+                "metadata": {
+                    "source": "stub-data-analyst-agent-service",
                 },
             }
         )
@@ -173,6 +216,70 @@ def _build_data_validation_payload() -> dict[str, Any]:
     }
 
 
+def _build_database_schema() -> dict[str, Any]:
+    return {
+        "name": "qa_database",
+        "description": "Database used for QA validation.",
+        "tables": [
+            {
+                "name": "transactions",
+                "description": "Financial transactions.",
+                "columns": [
+                    {
+                        "name": "transaction_id",
+                        "data_type": "integer",
+                        "nullable": False,
+                        "primary_key": True,
+                    },
+                    {
+                        "name": "account_id",
+                        "data_type": "integer",
+                        "nullable": False,
+                    },
+                    {
+                        "name": "amount",
+                        "data_type": "decimal",
+                        "nullable": False,
+                    },
+                    {
+                        "name": "transaction_type",
+                        "data_type": "varchar",
+                        "nullable": False,
+                    },
+                ],
+            }
+        ],
+    }
+
+
+def _build_table_data() -> list[dict[str, Any]]:
+    return [
+        {
+            "table_name": "transactions",
+            "rows": [
+                {
+                    "transaction_id": 123,
+                    "account_id": 101,
+                    "amount": 10.0,
+                    "transaction_type": "Deposit",
+                },
+                {
+                    "transaction_id": 124,
+                    "account_id": 101,
+                    "amount": 20.0,
+                    "transaction_type": "Deposit",
+                },
+                {
+                    "transaction_id": 125,
+                    "account_id": 101,
+                    "amount": 5.0,
+                    "transaction_type": "Withdrawal",
+                },
+            ],
+        }
+    ]
+
+
 def test_get_project_status_tool_should_return_m5_status() -> None:
     response = get_project_status_tool()
 
@@ -190,6 +297,8 @@ def test_get_project_status_tool_should_return_m5_status() -> None:
     assert "run_qa_agent" in response["available_mcp_tools"]
     assert "qa-agent-v1" in response["available_specialized_agents"]
     assert "data-analyst-agent-v1" in response["available_specialized_agents"]
+    assert "QA Agent MCP Tool" in response["completed_foundations"]
+    assert "run_data_analyst_agent" in response["available_mcp_tools"]
 
 
 def test_list_agent_tools_tool_should_return_registered_tools() -> None:
@@ -346,3 +455,50 @@ def test_run_qa_agent_tool_should_accept_data_validation_context() -> None:
     assert request_dump["data_validation"]["table_data"][0]["table_name"] == (
         "transactions"
     )
+
+
+def test_run_data_analyst_agent_tool_should_execute_data_analyst_service() -> None:
+    service = StubDataAnalystAgentService()
+
+    response = run_data_analyst_agent_tool(
+        objective="Calcule o saldo final por conta.",
+        language="pt-BR",
+        database_schema=_build_database_schema(),
+        table_data=_build_table_data(),
+        max_rows=100,
+        metadata={
+            "source": "mcp-test",
+        },
+        data_analyst_agent_service=service,
+    )
+
+    assert response["status"] == "completed"
+    assert response["agent_name"] == "data-analyst-agent-v1"
+    assert response["objective"] == "Calcule o saldo final por conta."
+    assert response["workflow"]["status"] == "executed"
+    assert response["evidence"]["row_count"] == 2
+
+    assert service.last_request is not None
+    assert service.last_request.objective == "Calcule o saldo final por conta."
+    assert service.last_request.language == "pt-BR"
+    assert service.last_request.max_rows == 100
+
+    request_dump = service.last_request.model_dump(mode="json")
+
+    assert request_dump["database_schema"]["tables"][0]["name"] == "transactions"
+    assert request_dump["table_data"][0]["table_name"] == "transactions"
+    assert request_dump["metadata"]["source"] == "mcp-test"
+
+
+def test_run_data_analyst_agent_tool_should_reject_invalid_payload() -> None:
+    service = StubDataAnalystAgentService()
+
+    with pytest.raises(ValidationError):
+        run_data_analyst_agent_tool(
+            objective="",
+            language="pt-BR",
+            database_schema=_build_database_schema(),
+            table_data=_build_table_data(),
+            max_rows=100,
+            data_analyst_agent_service=service,
+        )
