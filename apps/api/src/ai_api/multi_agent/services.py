@@ -1,8 +1,12 @@
 from typing import Any
+from ai_api.multi_agent.conflict_handling import MultiAgentConflictDetector
 from ai_api.multi_agent.contracts import MultiAgentCommunicationContractValidator
+from ai_api.multi_agent.failure_handling import MultiAgentFailureHandler
 from ai_api.multi_agent.roles import build_default_multi_agent_roles
 from ai_api.multi_agent.schemas import (
     MultiAgentArtifact,
+    MultiAgentConflictAnalysisResponse,
+    MultiAgentFailureRecord,
     MultiAgentFinalReport,
     MultiAgentMessage,
     MultiAgentQACopilotRequest,
@@ -20,12 +24,24 @@ class MultiAgentQACopilotService:
         self,
         roles: list[MultiAgentRoleDescriptor] | None = None,
         contract_validator: MultiAgentCommunicationContractValidator | None = None,
+        failure_handler: MultiAgentFailureHandler | None = None,
+        conflict_detector: MultiAgentConflictDetector | None = None,
     ) -> None:
         self.roles = roles if roles is not None else build_default_multi_agent_roles()
         self.contract_validator = (
             contract_validator
             if contract_validator is not None
             else MultiAgentCommunicationContractValidator()
+        )
+        self.failure_handler = (
+            failure_handler
+            if failure_handler is not None
+            else MultiAgentFailureHandler()
+        )
+        self.conflict_detector = (
+            conflict_detector
+            if conflict_detector is not None
+            else MultiAgentConflictDetector()
         )
 
     def run(
@@ -44,6 +60,7 @@ class MultiAgentQACopilotService:
             context=request.context,
             metadata={
                 "execution_mode": "deterministic_foundation",
+                "failure_strategy": request.failure_strategy,
                 "source": "multi-agent-qa-copilot-v1",
                 **request.metadata,
             },
@@ -52,13 +69,36 @@ class MultiAgentQACopilotService:
         selected_roles = self.roles[: request.max_agents]
         task_results: list[MultiAgentTaskResult] = []
         trace: list[MultiAgentTraceStep] = []
+        failures: list[MultiAgentFailureRecord] = []
+        execution_blocked = False
+        blocked_by: MultiAgentRoleName | None = None
 
         for role in selected_roles:
-            task_result = self._run_role(
-                role_name=role.name,
-                request=request,
-                shared_state=shared_state,
-            )
+            if execution_blocked and blocked_by is not None:
+                task_result = self.failure_handler.build_skipped_task_result(
+                    agent_name=role.name,
+                    blocked_by=blocked_by,
+                )
+            else:
+                try:
+                    task_result = self._run_role(
+                        role_name=role.name,
+                        request=request,
+                        shared_state=shared_state,
+                    )
+                except Exception as error:
+                    failure = self.failure_handler.build_failure_record(
+                        agent_name=role.name,
+                        error=error,
+                    )
+                    failures.append(failure)
+                    task_result = self.failure_handler.build_failed_task_result(
+                        failure=failure,
+                    )
+
+                    if request.failure_strategy == "stop_on_failure":
+                        execution_blocked = True
+                        blocked_by = role.name
 
             task_results.append(task_result)
             shared_state.artifacts.extend(task_result.artifacts)
@@ -78,10 +118,20 @@ class MultiAgentQACopilotService:
             )
 
         contract_validation = self.contract_validator.validate(shared_state)
-        final_report = self._build_final_report(shared_state)
+        conflict_analysis = self.conflict_detector.detect(shared_state)
+        final_report = self._build_final_report(
+            shared_state=shared_state,
+            failures=failures,
+            conflict_analysis=conflict_analysis,
+        )
+        response_status = self._resolve_status(
+            task_results=task_results,
+            failures=failures,
+            conflict_analysis=conflict_analysis,
+        )
 
         return MultiAgentQACopilotResponse(
-            status="completed",
+            status=response_status,
             copilot_name="multi-agent-qa-copilot-v1",
             objective=objective,
             roles=selected_roles,
@@ -90,12 +140,17 @@ class MultiAgentQACopilotService:
             final_report=final_report,
             trace=trace,
             contract_validation=contract_validation,
+            failures=failures,
+            conflict_analysis=conflict_analysis,
             metadata={
                 "execution_mode": "deterministic_foundation",
+                "failure_strategy": request.failure_strategy,
                 "agent_count": len(selected_roles),
                 "artifact_count": len(shared_state.artifacts),
                 "message_count": len(shared_state.messages),
+                "failure_count": len(failures),
                 "contract_validation_status": contract_validation.status,
+                "conflict_analysis_status": conflict_analysis.status,
             },
         )
 
@@ -302,11 +357,11 @@ class MultiAgentQACopilotService:
                 ],
                 "risks": [
                     "A análise ainda é determinística e não usa raciocínio LLM por agente.",
-                    "Conflitos entre agentes ainda não são tratados nesta fundação.",
+                    "Conflitos entre agentes são detectados, mas ainda não resolvidos automaticamente.",
                 ],
                 "recommended_improvements": [
-                    "Adicionar contratos explícitos de comunicação entre agentes.",
-                    "Adicionar tratamento de falhas e conflitos.",
+                    "Adicionar resolução automática de conflitos.",
+                    "Integrar agentes especializados com serviços reais do projeto.",
                     "Evoluir geração de relatório final com base em avaliação dos artefatos.",
                 ],
             },
@@ -368,6 +423,8 @@ class MultiAgentQACopilotService:
     def _build_final_report(
         self,
         shared_state: MultiAgentSharedState,
+        failures: list[MultiAgentFailureRecord],
+        conflict_analysis: MultiAgentConflictAnalysisResponse,
     ) -> MultiAgentFinalReport:
         requirement_analysis = self._find_artifact_content(
             shared_state=shared_state,
@@ -385,6 +442,25 @@ class MultiAgentQACopilotService:
             shared_state=shared_state,
             artifact_name="review_findings",
         )
+
+        next_steps = [
+            "Integrar agentes especializados com serviços reais do projeto.",
+            "Adicionar exposição MCP para o Multi-Agent QA Copilot.",
+            "Evoluir agentes determinísticos para agentes com raciocínio LLM controlado.",
+            "Adicionar resolução automática de conflitos.",
+        ]
+
+        if failures:
+            next_steps.insert(
+                0,
+                "Investigar falhas capturadas durante a execução multiagente.",
+            )
+
+        if conflict_analysis.status != "passed":
+            next_steps.insert(
+                0,
+                "Revisar conflitos detectados no estado compartilhado multiagente.",
+            )
 
         return MultiAgentFinalReport(
             summary=(
@@ -414,17 +490,43 @@ class MultiAgentQACopilotService:
                 *review_findings.get("risks", []),
                 *review_findings.get("recommended_improvements", []),
             ],
-            next_steps=[
-                "Adicionar tratamento de conflitos e falhas.",
-                "Integrar agentes especializados com serviços reais do projeto.",
-                "Adicionar endpoint HTTP e futura exposição MCP para o copilot.",
-                "Evoluir agentes determinísticos para agentes com raciocínio LLM controlado.",
-            ],
+            next_steps=next_steps,
             metadata={
                 "source": "multi-agent-qa-copilot-v1",
                 "artifact_count": len(shared_state.artifacts),
+                "failure_count": len(failures),
+                "conflict_analysis_status": conflict_analysis.status,
             },
         )
+
+    @staticmethod
+    def _resolve_status(
+        task_results: list[MultiAgentTaskResult],
+        failures: list[MultiAgentFailureRecord],
+        conflict_analysis: MultiAgentConflictAnalysisResponse,
+    ) -> str:
+        completed_count = len(
+            [
+                task_result
+                for task_result in task_results
+                if task_result.status == "completed"
+            ]
+        )
+        skipped_count = len(
+            [
+                task_result
+                for task_result in task_results
+                if task_result.status == "skipped"
+            ]
+        )
+
+        if completed_count == 0:
+            return "failed"
+
+        if failures or skipped_count > 0 or conflict_analysis.status == "failed":
+            return "partial"
+
+        return "completed"
 
     @staticmethod
     def _find_artifact_content(
