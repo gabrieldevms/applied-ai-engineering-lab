@@ -1,4 +1,5 @@
 from typing import Any
+from ai_api.multi_agent.contracts import MultiAgentCommunicationContractValidator
 from ai_api.multi_agent.roles import build_default_multi_agent_roles
 from ai_api.multi_agent.schemas import (
     MultiAgentArtifact,
@@ -18,8 +19,14 @@ class MultiAgentQACopilotService:
     def __init__(
         self,
         roles: list[MultiAgentRoleDescriptor] | None = None,
+        contract_validator: MultiAgentCommunicationContractValidator | None = None,
     ) -> None:
         self.roles = roles if roles is not None else build_default_multi_agent_roles()
+        self.contract_validator = (
+            contract_validator
+            if contract_validator is not None
+            else MultiAgentCommunicationContractValidator()
+        )
 
     def run(
         self,
@@ -70,6 +77,7 @@ class MultiAgentQACopilotService:
                 )
             )
 
+        contract_validation = self.contract_validator.validate(shared_state)
         final_report = self._build_final_report(shared_state)
 
         return MultiAgentQACopilotResponse(
@@ -81,11 +89,13 @@ class MultiAgentQACopilotService:
             task_results=task_results,
             final_report=final_report,
             trace=trace,
+            contract_validation=contract_validation,
             metadata={
                 "execution_mode": "deterministic_foundation",
                 "agent_count": len(selected_roles),
                 "artifact_count": len(shared_state.artifacts),
                 "message_count": len(shared_state.messages),
+                "contract_validation_status": contract_validation.status,
             },
         )
 
@@ -139,7 +149,7 @@ class MultiAgentQACopilotService:
 
         message = MultiAgentMessage(
             sender="orchestrator_agent",
-            recipient="shared_state",
+            recipient="requirement_analyst_agent",
             content=(
                 "Plano de execução multiagente criado para análise de qualidade."
             ),
@@ -405,10 +415,10 @@ class MultiAgentQACopilotService:
                 *review_findings.get("recommended_improvements", []),
             ],
             next_steps=[
-                "Adicionar contratos formais de comunicação entre agentes.",
                 "Adicionar tratamento de conflitos e falhas.",
                 "Integrar agentes especializados com serviços reais do projeto.",
                 "Adicionar endpoint HTTP e futura exposição MCP para o copilot.",
+                "Evoluir agentes determinísticos para agentes com raciocínio LLM controlado.",
             ],
             metadata={
                 "source": "multi-agent-qa-copilot-v1",

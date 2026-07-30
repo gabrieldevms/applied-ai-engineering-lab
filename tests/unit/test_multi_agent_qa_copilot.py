@@ -79,6 +79,11 @@ def test_multi_agent_qa_copilot_should_execute_full_foundation_flow() -> None:
 
     assert response.metadata["execution_mode"] == "deterministic_foundation"
     assert response.metadata["agent_count"] == 6
+    assert response.contract_validation is not None
+    assert response.contract_validation.status == "passed"
+    assert response.contract_validation.total_contracts == 6
+    assert response.contract_validation.passed_contracts == 6
+    assert response.metadata["contract_validation_status"] == "passed"
 
 
 def test_multi_agent_qa_copilot_should_support_limited_agent_execution() -> None:
@@ -105,6 +110,9 @@ def test_multi_agent_qa_copilot_should_support_limited_agent_execution() -> None
     assert len(response.task_results) == 3
     assert len(response.trace) == 3
     assert response.metadata["agent_count"] == 3
+    assert response.contract_validation is not None
+    assert response.contract_validation.status == "failed"
+    assert response.contract_validation.failed_contracts > 0
 
 
 def test_multi_agent_qa_copilot_should_use_default_objective_when_not_provided() -> None:

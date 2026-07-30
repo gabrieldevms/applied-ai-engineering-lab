@@ -23,6 +23,12 @@ MultiAgentQACopilotStatus = Literal[
     "failed",
 ]
 
+MultiAgentContractValidationStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
 
 class MultiAgentRoleDescriptor(BaseModel):
     name: MultiAgentRoleName
@@ -44,6 +50,37 @@ class MultiAgentArtifact(BaseModel):
     name: str
     produced_by: MultiAgentRoleName
     content: dict[str, Any]
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentCommunicationContract(BaseModel):
+    name: str
+    source_agent: MultiAgentRoleName
+    target_agent: MultiAgentRoleName | Literal["shared_state"]
+    required_artifacts: list[str] = Field(default_factory=list)
+    required_message: bool = True
+    description: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentContractCheckResult(BaseModel):
+    contract_name: str
+    status: MultiAgentContractValidationStatus
+    source_agent: MultiAgentRoleName
+    target_agent: MultiAgentRoleName | Literal["shared_state"]
+    missing_artifacts: list[str] = Field(default_factory=list)
+    message_found: bool
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MultiAgentContractValidationResponse(BaseModel):
+    status: MultiAgentContractValidationStatus
+    total_contracts: int
+    passed_contracts: int
+    warning_contracts: int
+    failed_contracts: int
+    checks: list[MultiAgentContractCheckResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -125,4 +162,5 @@ class MultiAgentQACopilotResponse(BaseModel):
     task_results: list[MultiAgentTaskResult]
     final_report: MultiAgentFinalReport
     trace: list[MultiAgentTraceStep]
+    contract_validation: MultiAgentContractValidationResponse | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
