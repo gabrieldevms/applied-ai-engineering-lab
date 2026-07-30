@@ -1,3 +1,4 @@
+from typing import Any
 import pytest
 from pydantic import ValidationError
 from ai_api.llm import FakeLLMProvider
@@ -8,12 +9,67 @@ from ai_api.mcp_server import (
     list_agent_tools_tool,
     list_specialized_agents_tool,
     retrieve_rag_context_tool,
+    run_qa_agent_tool,
 )
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
 )
 from ai_api.requirements.retry import RetryConfig
 from ai_api.requirements.services import RequirementAnalyzerService
+
+
+class StubQAAgentResponse:
+    def __init__(self, data: dict[str, Any]) -> None:
+        self.data = data
+
+    def model_dump(self, mode: str = "json") -> dict[str, Any]:
+        return self.data
+
+
+class StubQAAgentService:
+    def __init__(self) -> None:
+        self.last_request: Any | None = None
+
+    def run(self, request: Any) -> StubQAAgentResponse:
+        self.last_request = request
+
+        return StubQAAgentResponse(
+            {
+                "status": "completed",
+                "agent_name": "qa-agent-v1",
+                "requirement_text": request.requirement_text,
+                "answer": "Análise de QA concluída com sucesso.",
+                "requirement_analysis": {
+                    "summary": "Resumo do requisito.",
+                    "business_rules": [],
+                    "acceptance_criteria": [],
+                    "risks": [],
+                    "positive_test_scenarios": [],
+                    "negative_test_scenarios": [],
+                    "edge_cases": [],
+                    "open_questions": [],
+                    "automation_opportunities": [],
+                },
+                "data_validation_selection": {
+                    "decision": "skipped",
+                    "reason": "No data validation context was required.",
+                    "matched_signals": [],
+                    "metadata": {
+                        "mode": "auto",
+                    },
+                },
+                "data_validation": None,
+                "trace": [
+                    {
+                        "step_name": "requirement_analysis",
+                        "status": "completed",
+                    }
+                ],
+                "metadata": {
+                    "source": "stub-qa-agent-service",
+                },
+            }
+        )
 
 
 def _build_requirement_analyzer_service() -> RequirementAnalyzerService:
@@ -51,6 +107,72 @@ def _build_documents() -> list[dict]:
     ]
 
 
+def _build_data_validation_payload() -> dict[str, Any]:
+    return {
+        "objective": "Validar saldo final por conta.",
+        "mode": "required",
+        "database_schema": {
+            "name": "qa_database",
+            "description": "Database used for QA validation.",
+            "tables": [
+                {
+                    "name": "transactions",
+                    "description": "Financial transactions.",
+                    "columns": [
+                        {
+                            "name": "transaction_id",
+                            "data_type": "integer",
+                            "nullable": False,
+                            "primary_key": True,
+                        },
+                        {
+                            "name": "account_id",
+                            "data_type": "integer",
+                            "nullable": False,
+                        },
+                        {
+                            "name": "amount",
+                            "data_type": "decimal",
+                            "nullable": False,
+                        },
+                        {
+                            "name": "transaction_type",
+                            "data_type": "varchar",
+                            "nullable": False,
+                        },
+                    ],
+                }
+            ],
+        },
+        "table_data": [
+            {
+                "table_name": "transactions",
+                "rows": [
+                    {
+                        "transaction_id": 123,
+                        "account_id": 101,
+                        "amount": 10.0,
+                        "transaction_type": "Deposit",
+                    },
+                    {
+                        "transaction_id": 124,
+                        "account_id": 101,
+                        "amount": 20.0,
+                        "transaction_type": "Deposit",
+                    },
+                    {
+                        "transaction_id": 125,
+                        "account_id": 101,
+                        "amount": 5.0,
+                        "transaction_type": "Withdrawal",
+                    },
+                ],
+            }
+        ],
+        "max_rows": 100,
+    }
+
+
 def test_get_project_status_tool_should_return_m5_status() -> None:
     response = get_project_status_tool()
 
@@ -61,9 +183,11 @@ def test_get_project_status_tool_should_return_m5_status() -> None:
     assert "Data Analyst Agent Foundation" in response["completed_foundations"]
     assert "MCP Server Foundation" in response["completed_foundations"]
     assert "Requirement Analysis MCP Tool" in response["completed_foundations"]
+    assert "RAG MCP Tools" in response["completed_foundations"]
     assert "analyze_requirement" in response["available_mcp_tools"]
     assert "retrieve_rag_context" in response["available_mcp_tools"]
     assert "answer_with_rag" in response["available_mcp_tools"]
+    assert "run_qa_agent" in response["available_mcp_tools"]
     assert "qa-agent-v1" in response["available_specialized_agents"]
     assert "data-analyst-agent-v1" in response["available_specialized_agents"]
 
@@ -152,7 +276,6 @@ def test_retrieve_rag_context_tool_should_return_relevant_chunks() -> None:
     assert len(response["retrieved_chunks"]) == 1
 
     retrieved_chunk = response["retrieved_chunks"][0]
-
     serialized_chunk = str(retrieved_chunk).lower()
 
     assert "billing" in serialized_chunk or "cobrança" in serialized_chunk
@@ -171,3 +294,55 @@ def test_answer_with_rag_tool_should_return_grounded_answer() -> None:
 
     assert response["answer"]
     assert isinstance(response["citations"], list)
+
+
+def test_run_qa_agent_tool_should_execute_qa_agent_service() -> None:
+    service = StubQAAgentService()
+
+    response = run_qa_agent_tool(
+        requirement_text=(
+            "Como QA, preciso validar o fluxo de renegociação de dívida."
+        ),
+        language="pt-BR",
+        max_steps=6,
+        qa_agent_service=service,
+    )
+
+    assert response["status"] == "completed"
+    assert response["agent_name"] == "qa-agent-v1"
+    assert response["answer"] == "Análise de QA concluída com sucesso."
+    assert service.last_request is not None
+    assert service.last_request.requirement_text == (
+        "Como QA, preciso validar o fluxo de renegociação de dívida."
+    )
+    assert service.last_request.language == "pt-BR"
+    assert service.last_request.max_steps == 6
+
+
+def test_run_qa_agent_tool_should_accept_data_validation_context() -> None:
+    service = StubQAAgentService()
+
+    response = run_qa_agent_tool(
+        requirement_text=(
+            "Como QA, preciso validar o saldo final por conta "
+            "considerando depósitos e retiradas."
+        ),
+        language="pt-BR",
+        max_steps=6,
+        data_validation=_build_data_validation_payload(),
+        qa_agent_service=service,
+    )
+
+    assert response["status"] == "completed"
+    assert service.last_request is not None
+
+    request_dump = service.last_request.model_dump(mode="json")
+
+    assert request_dump["data_validation"]["mode"] == "required"
+    assert (
+        request_dump["data_validation"]["database_schema"]["tables"][0]["name"]
+        == "transactions"
+    )
+    assert request_dump["data_validation"]["table_data"][0]["table_name"] == (
+        "transactions"
+    )

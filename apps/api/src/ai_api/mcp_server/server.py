@@ -7,6 +7,7 @@ from ai_api.mcp_server.tools import (
     list_agent_tools_tool,
     list_specialized_agents_tool,
     retrieve_rag_context_tool,
+    run_qa_agent_tool,
 )
 
 
@@ -78,6 +79,22 @@ def answer_with_rag(
         top_k=top_k,
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
+    )
+
+
+@mcp.tool()
+def run_qa_agent(
+    requirement_text: str,
+    language: str = "pt-BR",
+    max_steps: int = 6,
+    data_validation: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run the QA Agent with optional data validation context."""
+    return run_qa_agent_tool(
+        requirement_text=requirement_text,
+        language=language,
+        max_steps=max_steps,
+        data_validation=data_validation,
     )
 
 

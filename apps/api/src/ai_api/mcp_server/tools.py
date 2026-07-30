@@ -1,8 +1,10 @@
 from typing import Any
 from ai_api.agents import (
+    QAAgentRunRequest,
     SpecializedAgentRegistry,
     ToolExecutionService,
     ToolRegistry,
+    get_qa_agent_service,
 )
 from ai_api.requirements.dependencies import (
     get_requirement_analyzer_service,
@@ -28,6 +30,7 @@ def get_project_status_tool() -> dict[str, Any]:
             "SQL Workflow Regression Dataset",
             "MCP Server Foundation",
             "Requirement Analysis MCP Tool",
+            "RAG MCP Tools",
         ],
         "available_mcp_tools": [
             "get_project_status",
@@ -36,6 +39,7 @@ def get_project_status_tool() -> dict[str, Any]:
             "analyze_requirement",
             "retrieve_rag_context",
             "answer_with_rag",
+            "run_qa_agent",
         ],
         "available_specialized_agents": [
             "qa-agent-v1",
@@ -150,3 +154,32 @@ def answer_with_rag_tool(
     )
 
     return response.output
+
+
+def run_qa_agent_tool(
+    requirement_text: str,
+    language: str = "pt-BR",
+    max_steps: int = 6,
+    data_validation: dict[str, Any] | None = None,
+    qa_agent_service: Any | None = None,
+) -> dict[str, Any]:
+    request_payload: dict[str, Any] = {
+        "requirement_text": requirement_text,
+        "language": language,
+        "max_steps": max_steps,
+    }
+
+    if data_validation is not None:
+        request_payload["data_validation"] = data_validation
+
+    payload = QAAgentRunRequest.model_validate(request_payload)
+
+    selected_service = (
+        qa_agent_service
+        if qa_agent_service is not None
+        else get_qa_agent_service()
+    )
+
+    response = selected_service.run(payload)
+
+    return response.model_dump(mode="json")
