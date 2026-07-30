@@ -157,3 +157,109 @@ class GoldenEvaluationDatasetRunResponse(BaseModel):
     skipped_count: int
     results: list[EvaluationScenarioRunResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+PromptRegressionOutputFormat = Literal[
+    "text",
+    "json",
+]
+
+PromptRegressionRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+
+class PromptRegressionExpectation(BaseModel):
+    expected_status: str | None = None
+    required_output_markers: list[str] = Field(default_factory=list)
+    forbidden_output_markers: list[str] = Field(default_factory=list)
+    required_json_keys: list[str] = Field(default_factory=list)
+    min_output_length: int = Field(default=0, ge=0)
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class PromptRegressionCase(BaseModel):
+    id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    prompt_name: str = Field(..., min_length=1)
+    output_format: PromptRegressionOutputFormat = "json"
+    input_payload: dict[str, Any]
+    actual_output: str | dict[str, Any]
+    expectations: PromptRegressionExpectation = Field(
+        default_factory=PromptRegressionExpectation
+    )
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("id", "name", "prompt_name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+    @field_validator("input_payload")
+    @classmethod
+    def validate_input_payload(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if not value:
+            raise ValueError("input_payload must not be empty")
+
+        return value
+
+
+class PromptRegressionSuite(BaseModel):
+    name: str = Field(..., min_length=1)
+    version: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    cases: list[PromptRegressionCase] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "version", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class PromptRegressionCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class PromptRegressionCaseResult(BaseModel):
+    case_id: str
+    case_name: str
+    prompt_name: str
+    status: PromptRegressionRunStatus
+    checks: list[PromptRegressionCheck] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class PromptRegressionRunRequest(BaseModel):
+    suite: PromptRegressionSuite | None = None
+    case_ids: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class PromptRegressionRunResponse(BaseModel):
+    status: PromptRegressionRunStatus
+    suite_name: str
+    suite_version: str
+    case_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    results: list[PromptRegressionCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)

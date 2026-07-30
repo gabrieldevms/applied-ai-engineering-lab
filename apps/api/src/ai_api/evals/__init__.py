@@ -2,8 +2,15 @@ from ai_api.evals.dependencies import (
     get_golden_evaluation_dataset_runner_service,
     get_golden_evaluation_dataset_service,
     get_golden_evaluation_dataset_validation_service,
+    get_prompt_regression_evaluation_service,
+    get_prompt_regression_suite_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
+from ai_api.evals.prompt_regression import (
+    PromptRegressionEvaluationService,
+    PromptRegressionSuiteService,
+    build_default_prompt_regression_suite,
+)
 from ai_api.evals.runner import GoldenEvaluationDatasetRunnerService
 from ai_api.evals.schemas import (
     EvaluationDatasetRunStatus,
@@ -21,6 +28,15 @@ from ai_api.evals.schemas import (
     GoldenEvaluationDataset,
     GoldenEvaluationDatasetRunRequest,
     GoldenEvaluationDatasetRunResponse,
+    PromptRegressionCase,
+    PromptRegressionCaseResult,
+    PromptRegressionCheck,
+    PromptRegressionExpectation,
+    PromptRegressionOutputFormat,
+    PromptRegressionRunRequest,
+    PromptRegressionRunResponse,
+    PromptRegressionRunStatus,
+    PromptRegressionSuite,
 )
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -46,8 +62,22 @@ __all__ = [
     "GoldenEvaluationDatasetRunnerService",
     "GoldenEvaluationDatasetService",
     "GoldenEvaluationDatasetValidationService",
+    "PromptRegressionCase",
+    "PromptRegressionCaseResult",
+    "PromptRegressionCheck",
+    "PromptRegressionEvaluationService",
+    "PromptRegressionExpectation",
+    "PromptRegressionOutputFormat",
+    "PromptRegressionRunRequest",
+    "PromptRegressionRunResponse",
+    "PromptRegressionRunStatus",
+    "PromptRegressionSuite",
+    "PromptRegressionSuiteService",
     "build_default_golden_evaluation_dataset",
+    "build_default_prompt_regression_suite",
     "get_golden_evaluation_dataset_runner_service",
     "get_golden_evaluation_dataset_service",
     "get_golden_evaluation_dataset_validation_service",
+    "get_prompt_regression_evaluation_service",
+    "get_prompt_regression_suite_service",
 ]
