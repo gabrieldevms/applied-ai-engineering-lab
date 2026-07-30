@@ -184,6 +184,20 @@ from ai_api.evals import (
     get_llm_output_evaluation_suite_service,
     get_rag_regression_evaluation_service,
     get_rag_regression_suite_service,
+    AgentRegressionEvaluationService,
+    AgentRegressionRunRequest,
+    AgentRegressionRunResponse,
+    AgentRegressionSuite,
+    AgentRegressionSuiteService,
+    ToolCallingEvaluationRunRequest,
+    ToolCallingEvaluationRunResponse,
+    ToolCallingEvaluationService,
+    ToolCallingEvaluationSuite,
+    ToolCallingEvaluationSuiteService,
+    get_agent_regression_evaluation_service,
+    get_agent_regression_suite_service,
+    get_tool_calling_evaluation_service,
+    get_tool_calling_evaluation_suite_service,
 )
 
 logging.basicConfig(
@@ -1220,6 +1234,76 @@ def run_rag_regression_suite(
         run_id=payload.metadata.get("run_id"),
         metadata={
             "operation": "run_rag_regression_suite",
+            **payload.metadata,
+        },
+    )
+
+
+@app.get("/evals/agent-regression/suite", response_model=AgentRegressionSuite,)
+def get_agent_regression_suite(
+    service: Annotated[
+        AgentRegressionSuiteService,
+        Depends(get_agent_regression_suite_service),
+    ],
+) -> AgentRegressionSuite:
+    return service.get_default_suite()
+
+
+@app.post("/evals/agent-regression/run", response_model=AgentRegressionRunResponse,)
+def run_agent_regression_suite(
+    payload: AgentRegressionRunRequest,
+    service: Annotated[
+        AgentRegressionEvaluationService,
+        Depends(get_agent_regression_evaluation_service),
+    ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
+) -> AgentRegressionRunResponse:
+    return instrumentation_service.instrument(
+        event_type="agent_regression_run",
+        component="evaluation",
+        source="api:/evals/agent-regression/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_agent_regression_suite",
+            **payload.metadata,
+        },
+    )
+
+
+@app.get("/evals/tool-calling/suite", response_model=ToolCallingEvaluationSuite,)
+def get_tool_calling_evaluation_suite(
+    service: Annotated[
+        ToolCallingEvaluationSuiteService,
+        Depends(get_tool_calling_evaluation_suite_service),
+    ],
+) -> ToolCallingEvaluationSuite:
+    return service.get_default_suite()
+
+
+@app.post("/evals/tool-calling/run", response_model=ToolCallingEvaluationRunResponse,)
+def run_tool_calling_evaluation_suite(
+    payload: ToolCallingEvaluationRunRequest,
+    service: Annotated[
+        ToolCallingEvaluationService,
+        Depends(get_tool_calling_evaluation_service),
+    ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
+) -> ToolCallingEvaluationRunResponse:
+    return instrumentation_service.instrument(
+        event_type="tool_calling_evaluation_run",
+        component="evaluation",
+        source="api:/evals/tool-calling/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_tool_calling_evaluation_suite",
             **payload.metadata,
         },
     )

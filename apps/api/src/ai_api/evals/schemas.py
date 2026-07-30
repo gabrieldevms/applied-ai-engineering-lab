@@ -325,6 +325,8 @@ EvaluationTelemetryEventType = Literal[
     "golden_dataset_run",
     "llm_output_evaluation_run",
     "rag_regression_run",
+    "agent_regression_run",
+    "tool_calling_evaluation_run",
     "scenario_run",
     "prompt_regression_run",
     "report_aggregation",
@@ -631,4 +633,224 @@ class RAGRegressionRunResponse(BaseModel):
     warning_count: int
     failed_count: int
     results: list[RAGRegressionCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AgentRegressionRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+ToolCallingEvaluationRunStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+
+class AgentRegressionExpectation(BaseModel):
+    expected_status: str | None = None
+    required_artifacts: list[str] = Field(default_factory=list)
+    required_trace_steps: list[str] = Field(default_factory=list)
+    required_metadata_keys: list[str] = Field(default_factory=list)
+    forbidden_error_markers: list[str] = Field(default_factory=list)
+    min_trace_steps: int = Field(default=0, ge=0)
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentRegressionCase(BaseModel):
+    id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    agent_name: str = Field(..., min_length=1)
+    input_payload: dict[str, Any]
+    actual_output: dict[str, Any]
+    expectations: AgentRegressionExpectation = Field(
+        default_factory=AgentRegressionExpectation
+    )
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("id", "name", "agent_name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+    @field_validator("input_payload")
+    @classmethod
+    def validate_input_payload(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if not value:
+            raise ValueError("input_payload must not be empty")
+
+        return value
+
+
+class AgentRegressionSuite(BaseModel):
+    name: str = Field(..., min_length=1)
+    version: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    cases: list[AgentRegressionCase] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "version", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class AgentRegressionCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentRegressionCaseResult(BaseModel):
+    case_id: str
+    case_name: str
+    agent_name: str
+    status: AgentRegressionRunStatus
+    checks: list[AgentRegressionCheck] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentRegressionRunRequest(BaseModel):
+    suite: AgentRegressionSuite | None = None
+    case_ids: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AgentRegressionRunResponse(BaseModel):
+    status: AgentRegressionRunStatus
+    suite_name: str
+    suite_version: str
+    case_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    results: list[AgentRegressionCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolCallEvaluationRecord(BaseModel):
+    tool_name: str = Field(..., min_length=1)
+    arguments: dict[str, Any] = Field(default_factory=dict)
+    status: str = "completed"
+    output: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("tool_name")
+    @classmethod
+    def validate_tool_name(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("tool_name must not be blank")
+
+        return normalized_value
+
+
+class ToolCallingEvaluationExpectation(BaseModel):
+    expected_status: str | None = None
+    required_tool_names: list[str] = Field(default_factory=list)
+    forbidden_tool_names: list[str] = Field(default_factory=list)
+    required_argument_keys: list[str] = Field(default_factory=list)
+    required_metadata_keys: list[str] = Field(default_factory=list)
+    min_tool_calls: int = Field(default=0, ge=0)
+    notes: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolCallingEvaluationCase(BaseModel):
+    id: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=1)
+    workflow_name: str = Field(..., min_length=1)
+    input_payload: dict[str, Any]
+    actual_tool_calls: list[ToolCallEvaluationRecord] = Field(default_factory=list)
+    actual_output: dict[str, Any] = Field(default_factory=dict)
+    expectations: ToolCallingEvaluationExpectation = Field(
+        default_factory=ToolCallingEvaluationExpectation
+    )
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("id", "name", "workflow_name")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+    @field_validator("input_payload")
+    @classmethod
+    def validate_input_payload(cls, value: dict[str, Any]) -> dict[str, Any]:
+        if not value:
+            raise ValueError("input_payload must not be empty")
+
+        return value
+
+
+class ToolCallingEvaluationSuite(BaseModel):
+    name: str = Field(..., min_length=1)
+    version: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    cases: list[ToolCallingEvaluationCase] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("name", "version", "description")
+    @classmethod
+    def validate_non_blank_text(cls, value: str) -> str:
+        normalized_value = value.strip()
+
+        if not normalized_value:
+            raise ValueError("value must not be blank")
+
+        return normalized_value
+
+
+class ToolCallingEvaluationCheck(BaseModel):
+    name: str
+    status: EvaluationMetricStatus
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolCallingEvaluationCaseResult(BaseModel):
+    case_id: str
+    case_name: str
+    workflow_name: str
+    status: ToolCallingEvaluationRunStatus
+    checks: list[ToolCallingEvaluationCheck] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolCallingEvaluationRunRequest(BaseModel):
+    suite: ToolCallingEvaluationSuite | None = None
+    case_ids: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolCallingEvaluationRunResponse(BaseModel):
+    status: ToolCallingEvaluationRunStatus
+    suite_name: str
+    suite_version: str
+    case_count: int
+    passed_count: int
+    warning_count: int
+    failed_count: int
+    results: list[ToolCallingEvaluationCaseResult] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
