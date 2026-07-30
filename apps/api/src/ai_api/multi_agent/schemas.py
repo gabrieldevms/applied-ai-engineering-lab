@@ -163,6 +163,7 @@ class MultiAgentFinalReport(BaseModel):
     requirement_understanding: list[str] = Field(default_factory=list)
     functional_coverage: list[str] = Field(default_factory=list)
     automation_strategy: list[str] = Field(default_factory=list)
+    data_validation_evidence: list[str] = Field(default_factory=list)
     review_notes: list[str] = Field(default_factory=list)
     next_steps: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -173,6 +174,7 @@ class MultiAgentQACopilotRequest(BaseModel):
     objective: str | None = None
     language: str = "pt-BR"
     context: dict[str, Any] = Field(default_factory=dict)
+    data_validation: dict[str, Any] | None = None
     max_agents: int = Field(default=6, ge=1, le=6)
     failure_strategy: MultiAgentFailureStrategy = "stop_on_failure"
     metadata: dict[str, Any] = Field(default_factory=dict)

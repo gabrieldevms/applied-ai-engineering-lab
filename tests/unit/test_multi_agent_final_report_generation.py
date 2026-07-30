@@ -96,6 +96,8 @@ def test_final_report_generator_should_approve_clean_execution() -> None:
     assert report.metadata["quality_gate"] == "approved"
     assert report.metadata["failure_count"] == 0
     assert report.metadata["conflict_count"] == 0
+    assert report.metadata["data_validation_available"] is False
+    assert report.data_validation_evidence == []
     assert "O requisito descreve cálculo de saldo final." in (
         report.requirement_understanding
     )
