@@ -230,6 +230,13 @@ from ai_api.evals import (
     AIRetrievalQualitySummaryResponse,
     AIRetrievalQualityTelemetryService,
     get_ai_retrieval_quality_telemetry_service,
+    AIAgentExecutionRecord,
+    AIAgentExecutionRecordRequest,
+    AIAgentExecutionRecordsResponse,
+    AIAgentExecutionSummaryRequest,
+    AIAgentExecutionSummaryResponse,
+    AIAgentExecutionTelemetryService,
+    get_ai_agent_execution_telemetry_service,
 )
 
 logging.basicConfig(
@@ -1536,3 +1543,58 @@ def summarize_stored_ai_retrieval_quality(
     ],
 ) -> AIRetrievalQualitySummaryResponse:
     return service.summarize(AIRetrievalQualitySummaryRequest())
+
+
+@app.post("/observability/agent-execution/records", response_model=AIAgentExecutionRecord,)
+def record_ai_agent_execution(
+    payload: AIAgentExecutionRecordRequest,
+    service: Annotated[
+        AIAgentExecutionTelemetryService,
+        Depends(get_ai_agent_execution_telemetry_service),
+    ],
+) -> AIAgentExecutionRecord:
+    return service.record(payload)
+
+
+@app.get("/observability/agent-execution/records", response_model=AIAgentExecutionRecordsResponse,)
+def list_ai_agent_execution_records(
+    service: Annotated[
+        AIAgentExecutionTelemetryService,
+        Depends(get_ai_agent_execution_telemetry_service),
+    ],
+    component: str | None = None,
+    agent_name: str | None = None,
+    operation: str | None = None,
+    status: str | None = None,
+    run_status: str | None = None,
+    limit: int = 100,
+) -> AIAgentExecutionRecordsResponse:
+    return service.list_records(
+        component=component,
+        agent_name=agent_name,
+        operation=operation,
+        status=status,
+        run_status=run_status,
+        limit=limit,
+    )
+
+
+@app.post("/observability/agent-execution/summary", response_model=AIAgentExecutionSummaryResponse,)
+def summarize_ai_agent_execution(
+    payload: AIAgentExecutionSummaryRequest,
+    service: Annotated[
+        AIAgentExecutionTelemetryService,
+        Depends(get_ai_agent_execution_telemetry_service),
+    ],
+) -> AIAgentExecutionSummaryResponse:
+    return service.summarize(payload)
+
+
+@app.get("/observability/agent-execution/summary", response_model=AIAgentExecutionSummaryResponse,)
+def summarize_stored_ai_agent_execution(
+    service: Annotated[
+        AIAgentExecutionTelemetryService,
+        Depends(get_ai_agent_execution_telemetry_service),
+    ],
+) -> AIAgentExecutionSummaryResponse:
+    return service.summarize(AIAgentExecutionSummaryRequest())
