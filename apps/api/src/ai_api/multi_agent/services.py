@@ -5,6 +5,7 @@ from ai_api.multi_agent.failure_handling import MultiAgentFailureHandler
 from ai_api.multi_agent.roles import build_default_multi_agent_roles
 from ai_api.multi_agent.report_generation import MultiAgentFinalReportGenerator
 from ai_api.requirements.services import RequirementAnalyzerService
+from ai_api.data_analysis.agent import DataAnalystAgentRequest
 from ai_api.multi_agent.schemas import (
     MultiAgentArtifact,
     MultiAgentConflictAnalysisResponse,
@@ -30,6 +31,7 @@ class MultiAgentQACopilotService:
         conflict_detector: MultiAgentConflictDetector | None = None,
         report_generator: MultiAgentFinalReportGenerator | None = None,
         requirement_analyzer_service: RequirementAnalyzerService | None = None,
+        data_analyst_agent_service: Any | None = None,
     ) -> None:
         self.roles = roles if roles is not None else build_default_multi_agent_roles()
         self.contract_validator = (
@@ -53,6 +55,7 @@ class MultiAgentQACopilotService:
             else MultiAgentFinalReportGenerator()
         )
         self.requirement_analyzer_service = requirement_analyzer_service
+        self.data_analyst_agent_service = data_analyst_agent_service
 
     def run(
         self,
@@ -162,6 +165,11 @@ class MultiAgentQACopilotService:
                 "failure_count": len(failures),
                 "contract_validation_status": contract_validation.status,
                 "conflict_analysis_status": conflict_analysis.status,
+                "data_validation_requested": request.data_validation is not None,
+                "data_validation_available": self._has_artifact(
+                    shared_state=shared_state,
+                    artifact_name="data_validation_analysis",
+                ),
             },
         )
 
@@ -336,7 +344,10 @@ class MultiAgentQACopilotService:
         request: MultiAgentQACopilotRequest,
         shared_state: MultiAgentSharedState,
     ) -> MultiAgentTaskResult:
-        artifact = MultiAgentArtifact(
+        artifacts: list[MultiAgentArtifact] = []
+        messages: list[MultiAgentMessage] = []
+
+        functional_artifact = MultiAgentArtifact(
             name="functional_test_strategy",
             produced_by="functional_qa_agent",
             content={
@@ -355,20 +366,111 @@ class MultiAgentQACopilotService:
             },
         )
 
-        message = MultiAgentMessage(
-            sender="functional_qa_agent",
-            recipient="test_automation_agent",
-            content=(
-                "Estratégia funcional criada e pronta para análise de automação."
-            ),
+        artifacts.append(functional_artifact)
+
+        if request.data_validation is not None:
+            data_validation_artifact = self._run_data_validation_capability(
+                request=request,
+            )
+            artifacts.append(data_validation_artifact)
+
+        messages.append(
+            MultiAgentMessage(
+                sender="functional_qa_agent",
+                recipient="test_automation_agent",
+                content=(
+                    "Estratégia funcional criada e pronta para análise de automação."
+                ),
+            )
+        )
+
+        messages.append(
+            MultiAgentMessage(
+                sender="functional_qa_agent",
+                recipient="reviewer_agent",
+                content=(
+                    "Evidências funcionais e de dados disponíveis para revisão."
+                ),
+                metadata={
+                    "data_validation_requested": request.data_validation is not None,
+                    "data_validation_executed": any(
+                        artifact.name == "data_validation_analysis"
+                        for artifact in artifacts
+                    ),
+                },
+            )
         )
 
         return MultiAgentTaskResult(
             agent_name="functional_qa_agent",
             status="completed",
             summary="Estratégia de testes funcionais criada.",
-            artifacts=[artifact],
-            messages=[message],
+            artifacts=artifacts,
+            messages=messages,
+            metadata={
+                "data_validation_requested": request.data_validation is not None,
+                "data_validation_executed": any(
+                    artifact.name == "data_validation_analysis"
+                    for artifact in artifacts
+                ),
+            },
+        )
+
+    def _run_data_validation_capability(
+        self,
+        request: MultiAgentQACopilotRequest,
+    ) -> MultiAgentArtifact:
+        if self.data_analyst_agent_service is None:
+            return MultiAgentArtifact(
+                name="data_validation_analysis",
+                produced_by="functional_qa_agent",
+                content={
+                    "status": "skipped",
+                    "reason": (
+                        "Data validation was requested, but no Data Analyst "
+                        "Agent service was configured."
+                    ),
+                },
+                metadata={
+                    "source": "multi_agent_data_validation",
+                    "executed": False,
+                },
+            )
+
+        data_validation_payload = request.data_validation or {}
+
+        data_analyst_request = DataAnalystAgentRequest.model_validate(
+            {
+                "objective": data_validation_payload.get(
+                    "objective",
+                    "Validar evidências de dados relacionadas ao requisito.",
+                ),
+                "language": data_validation_payload.get(
+                    "language",
+                    request.language,
+                ),
+                "database_schema": data_validation_payload["database_schema"],
+                "table_data": data_validation_payload["table_data"],
+                "max_rows": data_validation_payload.get("max_rows", 100),
+                "metadata": {
+                    "source": "multi_agent_qa_copilot",
+                    **data_validation_payload.get("metadata", {}),
+                },
+            }
+        )
+
+        data_analyst_response = self.data_analyst_agent_service.run(
+            data_analyst_request
+        )
+
+        return MultiAgentArtifact(
+            name="data_validation_analysis",
+            produced_by="functional_qa_agent",
+            content=data_analyst_response.model_dump(mode="json"),
+            metadata={
+                "source": "data_analyst_agent_service",
+                "executed": True,
+            },
         )
 
     def _run_test_automation_agent(
@@ -599,6 +701,16 @@ class MultiAgentQACopilotService:
             return "partial"
 
         return "completed"
+
+    @staticmethod
+    def _has_artifact(
+        shared_state: MultiAgentSharedState,
+        artifact_name: str,
+    ) -> bool:
+        return any(
+            artifact.name == artifact_name
+            for artifact in shared_state.artifacts
+        )
 
     @staticmethod
     def _find_artifact_content(

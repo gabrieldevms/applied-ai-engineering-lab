@@ -27,6 +27,10 @@ class MultiAgentFinalReportGenerator:
             shared_state=shared_state,
             artifact_name="test_automation_strategy",
         )
+        data_validation_analysis = self._find_artifact_content(
+            shared_state=shared_state,
+            artifact_name="data_validation_analysis",
+        )
         review_findings = self._find_artifact_content(
             shared_state=shared_state,
             artifact_name="review_findings",
@@ -47,6 +51,7 @@ class MultiAgentFinalReportGenerator:
             "contract_validation_status": contract_validation_status,
             "conflict_analysis_status": conflict_analysis.status,
             "quality_gate": quality_gate,
+            "data_validation_available": bool(data_validation_analysis),
         }
 
         return MultiAgentFinalReport(
@@ -66,17 +71,22 @@ class MultiAgentFinalReportGenerator:
             automation_strategy=self._build_automation_strategy(
                 automation_strategy=automation_strategy,
             ),
+            data_validation_evidence=self._build_data_validation_evidence(
+                data_validation_analysis=data_validation_analysis,
+            ),
             review_notes=self._build_review_notes(
                 review_findings=review_findings,
                 failures=failures,
                 conflict_analysis=conflict_analysis,
                 contract_validation_status=contract_validation_status,
+                data_validation_analysis=data_validation_analysis,
             ),
             next_steps=self._build_next_steps(
                 quality_gate=quality_gate,
                 failures=failures,
                 conflict_analysis=conflict_analysis,
                 contract_validation_status=contract_validation_status,
+                data_validation_analysis=data_validation_analysis,
             ),
             metadata=report_metadata,
         )
@@ -157,18 +167,60 @@ class MultiAgentFinalReportGenerator:
 
         return self._deduplicate(items)
 
+    def _build_data_validation_evidence(
+        self,
+        data_validation_analysis: dict[str, Any],
+    ) -> list[str]:
+        if not data_validation_analysis:
+            return []
+
+        workflow = data_validation_analysis.get("workflow", {})
+        evidence = data_validation_analysis.get("evidence", {})
+
+        items = [
+            f"Validação de dados retornou status: {data_validation_analysis.get('status', 'unknown')}.",
+            f"Resposta da validação de dados: {data_validation_analysis.get('answer', 'não disponível')}",
+        ]
+
+        if workflow:
+            items.append(
+                f"Workflow SQL retornou status: {workflow.get('status', 'unknown')}."
+            )
+
+            generated_sql = workflow.get("generated_sql")
+            if generated_sql:
+                items.append(f"SQL gerado para validação: {generated_sql}")
+
+        if evidence:
+            row_count = evidence.get("row_count")
+            column_count = evidence.get("column_count")
+
+            if row_count is not None:
+                items.append(f"Linhas retornadas pela validação: {row_count}.")
+
+            if column_count is not None:
+                items.append(f"Colunas retornadas pela validação: {column_count}.")
+
+        return self._deduplicate(items)
+
     def _build_review_notes(
         self,
         review_findings: dict[str, Any],
         failures: list[MultiAgentFailureRecord],
         conflict_analysis: MultiAgentConflictAnalysisResponse,
         contract_validation_status: str,
+        data_validation_analysis: dict[str, Any],
     ) -> list[str]:
         items = [
             *review_findings.get("strengths", []),
             *review_findings.get("risks", []),
             *review_findings.get("recommended_improvements", []),
         ]
+
+        if data_validation_analysis:
+            items.append(
+                "Evidência de validação de dados foi incorporada ao relatório final."
+            )
 
         if failures:
             items.append(
@@ -198,6 +250,7 @@ class MultiAgentFinalReportGenerator:
         failures: list[MultiAgentFailureRecord],
         conflict_analysis: MultiAgentConflictAnalysisResponse,
         contract_validation_status: str,
+        data_validation_analysis: dict[str, Any],
     ) -> list[str]:
         next_steps: list[str] = []
 
@@ -216,6 +269,11 @@ class MultiAgentFinalReportGenerator:
                 "Corrigir contratos de comunicação que não foram atendidos."
             )
 
+        if not data_validation_analysis:
+            next_steps.append(
+                "Adicionar validação de dados quando o requisito depender de evidência em tabelas ou bases de dados."
+            )
+
         if quality_gate != "approved":
             next_steps.append(
                 "Executar nova rodada do copilot após correções e revisão dos pontos críticos."
@@ -223,7 +281,7 @@ class MultiAgentFinalReportGenerator:
 
         next_steps.extend(
             [
-                "Integrar agentes especializados com serviços reais do projeto.",
+                "Integrar mais agentes especializados com serviços reais do projeto.",
                 "Adicionar exposição MCP para o Multi-Agent QA Copilot.",
                 "Evoluir agentes determinísticos para agentes com raciocínio LLM controlado.",
                 "Preparar relatório final para uso em demonstrações de portfólio.",
@@ -266,7 +324,7 @@ class MultiAgentFinalReportGenerator:
         seen_items: set[str] = set()
 
         for item in items:
-            normalized_item = item.strip()
+            normalized_item = str(item).strip()
 
             if not normalized_item or normalized_item in seen_items:
                 continue
