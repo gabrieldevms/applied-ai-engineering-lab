@@ -7,6 +7,7 @@ from ai_api.mcp_server.tools import (
     retrieve_rag_context_tool,
     run_data_analyst_agent_tool,
     run_qa_agent_tool,
+    run_sql_regression_suite_tool,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "retrieve_rag_context_tool",
     "run_data_analyst_agent_tool",
     "run_qa_agent_tool",
+    "run_sql_regression_suite_tool",
 ]
