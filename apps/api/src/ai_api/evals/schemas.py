@@ -1,5 +1,5 @@
 from typing import Any, Literal
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 EvaluationScenarioType = Literal[
@@ -262,4 +262,59 @@ class PromptRegressionRunResponse(BaseModel):
     warning_count: int
     failed_count: int
     results: list[PromptRegressionCaseResult] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AIEvaluationReportStatus = Literal[
+    "passed",
+    "warning",
+    "failed",
+]
+
+AIEvaluationReportSectionName = Literal[
+    "golden_dataset",
+    "prompt_regression",
+    "multi_agent_qa_copilot",
+]
+
+
+class AIEvaluationReportSection(BaseModel):
+    name: AIEvaluationReportSectionName
+    status: AIEvaluationReportStatus
+    score: float = Field(..., ge=0.0, le=1.0)
+    summary: str
+    highlights: list[str] = Field(default_factory=list)
+    risks: list[str] = Field(default_factory=list)
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIEvaluationReportAggregationRequest(BaseModel):
+    golden_dataset_run: GoldenEvaluationDatasetRunResponse | None = None
+    prompt_regression_run: PromptRegressionRunResponse | None = None
+    multi_agent_qa_copilot_evaluation: dict[str, Any] | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_at_least_one_evaluation_source(
+        self,
+    ) -> "AIEvaluationReportAggregationRequest":
+        if (
+            self.golden_dataset_run is None
+            and self.prompt_regression_run is None
+            and self.multi_agent_qa_copilot_evaluation is None
+        ):
+            raise ValueError(
+                "at least one evaluation source must be provided"
+            )
+
+        return self
+
+
+class AIEvaluationReportAggregationResponse(BaseModel):
+    status: AIEvaluationReportStatus
+    score: float = Field(..., ge=0.0, le=1.0)
+    summary: str
+    sections: list[AIEvaluationReportSection] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)

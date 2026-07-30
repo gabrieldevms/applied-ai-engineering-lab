@@ -4,6 +4,7 @@ from ai_api.evals.prompt_regression import (
     PromptRegressionEvaluationService,
     PromptRegressionSuiteService,
 )
+from ai_api.evals.reporting import AIEvaluationReportAggregationService
 from ai_api.evals.runner import GoldenEvaluationDatasetRunnerService
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -43,3 +44,9 @@ def get_prompt_regression_evaluation_service() -> (
     PromptRegressionEvaluationService
 ):
     return PromptRegressionEvaluationService()
+
+
+def get_ai_evaluation_report_aggregation_service() -> (
+    AIEvaluationReportAggregationService
+):
+    return AIEvaluationReportAggregationService()
