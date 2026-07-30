@@ -6,9 +6,9 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 
 ## Project Status
 
-**Current module:** M5 — MCP QA Server completed 
-**Latest completed milestone:** MCP QA Server with client validation
-**Next milestone:** M6 — Multi-Agent QA Copilot
+**Current module:** M6 — Multi-Agent QA Copilot completed
+**Latest completed milestone:** Multi-Agent QA Copilot with API, MCP exposure and deterministic evaluation
+**Next milestone:** M7 — Evaluation and LLMOps
 
 The project currently includes:
 
@@ -19,17 +19,24 @@ The project currently includes:
 - AI Agent runtime foundation
 - QA Agent
 - Data Analyst Agent
+- QA Agent and Data Analyst Agent integration
 - File ingestion expansion for text, PDF, DOCX, CSV and Excel files
 - Structured table extraction
 - Safe read-only SQL generation and execution
 - SQL workflow regression suite
-- Local AI Lab Console prototype
 - MCP QA Server exposing project capabilities through MCP
+- Multi-Agent QA Copilot
+- Multi-agent communication contracts
+- Multi-agent failure and conflict handling
+- Multi-agent final QA report generation
+- Multi-agent data validation evidence
+- Multi-agent deterministic evaluation
 
 For detailed reviews, see:
 
 - [M4 — AI Agents Module Review](docs/study-notes/04-ai-agents-module-review.md)
 - [File Ingestion Expansion Review](docs/study-notes/05-file-ingestion-expansion-review.md)
+- [Multi Agent QA Copilot](docs/study-notes/07-multi-agent-qa-copilot-review.md)
 
 | Module                             | Status         | Scope                                                                              |
 | ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
@@ -40,9 +47,9 @@ For detailed reviews, see:
 | M4 — AI Agents                     | ✅ Completed    | Runtime, tools, execution, planning, QA Agent and safety controls                  |
 | Pre-M5 — File Ingestion Expansion  | ✅ Completed    | Multi-format text extraction and structured table extraction                       |
 | Pre-M5 — Data Analyst Agent        | ✅ Completed    | SQL generation, read-only validation, controlled execution and evaluation          |
-| M5 — MCP QA Server                 | ⏳ Next         | MCP tools focused on QA and software engineering                                   |
-| M6 — Multi-Agent QA Copilot        | ⏳ Planned      | Specialized QA agents and orchestration                                            |
-| M7 — Evaluation and LLMOps         | ⏳ Planned      | Evaluation pipelines, observability, cost and latency tracking                     |
+| M5 — MCP QA Server                 | ✅ Completed        | MCP tools focused on QA and software engineering                                   |
+| M6 — Multi-Agent QA Copilot        | ✅ Completed       | Specialized QA agents and orchestration                                            |
+| M7 — Evaluation and LLMOps         | ⏳ Next     | Evaluation pipelines, observability, cost and latency tracking                     |
 | M8 — Cloud, Security and Portfolio | ⏳ Planned      | Deployment, security, governance and portfolio presentation                        |
 
 See the complete [project roadmap](ROADMAP.md).
@@ -230,6 +237,47 @@ $env:PYTHONPATH = "apps/api/src"
 uv run python scripts/mcp_client_smoke.py
 ```
 
+### Multi-Agent QA Copilot
+
+The project includes a Multi-Agent QA Copilot that orchestrates specialized QA agents around a shared quality-engineering workflow.
+
+Current agents:
+
+- `orchestrator_agent`
+- `requirement_analyst_agent`
+- `functional_qa_agent`
+- `test_automation_agent`
+- `reviewer_agent`
+- `report_agent`
+
+Current capabilities:
+
+- shared execution state
+- artifacts and messages
+- execution trace
+- communication contracts
+- contract validation
+- failure handling
+- conflict detection
+- final QA report generation
+- quality gate metadata
+- Requirement Analysis service integration
+- Data Analyst Agent integration
+- data validation evidence
+- deterministic evaluation
+- API execution endpoint
+- API evaluation endpoint
+- MCP tool exposure
+
+API endpoints:
+
+- `POST /multi-agent/qa-copilot/run`
+- `POST /multi-agent/qa-copilot/evaluate`
+
+MCP tool:
+
+- `run_multi_agent_qa_copilot`
+
 ## Architecture
 
 ```mermaid
@@ -355,6 +403,11 @@ http://127.0.0.1:8000/docs
 | `POST` | `/data-analysis/agent/run` | Run the specialized Data Analyst Agent |
 | `POST` | `/data-analysis/agent/evaluate` | Evaluate a Data Analyst Agent response |
 | `POST` | `/data-analysis/sql/regression/run` | Run SQL workflow regression scenarios |
+
+### Multi-Agent QA Copilot
+
+| `POST` | `multi-agent/qa-copilot/run` |
+| `POST` | `multi-agent/qa-copilot/evaluate` |
 
 ## Technology Stack
 
@@ -641,28 +694,37 @@ The current CI workflow:
 - authentication, authorization and multi-user isolation are not implemented;
 - the project does not yet provide a deployed frontend;
 - MCP server capabilities are not implemented yet.
+- Multi-agent reasoning is still mostly deterministic.
+- Functional QA, Test Automation, Reviewer and Report agents are not yet LLM-backed.
+- Multi-agent conflict detection exists, but automatic conflict resolution is not implemented yet.
+- Multi-agent evaluation is deterministic and does not include LLM-as-judge yet.
+- Production MCP hosting is not defined yet.
 
 These limitations define the boundary between the implemented foundation and the upcoming MCP, orchestration, evaluation and production capabilities.
 
-## Next Milestone
+## Next Milestone: M7 — Evaluation and LLMOps
 
-The next milestone is M6 — Multi-Agent QA Copilot.
+The next milestone will focus on continuously evaluating, observing and improving LLM, RAG and agent behavior.
 
-The focus will be to orchestrate multiple specialized agents around a shared quality-engineering workflow, including requirement analysis, functional QA reasoning, test automation planning, review and final report generation.
+Planned capabilities:
 
-Planned capabilities include:
-
-- MCP server foundation;
-- MCP tool definitions;
-- Requirement Analysis MCP tool;
-- RAG Retrieval MCP tool;
-- QA Agent MCP tool;
-- Data Analyst Agent MCP tool;
-- SQL Regression MCP tool;
-- local MCP client validation;
-- MCP usage documentation.
-
-This milestone will allow external AI clients and agents to call selected project capabilities through standardized MCP tools instead of only using HTTP endpoints.
+- Prompt regression tests
+- Golden evaluation dataset
+- LLM output evaluation suite
+- RAG regression evaluation suite
+- Agent regression evaluation suite
+- Multi-Agent QA Copilot regression evaluation
+- Tool-calling evaluation
+- LLM-as-judge evaluation prototype
+- CI evaluation pipeline
+- Structured AI execution telemetry
+- Token usage tracking
+- Cost tracking
+- Latency tracking
+- Retrieval quality metrics
+- Agent execution metrics
+- Multi-agent execution metrics
+- Observability dashboard
 
 The planned short-term implementation order is:
 

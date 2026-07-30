@@ -292,45 +292,83 @@ Current limitations:
 
 ## M6 — Multi-Agent QA Copilot
 
-**Goal:** Orchestrate multiple specialized agents around a shared quality-engineering workflow.
+Status: Completed
 
-* [ ] Orchestrator Agent
-* [ ] Requirement Analyst Agent
-* [ ] Functional QA Agent
-* [ ] Test Automation Agent
-* [ ] Reviewer Agent
-* [ ] Report Agent
-* [ ] Shared execution state
-* [ ] Inter-agent communication contracts
-* [ ] Conflict and failure handling
-* [ ] Final QA report generation
+Goal: orchestrate multiple specialized agents around a shared quality-engineering workflow.
+
+Completed:
+
+- [x] Orchestrator Agent
+- [x] Requirement Analyst Agent
+- [x] Functional QA Agent
+- [x] Test Automation Agent
+- [x] Reviewer Agent
+- [x] Report Agent
+- [x] Shared execution state
+- [x] Multi-agent artifacts
+- [x] Multi-agent messages
+- [x] Multi-agent execution trace
+- [x] Inter-agent communication contracts
+- [x] Contract validation
+- [x] Conflict and failure handling
+- [x] Failure strategies: `stop_on_failure` and `continue_on_failure`
+- [x] Skipped agent handling
+- [x] Shared-state conflict detection
+- [x] Final QA report generation
+- [x] Quality gate metadata
+- [x] Requirement Analysis service integration
+- [x] Data Analyst Agent integration
+- [x] Data validation evidence in final reports
+- [x] Multi-Agent QA Copilot API endpoint
+- [x] Multi-Agent QA Copilot MCP tool
+- [x] Multi-Agent QA Copilot deterministic evaluation
+- [x] Multi-Agent QA Copilot evaluation API endpoint
+- [x] M6 final review documentation
+
+Current limitations:
+
+- Agent reasoning is still mostly deterministic.
+- Only the Requirement Analyst Agent is connected to the existing LLM-backed requirement analysis service.
+- Functional QA, Test Automation, Reviewer and Report agents are not yet LLM-backed.
+- Conflict detection exists, but automatic conflict resolution is not implemented yet.
+- Failure handling exists, but retry policies per agent are not implemented yet.
+- Data validation requires explicit structured input.
+- External database connections are not supported.
+- MCP exposure exists, but production MCP hosting is not defined.
+- Evaluation is deterministic and does not include LLM-as-judge yet.
+- Authentication and authorization are not implemented.
 
 ---
 
 ## M7 — Evaluation and LLMOps
 
-**Goal:** Continuously evaluate, observe and improve the behavior of LLM, RAG and agent components.
+Status: Planned
+
+Goal: continuously evaluate, observe and improve the behavior of LLM, RAG and agent components.
 
 ### Evaluation
 
-* [ ] Prompt regression tests
-* [ ] Golden evaluation dataset
-* [ ] LLM output evaluation suite
-* [ ] RAG regression evaluation suite
-* [ ] Agent regression evaluation suite
-* [ ] Tool-calling evaluation
-* [ ] CI evaluation pipeline
+- [ ] Prompt regression tests
+- [ ] Golden evaluation dataset
+- [ ] LLM output evaluation suite
+- [ ] RAG regression evaluation suite
+- [ ] Agent regression evaluation suite
+- [ ] Multi-Agent QA Copilot regression evaluation
+- [ ] Tool-calling evaluation
+- [ ] LLM-as-judge evaluation prototype
+- [ ] CI evaluation pipeline
 
 ### Observability
 
-* [ ] Structured AI execution telemetry
-* [ ] Token usage tracking
-* [ ] Cost tracking
-* [ ] Latency tracking
-* [ ] Error and fallback tracking
-* [ ] Retrieval quality metrics
-* [ ] Agent execution metrics
-* [ ] Observability dashboard
+- [ ] Structured AI execution telemetry
+- [ ] Token usage tracking
+- [ ] Cost tracking
+- [ ] Latency tracking
+- [ ] Error and fallback tracking
+- [ ] Retrieval quality metrics
+- [ ] Agent execution metrics
+- [ ] Multi-agent execution metrics
+- [ ] Observability dashboard
 
 ---
 

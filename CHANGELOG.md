@@ -264,3 +264,23 @@ All notable changes to this project will be documented in this file.
 - Added M5 MCP QA Server final review study note.
 - Marked M5 MCP QA Server as completed.
 - Added M6 Agent Observability and LLMOps Foundation as the next planned milestone.
+- Added Multi-Agent QA Copilot foundation.
+- Added Multi-Agent QA Copilot API endpoint through `POST /multi-agent/qa-copilot/run`.
+- Added multi-agent role descriptors for Orchestrator, Requirement Analyst, Functional QA, Test Automation, Reviewer and Report agents.
+- Added shared multi-agent execution state, artifacts, messages, task results and trace.
+- Added inter-agent communication contracts and contract validation.
+- Added multi-agent failure handling with `stop_on_failure` and `continue_on_failure` strategies.
+- Added skipped agent handling after blocking failures.
+- Added multi-agent shared-state conflict detection.
+- Added dedicated Multi-Agent Final QA Report Generator.
+- Added quality gate metadata for multi-agent final reports.
+- Added Requirement Analysis service integration in the Requirement Analyst Agent.
+- Added Data Analyst Agent integration in the Functional QA Agent.
+- Added data validation evidence in Multi-Agent QA final reports.
+- Added `run_multi_agent_qa_copilot` MCP tool.
+- Added deterministic Multi-Agent QA Copilot evaluation.
+- Added Multi-Agent QA Copilot evaluation endpoint through `POST /multi-agent/qa-copilot/evaluate`.
+- Added evaluation metrics for status alignment, role coverage, trace integrity, contract validation, failure control, conflict control, final report completeness and data validation evidence.
+- Added M6 Multi-Agent QA Copilot final review study note.
+- Marked M6 Multi-Agent QA Copilot as completed.
+- Added M7 Evaluation and LLMOps as the next planned milestone.
