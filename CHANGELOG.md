@@ -249,3 +249,18 @@ All notable changes to this project will be documented in this file.
 - Updated ROADMAP status before M5
 - Marked Pre-M5 Data Analyst Agent and QA/Data Agent integration work as completed
 - Updated the next milestone to M5 — MCP QA Server
+- Added MCP QA Server foundation using FastMCP.
+- Added MCP discovery tools: `get_project_status`, `list_agent_tools`, and `list_specialized_agents`.
+- Added Requirement Analysis MCP tool through `analyze_requirement`.
+- Added RAG MCP tools through `retrieve_rag_context` and `answer_with_rag`.
+- Added QA Agent MCP tool through `run_qa_agent`.
+- Added Data Analyst Agent MCP tool through `run_data_analyst_agent`.
+- Added SQL Workflow Regression MCP tool through `run_sql_regression_suite`.
+- Added MCP client integration validation using FastMCP in-memory client.
+- Added MCP smoke test script for local validation.
+- Added FastMCP CLI wrapper for local tool inspection.
+- Added MCP security boundaries documentation.
+- Added MCP usage documentation.
+- Added M5 MCP QA Server final review study note.
+- Marked M5 MCP QA Server as completed.
+- Added M6 Agent Observability and LLMOps Foundation as the next planned milestone.

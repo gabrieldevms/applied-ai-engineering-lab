@@ -245,32 +245,48 @@ Goal: allow QA workflows to use controlled data validation when requirements dep
 
 Current limitations:
 
-- [ ] External database connectors
-- [ ] Database credentials management
-- [ ] Query cost estimation
-- [ ] Persistent SQL regression dataset files
-- [ ] NoSQL data source abstraction
-- [ ] LLM-based tool selection
-- [ ] LLM-as-judge evaluation
+- External database connectors
+- Database credentials management
+- Query cost estimation
+- Persistent SQL regression dataset files
+- NoSQL data source abstraction
+- LLM-based tool selection
+- LLM-as-judge evaluation
 
 ---
 
 ## M5 — MCP QA Server
 
-**Goal:** Expose selected QA and software engineering capabilities through the Model Context Protocol.
+Status: Completed
 
-* [ ] MCP server setup
-* [ ] MCP tool and resource definitions
-* [ ] Requirement Analysis MCP tool
-* [ ] RAG Retrieval MCP tool
-* [ ] RAG Answer MCP tool
-* [ ] QA Agent MCP tool
-* [ ] Data Analyst Agent MCP tool
-* [ ] SQL Workflow Regression MCP tool
-* [ ] MCP client validation
-* [ ] MCP tool tests
-* [ ] MCP security boundaries
-* [ ] MCP usage documentation
+Goal: expose selected QA and software engineering capabilities through the Model Context Protocol.
+
+Completed:
+
+- [x] MCP server setup
+- [x] MCP tool definitions
+- [x] Requirement Analysis MCP tool
+- [x] RAG Retrieval MCP tool
+- [x] RAG Answer MCP tool
+- [x] QA Agent MCP tool
+- [x] Data Analyst Agent MCP tool
+- [x] SQL Workflow Regression MCP tool
+- [x] MCP client validation
+- [x] MCP tool tests
+- [x] MCP security boundaries
+- [x] MCP usage documentation
+- [x] MCP smoke test script
+- [x] FastMCP CLI wrapper for local inspection
+- [x] M5 final review documentation
+
+Current limitations:
+
+- MCP server is validated locally, not deployed.
+- MCP tools do not yet include authentication or authorization.
+- MCP execution currently uses in-process services.
+- SQL execution remains limited to controlled in-memory SQLite table data.
+- No external database connection is introduced.
+- No production MCP hosting strategy has been defined yet.
 
 ---
 

@@ -6,11 +6,25 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 
 ## Project Status
 
-**Current module:** Pre-M5 Applied AI Extensions  
-**Latest completed milestone:** SQL Workflow Regression Dataset  
-**Next milestone:** M5 — MCP QA Server  
+**Current module:** M5 — MCP QA Server completed 
+**Latest completed milestone:** MCP QA Server with client validation
+**Next milestone:** M6 — Multi-Agent QA Copilot
 
-The project currently provides a tested foundation for LLM Engineering, RAG, controlled AI agent workflows, multi-format file ingestion, QA-oriented agents, controlled data analysis workflows and deterministic evaluation capabilities.
+The project currently includes:
+
+- FastAPI AI service foundation
+- LLM provider abstraction with Fake, OpenAI and Ollama providers
+- Structured requirement analysis
+- RAG Knowledge Assistant
+- AI Agent runtime foundation
+- QA Agent
+- Data Analyst Agent
+- File ingestion expansion for text, PDF, DOCX, CSV and Excel files
+- Structured table extraction
+- Safe read-only SQL generation and execution
+- SQL workflow regression suite
+- Local AI Lab Console prototype
+- MCP QA Server exposing project capabilities through MCP
 
 For detailed reviews, see:
 
@@ -192,6 +206,29 @@ The Data Analyst Agent currently supports:
 * deterministic Data Analyst Agent evaluation;
 * execution through the generic Agent Runtime as `data_analysis.agent.run`;
 * SQL workflow regression scenarios.
+
+### MCP QA Server
+
+The project includes a FastMCP-based MCP server that exposes selected capabilities through Model Context Protocol tools.
+
+Available MCP tools:
+
+- `get_project_status`
+- `list_agent_tools`
+- `list_specialized_agents`
+- `analyze_requirement`
+- `retrieve_rag_context`
+- `answer_with_rag`
+- `run_qa_agent`
+- `run_data_analyst_agent`
+- `run_sql_regression_suite`
+
+Local MCP smoke test:
+
+```powershell
+$env:PYTHONPATH = "apps/api/src"
+uv run python scripts/mcp_client_smoke.py
+```
 
 ## Architecture
 
@@ -607,9 +644,11 @@ The current CI workflow:
 
 These limitations define the boundary between the implemented foundation and the upcoming MCP, orchestration, evaluation and production capabilities.
 
-## Next Milestone: M5 — MCP QA Server
+## Next Milestone
 
-The next milestone will introduce a Model Context Protocol server focused on QA and software engineering workflows.
+The next milestone is M6 — Multi-Agent QA Copilot.
+
+The focus will be to orchestrate multiple specialized agents around a shared quality-engineering workflow, including requirement analysis, functional QA reasoning, test automation planning, review and final report generation.
 
 Planned capabilities include:
 
