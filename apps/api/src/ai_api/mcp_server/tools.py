@@ -1,6 +1,7 @@
 from typing import Any
 from ai_api.agents import (
     SpecializedAgentRegistry,
+    ToolExecutionService,
     ToolRegistry,
 )
 from ai_api.requirements.dependencies import (
@@ -26,12 +27,15 @@ def get_project_status_tool() -> dict[str, Any]:
             "Agent Evaluation",
             "SQL Workflow Regression Dataset",
             "MCP Server Foundation",
+            "Requirement Analysis MCP Tool",
         ],
         "available_mcp_tools": [
             "get_project_status",
             "list_agent_tools",
             "list_specialized_agents",
             "analyze_requirement",
+            "retrieve_rag_context",
+            "answer_with_rag",
         ],
         "available_specialized_agents": [
             "qa-agent-v1",
@@ -80,3 +84,69 @@ def analyze_requirement_tool(
     )
 
     return response.model_dump(mode="json")
+
+
+def retrieve_rag_context_tool(
+    query: str,
+    documents: list[dict[str, Any]],
+    top_k: int = 3,
+    chunk_size: int = 800,
+    chunk_overlap: int = 120,
+    tool_execution_service: ToolExecutionService | None = None,
+) -> dict[str, Any]:
+    selected_service = (
+        tool_execution_service
+        if tool_execution_service is not None
+        else ToolExecutionService()
+    )
+
+    response = selected_service.execute(
+        tool_name="rag.retrieve",
+        arguments={
+            "query": query,
+            "documents": documents,
+            "top_k": top_k,
+            "chunk_size": chunk_size,
+            "chunk_overlap": chunk_overlap,
+        },
+        metadata={
+            "requested_by": "mcp_server",
+            "mcp_tool": "retrieve_rag_context",
+        },
+    )
+
+    return response.output
+
+
+def answer_with_rag_tool(
+    query: str,
+    documents: list[dict[str, Any]],
+    language: str = "pt-BR",
+    top_k: int = 3,
+    chunk_size: int = 800,
+    chunk_overlap: int = 120,
+    tool_execution_service: ToolExecutionService | None = None,
+) -> dict[str, Any]:
+    selected_service = (
+        tool_execution_service
+        if tool_execution_service is not None
+        else ToolExecutionService()
+    )
+
+    response = selected_service.execute(
+        tool_name="rag.answer",
+        arguments={
+            "query": query,
+            "documents": documents,
+            "language": language,
+            "top_k": top_k,
+            "chunk_size": chunk_size,
+            "chunk_overlap": chunk_overlap,
+        },
+        metadata={
+            "requested_by": "mcp_server",
+            "mcp_tool": "answer_with_rag",
+        },
+    )
+
+    return response.output

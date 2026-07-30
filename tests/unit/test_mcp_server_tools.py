@@ -3,9 +3,11 @@ from pydantic import ValidationError
 from ai_api.llm import FakeLLMProvider
 from ai_api.mcp_server import (
     analyze_requirement_tool,
+    answer_with_rag_tool,
     get_project_status_tool,
     list_agent_tools_tool,
     list_specialized_agents_tool,
+    retrieve_rag_context_tool,
 )
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
@@ -23,6 +25,32 @@ def _build_requirement_analyzer_service() -> RequirementAnalyzerService:
     )
 
 
+def _build_documents() -> list[dict]:
+    return [
+        {
+            "source": "billing-doc",
+            "title": "Cobrança",
+            "document_text": (
+                "Boleto, cobrança, renegociação, dívida, pagamento, "
+                "vencimento e saldo final por conta."
+            ),
+            "metadata": {
+                "domain": "billing",
+            },
+        },
+        {
+            "source": "auth-doc",
+            "title": "Autenticação",
+            "document_text": (
+                "Login, senha, autenticação, usuário e sessão."
+            ),
+            "metadata": {
+                "domain": "auth",
+            },
+        },
+    ]
+
+
 def test_get_project_status_tool_should_return_m5_status() -> None:
     response = get_project_status_tool()
 
@@ -32,7 +60,10 @@ def test_get_project_status_tool_should_return_m5_status() -> None:
     assert "AI Agents" in response["completed_foundations"]
     assert "Data Analyst Agent Foundation" in response["completed_foundations"]
     assert "MCP Server Foundation" in response["completed_foundations"]
+    assert "Requirement Analysis MCP Tool" in response["completed_foundations"]
     assert "analyze_requirement" in response["available_mcp_tools"]
+    assert "retrieve_rag_context" in response["available_mcp_tools"]
+    assert "answer_with_rag" in response["available_mcp_tools"]
     assert "qa-agent-v1" in response["available_specialized_agents"]
     assert "data-analyst-agent-v1" in response["available_specialized_agents"]
 
@@ -106,3 +137,37 @@ def test_analyze_requirement_tool_should_reject_blank_requirement() -> None:
             language="pt-BR",
             analyzer_service=_build_requirement_analyzer_service(),
         )
+
+
+def test_retrieve_rag_context_tool_should_return_relevant_chunks() -> None:
+    response = retrieve_rag_context_tool(
+        query="Como funciona a renegociação por boleto?",
+        documents=_build_documents(),
+        top_k=1,
+        chunk_size=200,
+        chunk_overlap=40,
+    )
+
+    assert response["total_retrieved_chunks"] == 1
+    assert len(response["retrieved_chunks"]) == 1
+
+    retrieved_chunk = response["retrieved_chunks"][0]
+
+    serialized_chunk = str(retrieved_chunk).lower()
+
+    assert "billing" in serialized_chunk or "cobrança" in serialized_chunk
+    assert "boleto" in serialized_chunk
+
+
+def test_answer_with_rag_tool_should_return_grounded_answer() -> None:
+    response = answer_with_rag_tool(
+        query="Como funciona a renegociação por boleto?",
+        documents=_build_documents(),
+        language="pt-BR",
+        top_k=1,
+        chunk_size=200,
+        chunk_overlap=40,
+    )
+
+    assert response["answer"]
+    assert isinstance(response["citations"], list)
