@@ -7,7 +7,11 @@ from ai_api.agents import (
     get_qa_agent_service,
 )
 from ai_api.data_analysis.agent import DataAnalystAgentRequest
-from ai_api.data_analysis.dependencies import get_data_analyst_agent_service
+from ai_api.data_analysis.dependencies import (
+    get_data_analyst_agent_service,
+    get_sql_workflow_regression_service,
+)
+from ai_api.data_analysis.sql_regression import SQLRegressionSuiteRequest
 from ai_api.requirements.dependencies import (
     get_requirement_analyzer_service,
 )
@@ -34,6 +38,7 @@ def get_project_status_tool() -> dict[str, Any]:
             "Requirement Analysis MCP Tool",
             "RAG MCP Tools",
             "QA Agent MCP Tool",
+            "Data Analyst Agent MCP Tool",
         ],
         "available_mcp_tools": [
             "get_project_status",
@@ -44,6 +49,7 @@ def get_project_status_tool() -> dict[str, Any]:
             "answer_with_rag",
             "run_qa_agent",
             "run_data_analyst_agent",
+            "run_sql_regression_suite",
         ],
         "available_specialized_agents": [
             "qa-agent-v1",
@@ -213,6 +219,23 @@ def run_data_analyst_agent_tool(
         data_analyst_agent_service
         if data_analyst_agent_service is not None
         else get_data_analyst_agent_service()
+    )
+
+    response = selected_service.run(payload)
+
+    return response.model_dump(mode="json")
+
+
+def run_sql_regression_suite_tool(
+    suite: dict[str, Any],
+    sql_workflow_regression_service: Any | None = None,
+) -> dict[str, Any]:
+    payload = SQLRegressionSuiteRequest.model_validate(suite)
+
+    selected_service = (
+        sql_workflow_regression_service
+        if sql_workflow_regression_service is not None
+        else get_sql_workflow_regression_service()
     )
 
     response = selected_service.run(payload)

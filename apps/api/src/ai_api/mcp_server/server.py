@@ -9,6 +9,7 @@ from ai_api.mcp_server.tools import (
     retrieve_rag_context_tool,
     run_data_analyst_agent_tool,
     run_qa_agent_tool,
+    run_sql_regression_suite_tool,
 )
 
 
@@ -117,6 +118,14 @@ def run_data_analyst_agent(
         max_rows=max_rows,
         metadata=metadata,
     )
+
+
+@mcp.tool()
+def run_sql_regression_suite(
+    suite: dict[str, Any],
+) -> dict[str, Any]:
+    """Run SQL workflow regression scenarios and return deterministic checks."""
+    return run_sql_regression_suite_tool(suite=suite)
 
 
 if __name__ == "__main__":

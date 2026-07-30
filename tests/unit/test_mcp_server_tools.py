@@ -11,6 +11,7 @@ from ai_api.mcp_server import (
     retrieve_rag_context_tool,
     run_data_analyst_agent_tool,
     run_qa_agent_tool,
+    run_sql_regression_suite_tool,
 )
 from ai_api.requirements.fake_responses import (
     DEFAULT_REQUIREMENT_ANALYSIS_RESPONSE_JSON,
@@ -19,7 +20,7 @@ from ai_api.requirements.retry import RetryConfig
 from ai_api.requirements.services import RequirementAnalyzerService
 
 
-class StubQAAgentResponse:
+class StubResponse:
     def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
@@ -31,10 +32,10 @@ class StubQAAgentService:
     def __init__(self) -> None:
         self.last_request: Any | None = None
 
-    def run(self, request: Any) -> StubQAAgentResponse:
+    def run(self, request: Any) -> StubResponse:
         self.last_request = request
 
-        return StubQAAgentResponse(
+        return StubResponse(
             {
                 "status": "completed",
                 "agent_name": "qa-agent-v1",
@@ -77,10 +78,10 @@ class StubDataAnalystAgentService:
     def __init__(self) -> None:
         self.last_request: Any | None = None
 
-    def run(self, request: Any) -> StubQAAgentResponse:
+    def run(self, request: Any) -> StubResponse:
         self.last_request = request
 
-        return StubQAAgentResponse(
+        return StubResponse(
             {
                 "status": "completed",
                 "agent_name": "data-analyst-agent-v1",
@@ -115,6 +116,40 @@ class StubDataAnalystAgentService:
         )
 
 
+class StubSQLWorkflowRegressionService:
+    def __init__(self) -> None:
+        self.last_request: Any | None = None
+
+    def run(self, request: Any) -> StubResponse:
+        self.last_request = request
+
+        return StubResponse(
+            {
+                "suite_name": request.suite_name,
+                "status": "passed",
+                "total_scenarios": len(request.scenarios),
+                "passed_scenarios": len(request.scenarios),
+                "failed_scenarios": 0,
+                "scenario_results": [
+                    {
+                        "scenario_id": request.scenarios[0].scenario_id,
+                        "status": "passed",
+                        "checks": [
+                            {
+                                "name": "expected_status",
+                                "status": "passed",
+                                "message": "Workflow status matched.",
+                            }
+                        ],
+                    }
+                ],
+                "metadata": {
+                    "source": "stub-sql-workflow-regression-service",
+                },
+            }
+        )
+
+
 def _build_requirement_analyzer_service() -> RequirementAnalyzerService:
     return RequirementAnalyzerService(
         llm_provider=FakeLLMProvider(
@@ -124,7 +159,7 @@ def _build_requirement_analyzer_service() -> RequirementAnalyzerService:
     )
 
 
-def _build_documents() -> list[dict]:
+def _build_documents() -> list[dict[str, Any]]:
     return [
         {
             "source": "billing-doc",
@@ -140,80 +175,12 @@ def _build_documents() -> list[dict]:
         {
             "source": "auth-doc",
             "title": "Autenticação",
-            "document_text": (
-                "Login, senha, autenticação, usuário e sessão."
-            ),
+            "document_text": "Login, senha, autenticação, usuário e sessão.",
             "metadata": {
                 "domain": "auth",
             },
         },
     ]
-
-
-def _build_data_validation_payload() -> dict[str, Any]:
-    return {
-        "objective": "Validar saldo final por conta.",
-        "mode": "required",
-        "database_schema": {
-            "name": "qa_database",
-            "description": "Database used for QA validation.",
-            "tables": [
-                {
-                    "name": "transactions",
-                    "description": "Financial transactions.",
-                    "columns": [
-                        {
-                            "name": "transaction_id",
-                            "data_type": "integer",
-                            "nullable": False,
-                            "primary_key": True,
-                        },
-                        {
-                            "name": "account_id",
-                            "data_type": "integer",
-                            "nullable": False,
-                        },
-                        {
-                            "name": "amount",
-                            "data_type": "decimal",
-                            "nullable": False,
-                        },
-                        {
-                            "name": "transaction_type",
-                            "data_type": "varchar",
-                            "nullable": False,
-                        },
-                    ],
-                }
-            ],
-        },
-        "table_data": [
-            {
-                "table_name": "transactions",
-                "rows": [
-                    {
-                        "transaction_id": 123,
-                        "account_id": 101,
-                        "amount": 10.0,
-                        "transaction_type": "Deposit",
-                    },
-                    {
-                        "transaction_id": 124,
-                        "account_id": 101,
-                        "amount": 20.0,
-                        "transaction_type": "Deposit",
-                    },
-                    {
-                        "transaction_id": 125,
-                        "account_id": 101,
-                        "amount": 5.0,
-                        "transaction_type": "Withdrawal",
-                    },
-                ],
-            }
-        ],
-        "max_rows": 100,
-    }
 
 
 def _build_database_schema() -> dict[str, Any]:
@@ -280,6 +247,56 @@ def _build_table_data() -> list[dict[str, Any]]:
     ]
 
 
+def _build_data_validation_payload() -> dict[str, Any]:
+    return {
+        "objective": "Validar saldo final por conta.",
+        "mode": "required",
+        "database_schema": _build_database_schema(),
+        "table_data": _build_table_data(),
+        "max_rows": 100,
+    }
+
+
+def _build_sql_regression_suite() -> dict[str, Any]:
+    return {
+        "suite_name": "mcp-sql-regression-suite",
+        "metadata": {
+            "source": "mcp-test",
+        },
+        "scenarios": [
+            {
+                "scenario_id": "final-account-balance",
+                "name": "Final account balance",
+                "description": (
+                    "Validate final account balance by account using "
+                    "deposits and withdrawals."
+                ),
+                "request": {
+                    "question": "Qual é o saldo final por conta?",
+                    "language": "pt-BR",
+                    "max_rows": 100,
+                    "database_schema": _build_database_schema(),
+                    "table_data": _build_table_data(),
+                },
+                "expected_result": {
+                    "expected_status": "executed",
+                    "expected_row_count": 1,
+                    "expected_columns": [
+                        "account_id",
+                        "final_balance",
+                    ],
+                    "expected_rows": [
+                        {
+                            "account_id": 101,
+                            "final_balance": 25.0,
+                        }
+                    ],
+                },
+            }
+        ],
+    }
+
+
 def test_get_project_status_tool_should_return_m5_status() -> None:
     response = get_project_status_tool()
 
@@ -291,14 +308,16 @@ def test_get_project_status_tool_should_return_m5_status() -> None:
     assert "MCP Server Foundation" in response["completed_foundations"]
     assert "Requirement Analysis MCP Tool" in response["completed_foundations"]
     assert "RAG MCP Tools" in response["completed_foundations"]
+    assert "QA Agent MCP Tool" in response["completed_foundations"]
+    assert "Data Analyst Agent MCP Tool" in response["completed_foundations"]
     assert "analyze_requirement" in response["available_mcp_tools"]
     assert "retrieve_rag_context" in response["available_mcp_tools"]
     assert "answer_with_rag" in response["available_mcp_tools"]
     assert "run_qa_agent" in response["available_mcp_tools"]
+    assert "run_data_analyst_agent" in response["available_mcp_tools"]
+    assert "run_sql_regression_suite" in response["available_mcp_tools"]
     assert "qa-agent-v1" in response["available_specialized_agents"]
     assert "data-analyst-agent-v1" in response["available_specialized_agents"]
-    assert "QA Agent MCP Tool" in response["completed_foundations"]
-    assert "run_data_analyst_agent" in response["available_mcp_tools"]
 
 
 def test_list_agent_tools_tool_should_return_registered_tools() -> None:
@@ -452,8 +471,9 @@ def test_run_qa_agent_tool_should_accept_data_validation_context() -> None:
         request_dump["data_validation"]["database_schema"]["tables"][0]["name"]
         == "transactions"
     )
-    assert request_dump["data_validation"]["table_data"][0]["table_name"] == (
-        "transactions"
+    assert (
+        request_dump["data_validation"]["table_data"][0]["table_name"]
+        == "transactions"
     )
 
 
@@ -501,4 +521,44 @@ def test_run_data_analyst_agent_tool_should_reject_invalid_payload() -> None:
             table_data=_build_table_data(),
             max_rows=100,
             data_analyst_agent_service=service,
+        )
+
+
+def test_run_sql_regression_suite_tool_should_execute_regression_service() -> None:
+    service = StubSQLWorkflowRegressionService()
+
+    response = run_sql_regression_suite_tool(
+        suite=_build_sql_regression_suite(),
+        sql_workflow_regression_service=service,
+    )
+
+    assert response["suite_name"] == "mcp-sql-regression-suite"
+    assert response["status"] == "passed"
+    assert response["total_scenarios"] == 1
+    assert response["passed_scenarios"] == 1
+    assert response["failed_scenarios"] == 0
+    assert response["scenario_results"][0]["scenario_id"] == (
+        "final-account-balance"
+    )
+
+    assert service.last_request is not None
+    assert service.last_request.suite_name == "mcp-sql-regression-suite"
+
+    request_dump = service.last_request.model_dump(mode="json")
+
+    assert request_dump["metadata"]["source"] == "mcp-test"
+    assert request_dump["scenarios"][0]["scenario_id"] == "final-account-balance"
+    assert (
+        request_dump["scenarios"][0]["request"]["database_schema"]["tables"][0]["name"]
+        == "transactions"
+    )
+
+
+def test_run_sql_regression_suite_tool_should_reject_invalid_suite() -> None:
+    service = StubSQLWorkflowRegressionService()
+
+    with pytest.raises(ValidationError):
+        run_sql_regression_suite_tool(
+            suite={},
+            sql_workflow_regression_service=service,
         )
