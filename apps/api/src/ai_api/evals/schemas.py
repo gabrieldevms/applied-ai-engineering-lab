@@ -1698,3 +1698,37 @@ class AIMultiAgentExecutionSummaryResponse(BaseModel):
     run_status_coverage: dict[str, int] = Field(default_factory=dict)
     risks: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+AIObservabilityDashboardStatus = Literal[
+    "healthy",
+    "warning",
+    "critical",
+    "empty",
+]
+
+AIObservabilityDashboardSectionStatus = Literal[
+    "healthy",
+    "warning",
+    "critical",
+    "empty",
+]
+
+
+class AIObservabilityDashboardSection(BaseModel):
+    name: str
+    title: str
+    status: AIObservabilityDashboardSectionStatus
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    risks: list[str] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class AIObservabilityDashboardResponse(BaseModel):
+    status: AIObservabilityDashboardStatus
+    generated_at: str
+    sections: list[AIObservabilityDashboardSection] = Field(default_factory=list)
+    global_risks: list[str] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)

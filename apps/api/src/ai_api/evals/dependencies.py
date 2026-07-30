@@ -41,6 +41,7 @@ from ai_api.evals.agent_execution_metrics import AIAgentExecutionTelemetryServic
 from ai_api.evals.multi_agent_execution_metrics import (
     AIMultiAgentExecutionTelemetryService,
 )
+from ai_api.evals.observability_dashboard import AIObservabilityDashboardService
 
 _evaluation_telemetry_service = EvaluationTelemetryService()
 
@@ -181,3 +182,14 @@ def get_ai_multi_agent_execution_telemetry_service() -> (
     AIMultiAgentExecutionTelemetryService
 ):
     return _ai_multi_agent_execution_telemetry_service
+
+def get_ai_observability_dashboard_service() -> (
+    AIObservabilityDashboardService
+):
+    return AIObservabilityDashboardService(
+        evaluation_telemetry_service=get_evaluation_telemetry_service(),
+        usage_tracking_service=get_ai_usage_tracking_service(),
+        retrieval_quality_service=get_ai_retrieval_quality_telemetry_service(),
+        agent_execution_service=get_ai_agent_execution_telemetry_service(),
+        multi_agent_execution_service=get_ai_multi_agent_execution_telemetry_service(),
+    )
