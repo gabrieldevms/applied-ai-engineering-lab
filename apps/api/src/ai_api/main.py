@@ -212,6 +212,10 @@ from ai_api.evals import (
     LLMAsJudgeEvaluationSuiteService,
     get_llm_as_judge_evaluation_service,
     get_llm_as_judge_evaluation_suite_service,
+    CIEvaluationPipelineRunRequest,
+    CIEvaluationPipelineRunResponse,
+    CIEvaluationPipelineService,
+    get_ci_evaluation_pipeline_service,
 )
 
 logging.basicConfig(
@@ -1388,6 +1392,31 @@ def run_llm_as_judge_evaluation_suite(
         run_id=payload.metadata.get("run_id"),
         metadata={
             "operation": "run_llm_as_judge_evaluation_suite",
+            **payload.metadata,
+        },
+    )
+
+
+@app.post("/evals/ci/pipeline/run", response_model=CIEvaluationPipelineRunResponse,)
+def run_ci_evaluation_pipeline(
+    payload: CIEvaluationPipelineRunRequest,
+    service: Annotated[
+        CIEvaluationPipelineService,
+        Depends(get_ci_evaluation_pipeline_service),
+    ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
+) -> CIEvaluationPipelineRunResponse:
+    return instrumentation_service.instrument(
+        event_type="ci_evaluation_pipeline_run",
+        component="evaluation",
+        source="api:/evals/ci/pipeline/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_ci_evaluation_pipeline",
             **payload.metadata,
         },
     )

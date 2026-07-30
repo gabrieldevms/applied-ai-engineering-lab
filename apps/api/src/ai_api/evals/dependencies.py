@@ -34,6 +34,7 @@ from ai_api.evals.llm_as_judge import (
     LLMAsJudgeEvaluationService,
     LLMAsJudgeEvaluationSuiteService,
 )
+from ai_api.evals.ci_pipeline import CIEvaluationPipelineService
 
 _evaluation_telemetry_service = EvaluationTelemetryService()
 
@@ -140,3 +141,7 @@ def get_llm_as_judge_evaluation_suite_service() -> (
 
 def get_llm_as_judge_evaluation_service() -> LLMAsJudgeEvaluationService:
     return LLMAsJudgeEvaluationService()
+
+
+def get_ci_evaluation_pipeline_service() -> CIEvaluationPipelineService:
+    return CIEvaluationPipelineService()
