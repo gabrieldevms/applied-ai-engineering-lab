@@ -168,6 +168,8 @@ from ai_api.evals import (
     EvaluationTelemetrySummaryRequest,
     EvaluationTelemetrySummaryResponse,
     get_evaluation_telemetry_service,
+    EvaluationTelemetryInstrumentationService,
+    get_evaluation_telemetry_instrumentation_service,
 )
 
 logging.basicConfig(
@@ -954,8 +956,22 @@ def evaluate_multi_agent_qa_copilot(
         MultiAgentQACopilotEvaluationService,
         Depends(get_multi_agent_qa_copilot_evaluation_service),
     ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
 ) -> MultiAgentQACopilotEvaluationResponse:
-    return service.evaluate(payload)
+    return instrumentation_service.instrument(
+        event_type="copilot_evaluation",
+        component="multi_agent",
+        source="api:/multi-agent/qa-copilot/evaluate",
+        operation=lambda: service.evaluate(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "evaluate_multi_agent_qa_copilot",
+            **payload.metadata,
+        },
+    )
 
 
 @app.get("/evals/golden-dataset", response_model=GoldenEvaluationDataset,)
@@ -996,8 +1012,22 @@ def run_golden_evaluation_dataset(
         GoldenEvaluationDatasetRunnerService,
         Depends(get_golden_evaluation_dataset_runner_service),
     ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
 ) -> GoldenEvaluationDatasetRunResponse:
-    return service.run(payload)
+    return instrumentation_service.instrument(
+        event_type="golden_dataset_run",
+        component="evaluation",
+        source="api:/evals/golden-dataset/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_golden_evaluation_dataset",
+            **payload.metadata,
+        },
+    )
 
 
 @app.get("/evals/prompt-regression/suite", response_model=PromptRegressionSuite,)
@@ -1017,8 +1047,22 @@ def run_prompt_regression_suite(
         PromptRegressionEvaluationService,
         Depends(get_prompt_regression_evaluation_service),
     ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
 ) -> PromptRegressionRunResponse:
-    return service.run(payload)
+    return instrumentation_service.instrument(
+        event_type="prompt_regression_run",
+        component="evaluation",
+        source="api:/evals/prompt-regression/run",
+        operation=lambda: service.run(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "run_prompt_regression_suite",
+            **payload.metadata,
+        },
+    )
 
 
 @app.post("/evals/reports/aggregate", response_model=AIEvaluationReportAggregationResponse,)
@@ -1028,8 +1072,22 @@ def aggregate_ai_evaluation_report(
         AIEvaluationReportAggregationService,
         Depends(get_ai_evaluation_report_aggregation_service),
     ],
+    instrumentation_service: Annotated[
+        EvaluationTelemetryInstrumentationService,
+        Depends(get_evaluation_telemetry_instrumentation_service),
+    ],
 ) -> AIEvaluationReportAggregationResponse:
-    return service.aggregate(payload)
+    return instrumentation_service.instrument(
+        event_type="report_aggregation",
+        component="evaluation",
+        source="api:/evals/reports/aggregate",
+        operation=lambda: service.aggregate(payload),
+        run_id=payload.metadata.get("run_id"),
+        metadata={
+            "operation": "aggregate_ai_evaluation_report",
+            **payload.metadata,
+        },
+    )
 
 
 @app.post("/evals/telemetry/events", response_model=EvaluationTelemetryEvent,)
