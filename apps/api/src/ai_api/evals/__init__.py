@@ -31,6 +31,7 @@ from ai_api.evals.dependencies import (
     get_ai_usage_tracking_service,
     get_ai_retrieval_quality_telemetry_service,
     get_ai_agent_execution_telemetry_service,
+    get_ai_multi_agent_execution_telemetry_service,
 )
 from ai_api.evals.golden_dataset import build_default_golden_evaluation_dataset
 from ai_api.evals.instrumentation import EvaluationTelemetryInstrumentationService
@@ -166,6 +167,13 @@ from ai_api.evals.schemas import (
     AIAgentExecutionSummaryRequest,
     AIAgentExecutionSummaryResponse,
     AIAgentRunStatus,
+    AIMultiAgentExecutionMetricStatus,
+    AIMultiAgentExecutionRecord,
+    AIMultiAgentExecutionRecordRequest,
+    AIMultiAgentExecutionRecordsResponse,
+    AIMultiAgentExecutionSummaryRequest,
+    AIMultiAgentExecutionSummaryResponse,
+    AIMultiAgentRunStatus,
 )
 from ai_api.evals.services import (
     GoldenEvaluationDatasetService,
@@ -186,6 +194,9 @@ from ai_api.evals.ci_pipeline import CIEvaluationPipelineService
 from ai_api.evals.usage_tracking import AIUsageTrackingService
 from ai_api.evals.retrieval_quality import AIRetrievalQualityTelemetryService
 from ai_api.evals.agent_execution_metrics import AIAgentExecutionTelemetryService
+from ai_api.evals.multi_agent_execution_metrics import (
+    AIMultiAgentExecutionTelemetryService,
+)
 
 __all__ = [
     "AIEvaluationReportAggregationRequest",
@@ -360,4 +371,13 @@ __all__ = [
     "AIAgentExecutionTelemetryService",
     "AIAgentRunStatus",
     "get_ai_agent_execution_telemetry_service",
+    "AIMultiAgentExecutionMetricStatus",
+    "AIMultiAgentExecutionRecord",
+    "AIMultiAgentExecutionRecordRequest",
+    "AIMultiAgentExecutionRecordsResponse",
+    "AIMultiAgentExecutionSummaryRequest",
+    "AIMultiAgentExecutionSummaryResponse",
+    "AIMultiAgentExecutionTelemetryService",
+    "AIMultiAgentRunStatus",
+    "get_ai_multi_agent_execution_telemetry_service",
 ]
