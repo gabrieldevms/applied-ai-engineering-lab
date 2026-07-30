@@ -4,6 +4,7 @@ from ai_api.multi_agent.contracts import MultiAgentCommunicationContractValidato
 from ai_api.multi_agent.failure_handling import MultiAgentFailureHandler
 from ai_api.multi_agent.roles import build_default_multi_agent_roles
 from ai_api.multi_agent.report_generation import MultiAgentFinalReportGenerator
+from ai_api.requirements.services import RequirementAnalyzerService
 from ai_api.multi_agent.schemas import (
     MultiAgentArtifact,
     MultiAgentConflictAnalysisResponse,
@@ -28,6 +29,7 @@ class MultiAgentQACopilotService:
         failure_handler: MultiAgentFailureHandler | None = None,
         conflict_detector: MultiAgentConflictDetector | None = None,
         report_generator: MultiAgentFinalReportGenerator | None = None,
+        requirement_analyzer_service: RequirementAnalyzerService | None = None,
     ) -> None:
         self.roles = roles if roles is not None else build_default_multi_agent_roles()
         self.contract_validator = (
@@ -50,6 +52,7 @@ class MultiAgentQACopilotService:
             if report_generator is not None
             else MultiAgentFinalReportGenerator()
         )
+        self.requirement_analyzer_service = requirement_analyzer_service
 
     def run(
         self,
@@ -231,6 +234,61 @@ class MultiAgentQACopilotService:
         request: MultiAgentQACopilotRequest,
         shared_state: MultiAgentSharedState,
     ) -> MultiAgentTaskResult:
+        if self.requirement_analyzer_service is not None:
+            analysis_response = self.requirement_analyzer_service.analyze(
+                requirement_text=request.requirement_text,
+                language=request.language,
+            )
+
+            artifact = MultiAgentArtifact(
+                name="requirement_analysis",
+                produced_by="requirement_analyst_agent",
+                content={
+                    "summary": analysis_response.summary,
+                    "identified_rules": analysis_response.business_rules,
+                    "acceptance_criteria": analysis_response.acceptance_criteria,
+                    "risks": analysis_response.risks,
+                    "positive_test_scenarios": (
+                        analysis_response.positive_test_scenarios
+                    ),
+                    "negative_test_scenarios": (
+                        analysis_response.negative_test_scenarios
+                    ),
+                    "edge_cases": analysis_response.edge_cases,
+                    "open_questions": analysis_response.open_questions,
+                    "automation_opportunities": (
+                        analysis_response.automation_opportunities
+                    ),
+                },
+                metadata={
+                    "source": "requirement_analyzer_service",
+                    "integration": "multi-agent-requirement-analysis-v1",
+                },
+            )
+
+            message = MultiAgentMessage(
+                sender="requirement_analyst_agent",
+                recipient="functional_qa_agent",
+                content=(
+                    "Análise estruturada do requisito concluída via "
+                    "RequirementAnalyzerService e disponível para planejamento "
+                    "funcional."
+                ),
+            )
+
+            return MultiAgentTaskResult(
+                agent_name="requirement_analyst_agent",
+                status="completed",
+                summary=(
+                    "Requisito analisado com RequirementAnalyzerService."
+                ),
+                artifacts=[artifact],
+                messages=[message],
+                metadata={
+                    "source": "requirement_analyzer_service",
+                },
+            )
+
         excerpt = self._build_requirement_excerpt(request.requirement_text)
 
         artifact = MultiAgentArtifact(
@@ -247,6 +305,9 @@ class MultiAgentQACopilotService:
                     "Existem regras de negócio não descritas explicitamente?",
                     "Há cenários de exceção que precisam ser confirmados?",
                 ],
+            },
+            metadata={
+                "source": "deterministic_fallback",
             },
         )
 
@@ -265,6 +326,9 @@ class MultiAgentQACopilotService:
             summary="Requisito analisado em nível funcional e de negócio.",
             artifacts=[artifact],
             messages=[message],
+            metadata={
+                "source": "deterministic_fallback",
+            },
         )
 
     def _run_functional_qa_agent(
