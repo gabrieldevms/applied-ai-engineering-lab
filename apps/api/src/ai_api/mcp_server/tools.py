@@ -12,6 +12,10 @@ from ai_api.data_analysis.dependencies import (
     get_sql_workflow_regression_service,
 )
 from ai_api.data_analysis.sql_regression import SQLRegressionSuiteRequest
+from ai_api.multi_agent import (
+    MultiAgentQACopilotRequest,
+    get_multi_agent_qa_copilot_service,
+)
 from ai_api.requirements.dependencies import (
     get_requirement_analyzer_service,
 )
@@ -22,8 +26,8 @@ from ai_api.requirements.services import RequirementAnalyzerService
 def get_project_status_tool() -> dict[str, Any]:
     return {
         "project": "applied-ai-engineering-lab",
-        "status": "m5_mcp_qa_server_in_progress",
-        "current_milestone": "M5 — MCP QA Server",
+        "status": "m6_multi_agent_qa_copilot_in_progress",
+        "current_milestone": "M6 — Multi-Agent QA Copilot",
         "completed_foundations": [
             "AI API Base",
             "LLM Engineering",
@@ -39,6 +43,16 @@ def get_project_status_tool() -> dict[str, Any]:
             "RAG MCP Tools",
             "QA Agent MCP Tool",
             "Data Analyst Agent MCP Tool",
+            "SQL Regression MCP Tool",
+            "MCP Client Validation",
+            "M5 MCP QA Server",
+            "Multi-Agent QA Copilot Foundation",
+            "Multi-Agent QA Copilot API Endpoint",
+            "Multi-Agent Communication Contracts",
+            "Multi-Agent Failure and Conflict Handling",
+            "Multi-Agent Final QA Report Generation",
+            "Multi-Agent Requirement Analysis Integration",
+            "Multi-Agent Data Validation Integration",
         ],
         "available_mcp_tools": [
             "get_project_status",
@@ -50,14 +64,18 @@ def get_project_status_tool() -> dict[str, Any]:
             "run_qa_agent",
             "run_data_analyst_agent",
             "run_sql_regression_suite",
+            "run_multi_agent_qa_copilot",
         ],
         "available_specialized_agents": [
             "qa-agent-v1",
             "data-analyst-agent-v1",
         ],
+        "available_copilots": [
+            "multi-agent-qa-copilot-v1",
+        ],
         "metadata": {
             "tool": "get_project_status",
-            "source": "mcp_server_foundation",
+            "source": "mcp_server",
         },
     }
 
@@ -236,6 +254,41 @@ def run_sql_regression_suite_tool(
         sql_workflow_regression_service
         if sql_workflow_regression_service is not None
         else get_sql_workflow_regression_service()
+    )
+
+    response = selected_service.run(payload)
+
+    return response.model_dump(mode="json")
+
+
+def run_multi_agent_qa_copilot_tool(
+    requirement_text: str,
+    objective: str | None = None,
+    language: str = "pt-BR",
+    context: dict[str, Any] | None = None,
+    data_validation: dict[str, Any] | None = None,
+    max_agents: int = 6,
+    failure_strategy: str = "stop_on_failure",
+    metadata: dict[str, Any] | None = None,
+    multi_agent_qa_copilot_service: Any | None = None,
+) -> dict[str, Any]:
+    request_payload: dict[str, Any] = {
+        "requirement_text": requirement_text,
+        "objective": objective,
+        "language": language,
+        "context": context or {},
+        "data_validation": data_validation,
+        "max_agents": max_agents,
+        "failure_strategy": failure_strategy,
+        "metadata": metadata or {},
+    }
+
+    payload = MultiAgentQACopilotRequest.model_validate(request_payload)
+
+    selected_service = (
+        multi_agent_qa_copilot_service
+        if multi_agent_qa_copilot_service is not None
+        else get_multi_agent_qa_copilot_service()
     )
 
     response = selected_service.run(payload)

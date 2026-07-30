@@ -297,25 +297,19 @@ def _build_sql_regression_suite() -> dict[str, Any]:
     }
 
 
-def test_get_project_status_tool_should_return_m5_status() -> None:
+def test_get_project_status_tool_should_return_m6_status() -> None:
     response = get_project_status_tool()
 
     assert response["project"] == "applied-ai-engineering-lab"
-    assert response["status"] == "m5_mcp_qa_server_in_progress"
-    assert response["current_milestone"] == "M5 — MCP QA Server"
-    assert "AI Agents" in response["completed_foundations"]
-    assert "Data Analyst Agent Foundation" in response["completed_foundations"]
-    assert "MCP Server Foundation" in response["completed_foundations"]
-    assert "Requirement Analysis MCP Tool" in response["completed_foundations"]
-    assert "RAG MCP Tools" in response["completed_foundations"]
-    assert "QA Agent MCP Tool" in response["completed_foundations"]
-    assert "Data Analyst Agent MCP Tool" in response["completed_foundations"]
-    assert "analyze_requirement" in response["available_mcp_tools"]
-    assert "retrieve_rag_context" in response["available_mcp_tools"]
-    assert "answer_with_rag" in response["available_mcp_tools"]
-    assert "run_qa_agent" in response["available_mcp_tools"]
-    assert "run_data_analyst_agent" in response["available_mcp_tools"]
-    assert "run_sql_regression_suite" in response["available_mcp_tools"]
+    assert response["status"] == "m6_multi_agent_qa_copilot_in_progress"
+    assert response["current_milestone"] == "M6 — Multi-Agent QA Copilot"
+    assert "M5 MCP QA Server" in response["completed_foundations"]
+    assert "Multi-Agent QA Copilot Foundation" in response["completed_foundations"]
+    assert "Multi-Agent Data Validation Integration" in (
+        response["completed_foundations"]
+    )
+    assert "run_multi_agent_qa_copilot" in response["available_mcp_tools"]
+    assert "multi-agent-qa-copilot-v1" in response["available_copilots"]
     assert "qa-agent-v1" in response["available_specialized_agents"]
     assert "data-analyst-agent-v1" in response["available_specialized_agents"]
 
