@@ -17,12 +17,12 @@ from ai_api.evals import (  # noqa: E402
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the M7 deterministic AI evaluation pipeline."
+        description="Run the deterministic AI evaluation pipeline."
     )
 
     parser.add_argument(
         "--output",
-        default=".data/m7-evaluation-pipeline-report.json",
+        default=".data/ai-evaluation-pipeline-report.json",
         help="Path where the JSON evaluation report will be written.",
     )
     parser.add_argument(
@@ -54,8 +54,8 @@ def main() -> int:
             include_llm_as_judge_evaluation=not args.skip_llm_as_judge,
             fail_on_warning=args.fail_on_warning,
             metadata={
-                "source": "script:run_m7_evaluation_pipeline",
-                "run_id": "m7-ci-evaluation-pipeline",
+                "source": "script:run_ai_evaluation_pipeline",
+                "run_id": "ai-evaluation-pipeline",
             },
         )
     )
