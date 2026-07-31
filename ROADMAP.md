@@ -478,7 +478,7 @@ Current limitations:
 
 ## M8 — Cloud, Security and Portfolio
 
-**Status:** Next
+**Status:** In Progress
 
 **Goal:** Prepare the project for production-like deployment, governance, frontend experience and professional presentation.
 
@@ -511,18 +511,20 @@ M8 should transform the current backend platform foundation into a more demonstr
 
 ### Frontend and product experience
 
-- [ ] Frontend architecture decision
-- [ ] AI Quality Command Center foundation
-- [ ] Backend dashboard integration
-- [ ] Evaluation Center UI
-- [ ] Observability Center UI
-- [ ] QA Agent Console
-- [ ] Multi-Agent QA Copilot Console
-- [ ] RAG Console
-- [ ] Data Analyst Agent Console
+- [x] Frontend architecture decision
+- [x] AI Quality Command Center foundation
+- [x] Backend dashboard integration
+- [x] Evaluation Center UI
+- [x] Observability Center UI
+- [x] QA Agent Console
+- [x] Multi-Agent QA Copilot Console
+- [x] RAG Console
+- [x] Data Analyst Agent Console
 - [ ] Provider and model settings UI
 - [ ] Usage and cost visualization
 - [ ] Risk and recommendation panels
+
+> Current note: the AI Quality Command Center is already functional for local product demonstrations, but console executions are still stored in local React page state. Persistent execution history, automatic dashboard refresh, live observability updates, and backend telemetry integration for each frontend console execution remain future M8 work.
 
 ### Documentation and portfolio
 

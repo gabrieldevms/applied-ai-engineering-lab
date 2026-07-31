@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## M8 — Cloud, Security and Portfolio
+
+### Added
+
+- Started M8 product experience work.
+- Rebuilt the frontend from scratch using Vite, React and TypeScript.
+- Added the AI Quality Command Center foundation.
+- Added backend observability dashboard integration through the frontend.
+- Added Observability Center UI.
+- Added Evaluation Center UI.
+- Added QA Agent Console integrated with `POST /agents/qa/run`.
+- Added Multi-Agent QA Copilot Console integrated with `POST /multi-agent/qa-copilot/run`.
+- Added RAG Console integrated with `POST /rag/retrieve` and `POST /rag/answer`.
+- Added Data Analyst Console integrated with `POST /data-analysis/agent/run`.
+
+### Changed
+
+- Replaced the old frontend prototype with a clean product-oriented frontend foundation.
+- Organized frontend navigation around product areas and AI engineering workflows.
+- Introduced reusable frontend structures for API clients, typed responses, JSON viewers, metric cards and console pages.
+
+### Notes
+
+- M8 is still in progress.
+- The current frontend is suitable for local demonstrations and portfolio presentation.
+- Console execution results are currently kept in local React state.
+- Persistent execution history, live dashboard updates, production observability integration, provider/model settings, security/governance, cloud readiness and portfolio documentation remain future M8 work.
+
+---
+
 ## M7 — Evaluation and LLMOps
 
 ### Added
