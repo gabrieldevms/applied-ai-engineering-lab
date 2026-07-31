@@ -25,6 +25,13 @@ const pageContent: Record<
     description: "Área de observabilidade de sistemas de IA.",
     plannedItems: [],
   },
+    "usage-cost": {
+    eyebrow: "LLMOps",
+    title: "Usage & Cost",
+    description:
+      "Visualização de tokens, custos estimados, coverage por provider/modelo e riscos de usage tracking.",
+    plannedItems: [],
+  },
   evaluation: {
     eyebrow: "Evaluation",
     title: "Evaluation Center",
