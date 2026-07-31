@@ -4,6 +4,7 @@ import { CommandCenterPage } from "./pages/CommandCenterPage";
 import { EvaluationCenterPage } from "./pages/EvaluationCenterPage";
 import { ObservabilityCenterPage } from "./pages/ObservabilityCenterPage";
 import { ProductPlaceholderPage } from "./pages/ProductPlaceholderPage";
+import { QAAgentConsolePage } from "./pages/QAAgentConsolePage";
 import type { AppPage } from "./types/navigation";
 
 export default function App() {
@@ -20,6 +21,10 @@ export default function App() {
 
     if (activePage === "evaluation") {
       return <EvaluationCenterPage />;
+    }
+
+    if (activePage === "qa-agent") {
+      return <QAAgentConsolePage />;
     }
 
     return <ProductPlaceholderPage page={activePage} />;
