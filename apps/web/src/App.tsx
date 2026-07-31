@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { CommandCenterPage } from "./pages/CommandCenterPage";
+import { DataAnalystConsolePage } from "./pages/DataAnalystConsolePage";
 import { EvaluationCenterPage } from "./pages/EvaluationCenterPage";
 import { MultiAgentCopilotConsolePage } from "./pages/MultiAgentCopilotConsolePage";
 import { ObservabilityCenterPage } from "./pages/ObservabilityCenterPage";
@@ -35,6 +36,10 @@ export default function App() {
 
     if (activePage === "rag") {
       return <RAGConsolePage />;
+    }
+
+    if (activePage === "data-analyst") {
+      return <DataAnalystConsolePage />;
     }
 
     return <ProductPlaceholderPage page={activePage} />;
