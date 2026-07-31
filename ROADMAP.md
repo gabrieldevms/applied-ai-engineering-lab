@@ -4,18 +4,18 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-**Current module:** Pre-M5 Applied AI Extensions  
-**Latest completed milestone:** SQL workflow regression dataset  
-**Next milestone:** M5 — MCP QA Server  
+**Current module:** M7 — Evaluation and LLMOps completed  
+**Latest completed milestone:** Backend AI Observability Dashboard  
+**Next milestone:** M8 — Cloud, Security and Portfolio  
 
 The short-term implementation order is:
 
 ```text
-M5 — MCP QA Server
-  ↓
-M6 — Multi-Agent QA Copilot
-  ↓
 M7 — Evaluation and LLMOps
+  ↓
+M8 — Cloud, Security and Portfolio
+  ↓
+AI Quality Command Center
 ```
 
 | Module                             | Status      |
@@ -25,177 +25,189 @@ M7 — Evaluation and LLMOps
 | M2 — LLM Engineering               | Completed   |
 | M3 — RAG Knowledge Assistant       | Completed   |
 | M4 — AI Agents                     | Completed   |
-| M5 — MCP QA Server                 | Next        |
-| M6 — Multi-Agent QA Copilot        | Planned     |
-| M7 — Evaluation and LLMOps         | Planned     |
-| M8 — Cloud, Security and Portfolio | Planned     |
+| Pre-M5 — File Ingestion Expansion  | Completed   |
+| Pre-M5 — Data Analyst Agent        | Completed   |
+| M5 — MCP QA Server                 | Completed   |
+| M6 — Multi-Agent QA Copilot        | Completed   |
+| M7 — Evaluation and LLMOps         | Completed   |
+| M8 — Cloud, Security and Portfolio | Next        |
 
 ---
 
 ## M0 — Foundation
 
+**Status:** Completed
+
 **Goal:** Prepare the repository, development workflow, documentation and initial architecture.
 
-* [x] Repository structure
-* [x] GitHub Project board
-* [x] Issue templates
-* [x] Pull request template
-* [x] Initial README
-* [x] Initial roadmap
-* [x] Initial architecture document
-* [x] ADR template
-* [x] First architecture decision record
-* [x] Local development environment validation
+- [x] Repository structure
+- [x] GitHub Project board
+- [x] Issue templates
+- [x] Pull request template
+- [x] Initial README
+- [x] Initial roadmap
+- [x] Initial architecture document
+- [x] ADR template
+- [x] First architecture decision record
+- [x] Local development environment validation
 
 ---
 
 ## M1 — AI API Base
 
+**Status:** Completed
+
 **Goal:** Create the first production-oriented API foundation.
 
-* [x] FastAPI project setup
-* [x] Health check endpoint
-* [x] Analyze text endpoint
-* [x] Pydantic schemas
-* [x] Unit tests with pytest
-* [x] Dockerfile
-* [x] GitHub Actions CI pipeline
-* [x] Basic logging
-* [x] Basic error handling
+- [x] FastAPI project setup
+- [x] Health check endpoint
+- [x] Analyze text endpoint
+- [x] Pydantic schemas
+- [x] Unit tests with pytest
+- [x] Dockerfile
+- [x] GitHub Actions CI pipeline
+- [x] Basic logging
+- [x] Basic error handling
 
 ---
 
 ## M2 — LLM Engineering
 
+**Status:** Completed
+
 **Goal:** Integrate large language models through structured, testable and provider-independent components.
 
-* [x] LLM provider abstraction
-* [x] Prompt templates
-* [x] Structured outputs
-* [x] JSON Schema validation
-* [x] Retry strategy
-* [x] Fallback strategy
-* [x] Requirement Analyzer
-* [x] LLM response tests
-* [x] Requirement Analysis API endpoint
-* [x] Environment-based provider settings
-* [x] OpenAI provider
-* [x] Ollama provider
-* [x] LLM provider diagnostic endpoints
-* [x] LLM output normalization
+- [x] LLM provider abstraction
+- [x] Prompt templates
+- [x] Structured outputs
+- [x] JSON Schema validation
+- [x] Retry strategy
+- [x] Fallback strategy
+- [x] Requirement Analyzer
+- [x] LLM response tests
+- [x] Requirement Analysis API endpoint
+- [x] Environment-based provider settings
+- [x] OpenAI provider
+- [x] Ollama provider
+- [x] LLM provider diagnostic endpoints
+- [x] LLM output normalization
 
 ---
 
 ## M3 — RAG Knowledge Assistant
 
+**Status:** Completed
+
 **Goal:** Build a document-based AI assistant capable of retrieving information and generating grounded answers with citations.
 
 ### Functional milestones
 
-* [x] Document ingestion
-* [x] Text extraction
-* [x] Chunking strategy
-* [x] Embeddings
-* [x] Vector store foundation
-* [x] Semantic search
-* [x] Context retrieval
-* [x] RAG answer generation
-* [x] Source citations
-* [x] RAG evaluation
+- [x] Document ingestion
+- [x] Text extraction
+- [x] Chunking strategy
+- [x] Embeddings
+- [x] Vector store foundation
+- [x] Semantic search
+- [x] Context retrieval
+- [x] RAG answer generation
+- [x] Source citations
+- [x] RAG evaluation
 
 ### Technical breakdown
 
 #### Document processing
 
-* [x] Basic text chunking service
-* [x] Chunking API endpoint
-* [x] Document ingestion service
-* [x] Document ingestion API endpoint
-* [x] Text extraction service
-* [x] Text extraction API endpoint
-* [x] File ingestion pipeline
-* [x] File ingestion API endpoint
+- [x] Basic text chunking service
+- [x] Chunking API endpoint
+- [x] Document ingestion service
+- [x] Document ingestion API endpoint
+- [x] Text extraction service
+- [x] Text extraction API endpoint
+- [x] File ingestion pipeline
+- [x] File ingestion API endpoint
 
 #### Embeddings and storage
 
-* [x] Embedding provider abstraction
-* [x] Fake embedding provider
-* [x] Embedding service
-* [x] Embedding API endpoint
-* [x] Vector store abstraction
-* [x] In-memory vector store
-* [x] Cosine similarity search
+- [x] Embedding provider abstraction
+- [x] Fake embedding provider
+- [x] Embedding service
+- [x] Embedding API endpoint
+- [x] Vector store abstraction
+- [x] In-memory vector store
+- [x] Cosine similarity search
 
 #### Search and retrieval
 
-* [x] Semantic Search Service
-* [x] Semantic search API endpoint
-* [x] Retrieval service
+- [x] Semantic Search Service
+- [x] Semantic search API endpoint
+- [x] Retrieval service
 
 #### Answer generation and citations
 
-* [x] RAG answer prompt
-* [x] RAG answer generation service
-* [x] RAG answer API endpoint
-* [x] Source citation builder
-* [x] RAG answer citations
+- [x] RAG answer prompt
+- [x] RAG answer generation service
+- [x] RAG answer API endpoint
+- [x] Source citation builder
+- [x] RAG answer citations
 
 #### Evaluation
 
-* [x] RAG evaluation service
-* [x] RAG evaluation API endpoint
-* [x] Deterministic evaluation metrics
+- [x] RAG evaluation service
+- [x] RAG evaluation API endpoint
+- [x] Deterministic evaluation metrics
 
 ---
 
 ## M4 — AI Agents
 
+**Status:** Completed
+
 **Goal:** Build controlled AI agents capable of using tools and executing observable multi-step workflows.
 
 ### Agent foundation
 
-* [x] Agent runtime foundation
-* [x] Agent request and response schemas
-* [x] Agent execution trace
-* [x] Tool Registry
-* [x] Tool Execution Service
-* [x] Tool calling
+- [x] Agent runtime foundation
+- [x] Agent request and response schemas
+- [x] Agent execution trace
+- [x] Tool Registry
+- [x] Tool Execution Service
+- [x] Tool calling
 
 ### Agent tools
 
-* [x] RAG Retrieval Tool
-* [x] Requirement Analysis Tool
-* [x] RAG Answer Tool execution handler
+- [x] RAG Retrieval Tool
+- [x] Requirement Analysis Tool
+- [x] RAG Answer Tool execution handler
 
 ### Specialized agent
 
-* [x] QA Agent
+- [x] QA Agent
 
 ### Agent orchestration
 
-* [x] Agent planning with LLM
-* [x] Automatic tool selection
-* [x] Multi-step agent execution
-* [x] Memory and execution state
+- [x] Agent planning with LLM
+- [x] Automatic tool selection
+- [x] Multi-step agent execution
+- [x] Memory and execution state
 
 ### Control and reliability
 
-* [x] Human approval flow
-* [x] Persistent agent execution logs
-* [x] Agent safety limits
-* [x] Agent evaluation
+- [x] Human approval flow
+- [x] Persistent agent execution logs
+- [x] Agent safety limits
+- [x] Agent evaluation
 
 Detailed review:
 
 - [M4 — AI Agents Module Review](docs/study-notes/04-ai-agents-module-review.md)
 
-## Pre-M5 Applied AI Extensions
+---
 
-These extensions improve the practical usefulness of the platform before MCP integration.
+## Pre-M5 — File Ingestion Expansion
 
-### File ingestion expansion
+**Status:** Completed
 
-Goal: support real-world business and technical documents in RAG and agent workflows.
+**Goal:** Support real-world business and technical documents in RAG and agent workflows.
 
 - [x] PDF text extraction
 - [x] DOCX text extraction
@@ -210,9 +222,21 @@ Detailed review:
 
 - [File Ingestion Expansion Review](docs/study-notes/05-file-ingestion-expansion-review.md)
 
-### Data Analyst Agent foundation
+Current limitations:
 
-Goal: introduce controlled data analysis and database validation workflows that can collaborate with the QA Agent.
+- Scanned PDFs and OCR are not supported.
+- Legacy `.doc` and `.xls` files are not supported.
+- Structured table extraction does not yet infer semantic column types.
+
+---
+
+## Pre-M5 — Data Analyst Agent
+
+**Status:** Completed
+
+**Goal:** Introduce controlled data analysis and database validation workflows that can collaborate with the QA Agent.
+
+### Data Analyst Agent foundation
 
 - [x] Database schema representation
 - [x] Table and column metadata
@@ -231,8 +255,6 @@ Goal: introduce controlled data analysis and database validation workflows that 
 
 ### QA Agent and Data Analyst integration
 
-Goal: allow QA workflows to use controlled data validation when requirements depend on database-like evidence.
-
 - [x] Specialized Agent Registry
 - [x] Data Analyst Agent tool adapter
 - [x] `data_analysis.agent.run` tool registration
@@ -245,21 +267,19 @@ Goal: allow QA workflows to use controlled data validation when requirements dep
 
 Current limitations:
 
-- External database connectors
-- Database credentials management
-- Query cost estimation
-- Persistent SQL regression dataset files
-- NoSQL data source abstraction
-- LLM-based tool selection
-- LLM-as-judge evaluation
+- External database connectors are not implemented.
+- Database credentials management is not implemented.
+- Query cost estimation is not implemented.
+- Persistent SQL regression dataset files are not implemented.
+- NoSQL data source abstraction is planned for future evolution.
 
 ---
 
 ## M5 — MCP QA Server
 
-Status: Completed
+**Status:** Completed
 
-Goal: expose selected QA and software engineering capabilities through the Model Context Protocol.
+**Goal:** Expose selected QA and software engineering capabilities through the Model Context Protocol.
 
 Completed:
 
@@ -271,6 +291,7 @@ Completed:
 - [x] QA Agent MCP tool
 - [x] Data Analyst Agent MCP tool
 - [x] SQL Workflow Regression MCP tool
+- [x] Multi-Agent QA Copilot MCP tool
 - [x] MCP client validation
 - [x] MCP tool tests
 - [x] MCP security boundaries
@@ -278,6 +299,10 @@ Completed:
 - [x] MCP smoke test script
 - [x] FastMCP CLI wrapper for local inspection
 - [x] M5 final review documentation
+
+Detailed review:
+
+- [M5 — MCP QA Server Review](docs/study-notes/06-mcp-qa-server-review.md)
 
 Current limitations:
 
@@ -292,9 +317,9 @@ Current limitations:
 
 ## M6 — Multi-Agent QA Copilot
 
-Status: Completed
+**Status:** Completed
 
-Goal: orchestrate multiple specialized agents around a shared quality-engineering workflow.
+**Goal:** Orchestrate multiple specialized agents around a shared quality-engineering workflow.
 
 Completed:
 
@@ -325,26 +350,31 @@ Completed:
 - [x] Multi-Agent QA Copilot evaluation API endpoint
 - [x] M6 final review documentation
 
+Detailed review:
+
+- [M6 — Multi-Agent QA Copilot Review](docs/study-notes/07-multi-agent-qa-copilot-review.md)
+
 Current limitations:
 
 - Agent reasoning is still mostly deterministic.
 - Only the Requirement Analyst Agent is connected to the existing LLM-backed requirement analysis service.
-- Functional QA, Test Automation, Reviewer and Report agents are not yet LLM-backed.
+- Functional QA, Test Automation, Reviewer and Report agents are not yet fully LLM-backed.
 - Conflict detection exists, but automatic conflict resolution is not implemented yet.
 - Failure handling exists, but retry policies per agent are not implemented yet.
 - Data validation requires explicit structured input.
 - External database connections are not supported.
 - MCP exposure exists, but production MCP hosting is not defined.
-- Evaluation is deterministic and does not include LLM-as-judge yet.
 - Authentication and authorization are not implemented.
 
 ---
 
 ## M7 — Evaluation and LLMOps
 
-Status: Planned
+**Status:** Completed
 
-Goal: continuously evaluate, observe and improve the behavior of LLM, RAG and agent components.
+**Goal:** Continuously evaluate, observe and improve the behavior of LLM, RAG, agent and multi-agent components.
+
+M7 introduced the evaluation, regression, telemetry and observability foundation of the project.
 
 ### Evaluation
 
@@ -352,61 +382,191 @@ Goal: continuously evaluate, observe and improve the behavior of LLM, RAG and ag
 - [x] Golden evaluation dataset runner
 - [x] Prompt regression tests foundation
 - [x] AI evaluation report aggregation
-- [ ] LLM output evaluation suite
-- [ ] RAG regression evaluation suite
-- [ ] Agent regression evaluation suite
-- [ ] Multi-Agent QA Copilot regression evaluation
-- [ ] Tool-calling evaluation
-- [ ] LLM-as-judge evaluation prototype
-- [ ] CI evaluation pipeline
+- [x] LLM output evaluation suite
+- [x] RAG regression evaluation suite
+- [x] Agent regression evaluation suite
+- [x] Multi-Agent QA Copilot regression evaluation
+- [x] Tool-calling evaluation
+- [x] LLM-as-judge evaluation prototype
+- [x] CI evaluation pipeline
 
 ### Observability
 
-- [ ] Structured AI execution telemetry
-- [ ] Token usage tracking
-- [ ] Cost tracking
-- [ ] Latency tracking
-- [ ] Error and fallback tracking
-- [ ] Retrieval quality metrics
-- [ ] Agent execution metrics
-- [ ] Multi-agent execution metrics
-- [ ] Observability dashboard
+- [x] Structured AI execution telemetry
+- [x] Token usage tracking
+- [x] Cost tracking
+- [x] Latency tracking
+- [x] Error and fallback tracking
+- [x] Retrieval quality metrics
+- [x] Agent execution metrics
+- [x] Multi-agent execution metrics
+- [x] Observability dashboard
+
+### Evaluation endpoints
+
+- [x] `GET /evals/golden-dataset`
+- [x] `GET /evals/golden-dataset/validation`
+- [x] `POST /evals/golden-dataset/validate`
+- [x] `POST /evals/golden-dataset/run`
+- [x] `GET /evals/prompt-regression/suite`
+- [x] `POST /evals/prompt-regression/run`
+- [x] `POST /evals/reports/aggregate`
+- [x] `GET /evals/llm-output/suite`
+- [x] `POST /evals/llm-output/run`
+- [x] `GET /evals/rag-regression/suite`
+- [x] `POST /evals/rag-regression/run`
+- [x] `GET /evals/agent-regression/suite`
+- [x] `POST /evals/agent-regression/run`
+- [x] `GET /evals/tool-calling/suite`
+- [x] `POST /evals/tool-calling/run`
+- [x] `GET /evals/multi-agent-copilot-regression/suite`
+- [x] `POST /evals/multi-agent-copilot-regression/run`
+- [x] `GET /evals/llm-as-judge/suite`
+- [x] `POST /evals/llm-as-judge/run`
+- [x] `POST /evals/ci/pipeline/run`
+
+### Telemetry and observability endpoints
+
+- [x] `POST /evals/telemetry/events`
+- [x] `GET /evals/telemetry/events`
+- [x] `POST /evals/telemetry/summary`
+- [x] `GET /evals/telemetry/summary`
+- [x] `POST /observability/usage/records`
+- [x] `GET /observability/usage/records`
+- [x] `POST /observability/usage/summary`
+- [x] `GET /observability/usage/summary`
+- [x] `POST /observability/retrieval-quality/records`
+- [x] `GET /observability/retrieval-quality/records`
+- [x] `POST /observability/retrieval-quality/summary`
+- [x] `GET /observability/retrieval-quality/summary`
+- [x] `POST /observability/agent-execution/records`
+- [x] `GET /observability/agent-execution/records`
+- [x] `POST /observability/agent-execution/summary`
+- [x] `GET /observability/agent-execution/summary`
+- [x] `POST /observability/multi-agent-execution/records`
+- [x] `GET /observability/multi-agent-execution/records`
+- [x] `POST /observability/multi-agent-execution/summary`
+- [x] `GET /observability/multi-agent-execution/summary`
+- [x] `GET /observability/dashboard`
+
+### CI evaluation pipeline
+
+- [x] Deterministic AI evaluation pipeline service
+- [x] AI evaluation pipeline API endpoint
+- [x] AI evaluation pipeline script
+- [x] GitHub Actions workflow for AI evaluation
+- [x] Quality gate support
+- [x] Pipeline report output
+
+### Detailed review
+
+- [M7 — Evaluation and LLMOps Review](docs/study-notes/08-evaluation-and-llmops-review.md)
+
+Current limitations:
+
+- Evaluation datasets are still small and deterministic.
+- Most evaluation and observability records are currently stored in memory.
+- Token and cost tracking depends on caller-provided pricing data.
+- Cost calculation is an estimate and not provider billing reconciliation.
+- Retrieval quality metrics depend on caller-provided relevance and similarity signals.
+- Observability dashboard is backend-only.
+- Dashboard output is not yet connected to a persistent database.
+- OpenTelemetry, Grafana and external monitoring integrations are not implemented yet.
+- Authentication, authorization and multi-user isolation are not implemented yet.
 
 ---
 
 ## M8 — Cloud, Security and Portfolio
 
-**Goal:** Prepare the project for production-like deployment, governance and professional presentation.
+**Status:** Next
+
+**Goal:** Prepare the project for production-like deployment, governance, frontend experience and professional presentation.
+
+M8 should transform the current backend platform foundation into a more demonstrable and portfolio-ready AI engineering product.
 
 ### Cloud and operations
 
-* [ ] Cloud deployment
-* [ ] Environment-specific configuration
-* [ ] Persistent vector storage
-* [ ] Persistent agent state
-* [ ] Deployment pipeline
-* [ ] Production health checks
+- [ ] Cloud deployment
+- [ ] Environment-specific configuration
+- [ ] Persistent vector storage
+- [ ] Persistent evaluation storage
+- [ ] Persistent observability storage
+- [ ] Persistent agent state
+- [ ] Deployment pipeline
+- [ ] Production health checks
+- [ ] Production MCP hosting direction
+- [ ] Production monitoring direction
 
 ### Security and governance
 
-* [ ] Secrets management
-* [ ] Authentication and access control
-* [ ] Prompt injection protection
-* [ ] Tool authorization boundaries
-* [ ] Sensitive data handling
-* [ ] Audit logs
-* [ ] AI governance documentation
+- [ ] Secrets management
+- [ ] Authentication and access control
+- [ ] Multi-user isolation
+- [ ] Prompt injection protection
+- [ ] Tool authorization boundaries
+- [ ] Sensitive data handling
+- [ ] Audit logs
+- [ ] AI governance documentation
+- [ ] Safe provider configuration strategy
+
+### Frontend and product experience
+
+- [ ] Frontend architecture decision
+- [ ] AI Quality Command Center foundation
+- [ ] Backend dashboard integration
+- [ ] Evaluation Center UI
+- [ ] Observability Center UI
+- [ ] QA Agent Console
+- [ ] Multi-Agent QA Copilot Console
+- [ ] RAG Console
+- [ ] Data Analyst Agent Console
+- [ ] Provider and model settings UI
+- [ ] Usage and cost visualization
+- [ ] Risk and recommendation panels
 
 ### Documentation and portfolio
 
-* [ ] Updated architecture documentation
-* [ ] Architecture diagrams
-* [ ] Complete API usage examples
-* [ ] Portfolio-oriented README
-* [ ] Demonstration scenarios
-* [ ] GitHub project presentation
-* [ ] LinkedIn project presentation
-* [ ] Final technical case study
+- [ ] Updated architecture documentation
+- [ ] Architecture diagrams
+- [ ] Complete API usage examples
+- [ ] Portfolio-oriented README
+- [ ] Demonstration scenarios
+- [ ] GitHub project presentation
+- [ ] LinkedIn project presentation
+- [ ] Final technical case study
+
+---
+
+## Future Extensions
+
+Potential future extensions after M8 include:
+
+### Additional LLM Providers
+
+- [ ] Anthropic Claude provider
+- [ ] Google Gemini provider
+- [ ] Provider comparison evaluation
+- [ ] Multi-provider benchmark datasets
+- [ ] Provider-specific latency, cost and quality comparison
+
+### Data Analyst Agent Evolution
+
+- [ ] External SQL database connectors
+- [ ] Read-only database credential handling
+- [ ] Query cost estimation
+- [ ] Persistent SQL regression datasets
+- [ ] NoSQL data source abstraction
+- [ ] Natural-language analytics workflows
+- [ ] Data validation dashboards
+
+### AI Quality Engineering Evolution
+
+- [ ] Quality evaluation for AI agents
+- [ ] Quality evaluation for AI systems
+- [ ] Agent reliability scoring
+- [ ] Prompt quality scoring
+- [ ] RAG quality dashboards
+- [ ] Production LLMOps scorecards
 
 ---
 
@@ -431,7 +591,11 @@ Multi-Agent QA Copilot
         ↓
 Evaluation and LLMOps
         ↓
-Cloud-ready AI engineering portfolio
+AI Observability Dashboard
+        ↓
+Cloud, Security and Portfolio
+        ↓
+AI Quality Command Center
 ```
 
 Each module builds on the contracts, tests and architectural decisions introduced by the previous modules.
