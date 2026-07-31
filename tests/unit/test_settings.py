@@ -17,6 +17,7 @@ SETTINGS_ENV_VARS = [
     "STORAGE_BACKEND",
     "STORAGE_BASE_DIR",
     "AI_USAGE_RECORDS_PATH",
+    "EVALUATION_TELEMETRY_EVENTS_PATH",
 ]
 
 
@@ -37,6 +38,10 @@ def test_settings_should_use_fake_provider_by_default() -> None:
     assert settings.storage_backend == "local_jsonl"
     assert settings.storage_base_dir == ".data"
     assert settings.ai_usage_records_path == "observability/usage-records.jsonl"
+    assert (
+    settings.evaluation_telemetry_events_path
+    == "observability/evaluation-telemetry-events.jsonl"
+    )
 
 
 def test_settings_should_accept_openai_provider() -> None:
@@ -104,3 +109,19 @@ def test_settings_should_load_ai_usage_records_path_from_environment(
     settings = Settings()
 
     assert settings.ai_usage_records_path == "custom/usage-records.jsonl"
+
+
+def test_settings_should_load_evaluation_telemetry_events_path_from_environment(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv(
+        "EVALUATION_TELEMETRY_EVENTS_PATH",
+        "custom/evaluation-telemetry-events.jsonl",
+    )
+
+    settings = Settings()
+
+    assert (
+        settings.evaluation_telemetry_events_path
+        == "custom/evaluation-telemetry-events.jsonl"
+    )

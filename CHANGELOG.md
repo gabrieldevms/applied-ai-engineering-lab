@@ -26,6 +26,8 @@ All notable changes to this project will be documented in this file.
 - Added generic JSONL store support for append, list, recent listing, field lookup, count, clear and metadata operations.
 - Added persistent local JSONL storage support for AI usage tracking records.
 - Added `AI_USAGE_RECORDS_PATH` setting for configurable usage tracking persistence.
+- Added persistent local JSONL storage support for evaluation telemetry events.
+- Added `EVALUATION_TELEMETRY_EVENTS_PATH` setting for configurable evaluation telemetry persistence.
 
 ### Changed
 
@@ -36,6 +38,8 @@ All notable changes to this project will be documented in this file.
 - Updated the frontend navigation to include provider settings, Usage & Cost and Central de Riscos.
 - Updated AI usage tracking to support persistent storage through the storage foundation.
 - Updated Usage & Cost backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
+- Updated evaluation telemetry to support persistent storage through the storage foundation.
+- Updated Evaluation Center and observability dashboard backend data flow to survive API restarts for evaluation telemetry when `STORAGE_BACKEND=local_jsonl`.
 
 ### Notes
 
@@ -46,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - Persistent execution history, live dashboard updates, production observability integration, security/governance, cloud readiness and portfolio documentation remain future M8 work.
 - Persistent Storage Foundation introduces reusable storage primitives, but existing observability services are not migrated to persistent storage yet.
 - Usage tracking is the first observability service migrated from in-memory-only storage to the persistent storage foundation.
+- Evaluation telemetry is now the second observability capability migrated to the persistent storage foundation, after usage tracking.
 
 ---
 

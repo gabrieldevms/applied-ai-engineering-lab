@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+from ai_api.evals.telemetry import JsonlEvaluationTelemetryEventStore
 from ai_api.evals import (
     EvaluationTelemetryEvent,
     EvaluationTelemetryRecordRequest,
@@ -180,3 +181,108 @@ def test_evaluation_telemetry_record_request_should_reject_blank_source() -> Non
             status="completed",
             source="   ",
         )
+
+
+def test_evaluation_telemetry_service_should_persist_events_with_jsonl_store(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "evaluation-telemetry-events.jsonl"
+
+    first_service = EvaluationTelemetryService(
+        event_store=JsonlEvaluationTelemetryEventStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    first_service.record(
+        EvaluationTelemetryRecordRequest(
+            event_type="golden_dataset_run",
+            component="evaluation",
+            status="completed",
+            source="unit-test",
+            duration_ms=12.5,
+            score=1.0,
+            run_id="eval-run-001",
+            metadata={
+                "source_detail": "persistence-test",
+            },
+        )
+    )
+
+    second_service = EvaluationTelemetryService(
+        event_store=JsonlEvaluationTelemetryEventStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = second_service.list_events()
+
+    assert response.count == 1
+    assert response.events[0].event_type == "golden_dataset_run"
+    assert response.events[0].component == "evaluation"
+    assert response.events[0].status == "completed"
+    assert response.events[0].run_id == "eval-run-001"
+    assert response.events[0].metadata["storage_backend"] == "local_jsonl"
+    assert response.events[0].metadata["source_detail"] == "persistence-test"
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_evaluation_telemetry_service_should_summarize_persisted_jsonl_events(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "evaluation-telemetry-events.jsonl"
+
+    service = EvaluationTelemetryService(
+        event_store=JsonlEvaluationTelemetryEventStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        EvaluationTelemetryRecordRequest(
+            event_type="prompt_regression_run",
+            component="evaluation",
+            status="completed",
+            source="unit-test",
+            duration_ms=20.0,
+            score=0.9,
+            run_id="eval-run-001",
+        )
+    )
+
+    restored_service = EvaluationTelemetryService(
+        event_store=JsonlEvaluationTelemetryEventStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = restored_service.summarize(EvaluationTelemetrySummaryRequest())
+
+    assert response.status == "passed"
+    assert response.event_count == 1
+    assert response.completed_count == 1
+    assert response.failed_count == 0
+    assert response.average_score == 0.9
+    assert response.average_duration_ms == 20.0
+    assert response.event_type_coverage["prompt_regression_run"] == 1
+    assert response.component_coverage["evaluation"] == 1
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_evaluation_telemetry_service_should_clear_jsonl_events(tmp_path) -> None:
+    file_path = tmp_path / "evaluation-telemetry-events.jsonl"
+
+    service = EvaluationTelemetryService(
+        event_store=JsonlEvaluationTelemetryEventStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        EvaluationTelemetryRecordRequest(
+            event_type="llm_output_evaluation_run",
+            component="evaluation",
+            status="completed",
+            source="unit-test",
+        )
+    )
+
+    service.clear()
+
+    assert service.list_events().count == 0
+    assert service.summarize(EvaluationTelemetrySummaryRequest()).event_count == 0
