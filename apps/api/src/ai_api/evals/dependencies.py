@@ -49,7 +49,9 @@ _ai_usage_tracking_service = AIUsageTrackingService.from_settings(
     get_settings(),
 )
 
-_evaluation_telemetry_service = EvaluationTelemetryService()
+_evaluation_telemetry_service = EvaluationTelemetryService.from_settings(
+    get_settings(),
+)
 
 _ai_retrieval_quality_telemetry_service = AIRetrievalQualityTelemetryService()
 
@@ -186,6 +188,7 @@ def get_ai_multi_agent_execution_telemetry_service() -> (
     AIMultiAgentExecutionTelemetryService
 ):
     return _ai_multi_agent_execution_telemetry_service
+
 
 def get_ai_observability_dashboard_service() -> (
     AIObservabilityDashboardService
