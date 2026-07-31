@@ -1,5 +1,8 @@
 from datetime import UTC, datetime
+from pathlib import Path
+from typing import Protocol
 from uuid import uuid4
+from ai_api.config import Settings
 from ai_api.evals.schemas import (
     AIRetrievalQualityRecord,
     AIRetrievalQualityRecordRequest,
@@ -7,11 +10,109 @@ from ai_api.evals.schemas import (
     AIRetrievalQualitySummaryRequest,
     AIRetrievalQualitySummaryResponse,
 )
+from ai_api.storage import JsonlStore, resolve_storage_path
+
+
+class AIRetrievalQualityRecordStore(Protocol):
+    def append(
+        self,
+        record: AIRetrievalQualityRecord,
+    ) -> AIRetrievalQualityRecord:
+        """Append a retrieval quality record."""
+        ...
+
+    def list_records(self) -> list[AIRetrievalQualityRecord]:
+        """List all stored retrieval quality records."""
+        ...
+
+    def count(self) -> int:
+        """Return the number of stored retrieval quality records."""
+        ...
+
+    def clear(self) -> None:
+        """Clear all stored retrieval quality records."""
+        ...
+
+
+class InMemoryAIRetrievalQualityRecordStore:
+    def __init__(self) -> None:
+        self._records: list[AIRetrievalQualityRecord] = []
+
+    def append(
+        self,
+        record: AIRetrievalQualityRecord,
+    ) -> AIRetrievalQualityRecord:
+        self._records.append(record)
+
+        return record
+
+    def list_records(self) -> list[AIRetrievalQualityRecord]:
+        return list(self._records)
+
+    def count(self) -> int:
+        return len(self._records)
+
+    def clear(self) -> None:
+        self._records.clear()
+
+
+class JsonlAIRetrievalQualityRecordStore:
+    def __init__(
+        self,
+        file_path: str | Path,
+    ) -> None:
+        self._store = JsonlStore(
+            file_path=file_path,
+            record_type=AIRetrievalQualityRecord,
+        )
+
+    def append(
+        self,
+        record: AIRetrievalQualityRecord,
+    ) -> AIRetrievalQualityRecord:
+        return self._store.append(record)
+
+    def list_records(self) -> list[AIRetrievalQualityRecord]:
+        return self._store.list_records()
+
+    def count(self) -> int:
+        return self._store.count()
+
+    def clear(self) -> None:
+        self._store.clear()
 
 
 class AIRetrievalQualityTelemetryService:
-    def __init__(self) -> None:
-        self._records: list[AIRetrievalQualityRecord] = []
+    def __init__(
+        self,
+        record_store: AIRetrievalQualityRecordStore | None = None,
+        storage_backend: str = "memory",
+    ) -> None:
+        self.record_store = (
+            record_store or InMemoryAIRetrievalQualityRecordStore()
+        )
+        self.storage_backend = storage_backend
+
+    @classmethod
+    def from_settings(
+        cls,
+        settings: Settings,
+    ) -> "AIRetrievalQualityTelemetryService":
+        if settings.storage_backend == "local_jsonl":
+            return cls(
+                record_store=JsonlAIRetrievalQualityRecordStore(
+                    file_path=resolve_storage_path(
+                        settings=settings,
+                        relative_path=settings.retrieval_quality_records_path,
+                    ),
+                ),
+                storage_backend="local_jsonl",
+            )
+
+        return cls(
+            record_store=InMemoryAIRetrievalQualityRecordStore(),
+            storage_backend="memory",
+        )
 
     def record(
         self,
@@ -72,13 +173,12 @@ class AIRetrievalQualityTelemetryService:
             metadata={
                 "retrieval_quality_schema_version": "0.1.0",
                 "scoring_mode": "caller_provided_retrieval_signals",
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
-        self._records.append(record)
-
-        return record
+        return self.record_store.append(record)
 
     def list_records(
         self,
@@ -87,7 +187,11 @@ class AIRetrievalQualityTelemetryService:
         status: str | None = None,
         limit: int = 100,
     ) -> AIRetrievalQualityRecordsResponse:
-        filtered_records = self._records
+        if limit < 1:
+            raise ValueError("limit must be greater than zero")
+
+        stored_records = self.record_store.list_records()
+        filtered_records = stored_records
 
         if component is not None:
             filtered_records = [
@@ -117,7 +221,8 @@ class AIRetrievalQualityTelemetryService:
             count=len(limited_records),
             metadata={
                 "source": "ai-retrieval-quality-telemetry-service",
-                "total_stored_records": len(self._records),
+                "storage_backend": self.storage_backend,
+                "total_stored_records": len(stored_records),
                 "applied_filters": {
                     "component": component,
                     "operation": operation,
@@ -131,7 +236,11 @@ class AIRetrievalQualityTelemetryService:
         self,
         request: AIRetrievalQualitySummaryRequest,
     ) -> AIRetrievalQualitySummaryResponse:
-        records = request.records if request.records is not None else self._records
+        records = (
+            request.records
+            if request.records is not None
+            else self.record_store.list_records()
+        )
 
         return AIRetrievalQualitySummaryResponse(
             record_count=len(records),
@@ -196,12 +305,13 @@ class AIRetrievalQualityTelemetryService:
                 "source": "stored_records"
                 if request.records is None
                 else "request_records",
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
     def clear(self) -> None:
-        self._records.clear()
+        self.record_store.clear()
 
     @staticmethod
     def _calculate_precision_at_k(

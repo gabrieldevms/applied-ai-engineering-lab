@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+from ai_api.evals.retrieval_quality import JsonlAIRetrievalQualityRecordStore
 from ai_api.evals import (
     AIRetrievalQualityRecord,
     AIRetrievalQualityRecordRequest,
@@ -277,3 +278,131 @@ def test_retrieval_quality_request_should_reject_invalid_similarity_score() -> N
             query="Query",
             average_similarity_score=1.5,
         )
+
+
+def test_retrieval_quality_service_should_persist_records_with_jsonl_store(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "retrieval-quality-records.jsonl"
+
+    first_service = AIRetrievalQualityTelemetryService(
+        record_store=JsonlAIRetrievalQualityRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    first_service.record(
+        AIRetrievalQualityRecordRequest(
+            component="rag",
+            operation="rag_answer",
+            query="Quando o boleto deve ser registrado?",
+            retrieved_chunks_count=3,
+            relevant_chunks_count=3,
+            citation_count=2,
+            unique_source_count=2,
+            required_source_count=2,
+            matched_required_source_count=2,
+            average_similarity_score=0.9,
+            expected_min_retrieved_chunks=1,
+            expected_min_citations=1,
+            min_quality_score=0.7,
+            run_id="retrieval-run-001",
+            metadata={
+                "source_detail": "persistence-test",
+            },
+        )
+    )
+
+    second_service = AIRetrievalQualityTelemetryService(
+        record_store=JsonlAIRetrievalQualityRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = second_service.list_records()
+
+    assert response.count == 1
+    assert response.records[0].component == "rag"
+    assert response.records[0].operation == "rag_answer"
+    assert response.records[0].status == "passed"
+    assert response.records[0].run_id == "retrieval-run-001"
+    assert response.records[0].precision_at_k == 1.0
+    assert response.records[0].source_coverage_score == 1.0
+    assert response.records[0].quality_score == 0.9667
+    assert response.records[0].metadata["storage_backend"] == "local_jsonl"
+    assert response.records[0].metadata["source_detail"] == "persistence-test"
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_retrieval_quality_service_should_summarize_persisted_jsonl_records(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "retrieval-quality-records.jsonl"
+
+    service = AIRetrievalQualityTelemetryService(
+        record_store=JsonlAIRetrievalQualityRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        AIRetrievalQualityRecordRequest(
+            component="rag",
+            operation="rag_retrieve",
+            query="Qual é a política de cobrança?",
+            retrieved_chunks_count=2,
+            relevant_chunks_count=1,
+            citation_count=1,
+            unique_source_count=1,
+            average_similarity_score=0.8,
+            expected_min_retrieved_chunks=1,
+            expected_min_citations=1,
+            min_quality_score=0.5,
+            run_id="retrieval-run-001",
+        )
+    )
+
+    restored_service = AIRetrievalQualityTelemetryService(
+        record_store=JsonlAIRetrievalQualityRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = restored_service.summarize(AIRetrievalQualitySummaryRequest())
+
+    assert response.record_count == 1
+    assert response.passed_count == 1
+    assert response.warning_count == 0
+    assert response.failed_count == 0
+    assert response.total_retrieved_chunks == 2
+    assert response.total_relevant_chunks == 1
+    assert response.total_citations == 1
+    assert response.average_precision_at_k == 0.5
+    assert response.average_quality_score == 0.65
+    assert response.average_similarity_score == 0.8
+    assert response.component_coverage["rag"] == 1
+    assert response.operation_coverage["rag_retrieve"] == 1
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_retrieval_quality_service_should_clear_jsonl_records(tmp_path) -> None:
+    file_path = tmp_path / "retrieval-quality-records.jsonl"
+
+    service = AIRetrievalQualityTelemetryService(
+        record_store=JsonlAIRetrievalQualityRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        AIRetrievalQualityRecordRequest(
+            component="rag",
+            operation="rag_answer",
+            query="Query",
+            retrieved_chunks_count=1,
+            relevant_chunks_count=1,
+            citation_count=1,
+            unique_source_count=1,
+            average_similarity_score=0.9,
+        )
+    )
+
+    service.clear()
+
+    assert service.list_records().count == 0
+    assert service.summarize(AIRetrievalQualitySummaryRequest()).record_count == 0

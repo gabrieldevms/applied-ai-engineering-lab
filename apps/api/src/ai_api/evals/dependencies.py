@@ -53,7 +53,11 @@ _evaluation_telemetry_service = EvaluationTelemetryService.from_settings(
     get_settings(),
 )
 
-_ai_retrieval_quality_telemetry_service = AIRetrievalQualityTelemetryService()
+_ai_retrieval_quality_telemetry_service = (
+    AIRetrievalQualityTelemetryService.from_settings(
+        get_settings(),
+    )
+)
 
 _ai_agent_execution_telemetry_service = AIAgentExecutionTelemetryService()
 
