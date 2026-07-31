@@ -1,11 +1,14 @@
 import type { ReactNode } from "react";
-import { navigationLabels } from "../../i18n/ptBr";
+import { navigationItems } from "../../i18n/ptBr";
+import type { AppPage } from "../../types/navigation";
 
 type AppShellProps = {
+  activePage: AppPage;
   children: ReactNode;
+  onNavigate: (page: AppPage) => void;
 };
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ activePage, children, onNavigate }: AppShellProps) {
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -18,15 +21,21 @@ export function AppShell({ children }: AppShellProps) {
         </div>
 
         <nav className="sidebar-nav" aria-label="Navegação principal">
-          {navigationLabels.map((item) => (
-            <button
-              className={item === "Overview" ? "nav-item active" : "nav-item"}
-              key={item}
-              type="button"
-            >
-              {item}
-            </button>
-          ))}
+          {navigationItems.map((item) => {
+            const isActive = item.page === activePage;
+
+            return (
+              <button
+                aria-current={isActive ? "page" : undefined}
+                className={isActive ? "nav-item active" : "nav-item"}
+                key={item.page}
+                onClick={() => onNavigate(item.page)}
+                type="button"
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </nav>
       </aside>
 
