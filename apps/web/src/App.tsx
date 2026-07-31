@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { CommandCenterPage } from "./pages/CommandCenterPage";
 import { EvaluationCenterPage } from "./pages/EvaluationCenterPage";
+import { MultiAgentCopilotConsolePage } from "./pages/MultiAgentCopilotConsolePage";
 import { ObservabilityCenterPage } from "./pages/ObservabilityCenterPage";
 import { ProductPlaceholderPage } from "./pages/ProductPlaceholderPage";
 import { QAAgentConsolePage } from "./pages/QAAgentConsolePage";
@@ -25,6 +26,10 @@ export default function App() {
 
     if (activePage === "qa-agent") {
       return <QAAgentConsolePage />;
+    }
+
+    if (activePage === "multi-agent-copilot") {
+      return <MultiAgentCopilotConsolePage />;
     }
 
     return <ProductPlaceholderPage page={activePage} />;
