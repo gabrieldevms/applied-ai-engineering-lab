@@ -32,6 +32,13 @@ const pageContent: Record<
       "Visualização de tokens, custos estimados, coverage por provider/modelo e riscos de usage tracking.",
     plannedItems: [],
   },
+    "risk-center": {
+    eyebrow: "Risk Center",
+    title: "Central de Riscos",
+    description:
+      "Painéis consolidados de riscos, recomendações e sinais de atenção da plataforma.",
+    plannedItems: [],
+  },
   evaluation: {
     eyebrow: "Evaluation",
     title: "Evaluation Center",

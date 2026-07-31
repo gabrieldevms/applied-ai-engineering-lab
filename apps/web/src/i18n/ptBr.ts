@@ -20,6 +20,10 @@ export const navigationItems: NavigationItem[] = [
     label: "Uso e Custos",
   },
   {
+    page: "risk-center",
+    label: "Central de Riscos",
+  },
+  {
     page: "evaluation",
     label: "Central de Avaliação",
   },

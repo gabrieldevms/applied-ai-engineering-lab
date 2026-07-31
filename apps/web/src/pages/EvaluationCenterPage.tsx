@@ -171,7 +171,7 @@ export function EvaluationCenterPage() {
       <section className="hero-card">
         <div>
           <span className="eyebrow">Evaluation</span>
-          <h1>Evaluation Center</h1>
+          <h1>Central de Avaliação</h1>
           <p>
             Uma área dedicada para acompanhar sinais de avaliação, regressões,
             quality gates e confiabilidade dos workflows de IA do projeto.

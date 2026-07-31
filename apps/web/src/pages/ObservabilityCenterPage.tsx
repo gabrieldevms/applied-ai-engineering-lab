@@ -84,7 +84,7 @@ export function ObservabilityCenterPage() {
       <section className="hero-card">
         <div>
           <span className="eyebrow">Observability</span>
-          <h1>Observability Center</h1>
+          <h1>Central de Observabilidade</h1>
           <p>
             Uma visão dedicada para acompanhar saúde, riscos, recomendações e
             sinais operacionais dos workflows de IA do projeto.

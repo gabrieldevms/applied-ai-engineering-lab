@@ -133,7 +133,7 @@ export function UsageCostPage() {
       <section className="hero-card">
         <div>
           <span className="eyebrow">LLMOps</span>
-          <h1>Usage & Cost</h1>
+          <h1>Uso e Custos</h1>
           <p>
             Visualize tokens, custos estimados, coverage por provider/modelo e
             riscos de usage tracking. Esta tela usa os endpoints de observability

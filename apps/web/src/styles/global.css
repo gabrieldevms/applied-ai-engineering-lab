@@ -1231,3 +1231,113 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+.risk-signal-card,
+.risk-status-card,
+.risk-panel-card,
+.risk-section-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+  padding: 1.25rem;
+}
+
+.risk-signal-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.risk-signal-card h2,
+.risk-status-card h2,
+.risk-panel-card h2,
+.risk-section-card h3 {
+  margin: 0.2rem 0 0.7rem;
+  color: #f8fafc;
+}
+
+.risk-signal-card p,
+.risk-section-card p {
+  color: #cbd5e1;
+}
+
+.risk-status-grid {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.8fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.risk-status-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.risk-status-list div {
+  align-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.risk-status-list span {
+  color: #94a3b8;
+}
+
+.risk-status-list strong {
+  color: #f8fafc;
+}
+
+.risk-list {
+  margin: 0.7rem 0 0;
+  padding-left: 1.2rem;
+  color: #cbd5e1;
+}
+
+.risk-list li + li {
+  margin-top: 0.45rem;
+}
+
+.risk-section-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.risk-section-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.risk-section-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.risk-section-content {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 1180px) {
+  .risk-status-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .risk-signal-card,
+  .risk-section-header {
+    flex-direction: column;
+  }
+
+  .risk-section-content {
+    grid-template-columns: 1fr;
+  }
+}

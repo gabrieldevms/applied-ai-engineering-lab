@@ -9,6 +9,7 @@ import { ProductPlaceholderPage } from "./pages/ProductPlaceholderPage";
 import { ProviderSettingsPage } from "./pages/ProviderSettingsPage";
 import { QAAgentConsolePage } from "./pages/QAAgentConsolePage";
 import { RAGConsolePage } from "./pages/RAGConsolePage";
+import { RiskCenterPage } from "./pages/RiskCenterPage";
 import { UsageCostPage } from "./pages/UsageCostPage";
 import type { AppPage } from "./types/navigation";
 
@@ -26,6 +27,10 @@ export default function App() {
 
     if (activePage === "usage-cost") {
       return <UsageCostPage />;
+    }
+
+    if (activePage === "risk-center") {
+      return <RiskCenterPage />;
     }
 
     if (activePage === "evaluation") {
