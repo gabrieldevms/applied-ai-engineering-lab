@@ -119,7 +119,7 @@ export function ProviderSettingsPage() {
       <section className="hero-card">
         <div>
           <span className="eyebrow">Configurações de provider</span>
-          <h1>Provider and Model Settings</h1>
+          <h1>Configurações de Provider e Modelo</h1>
           <p>
             Visualize o provider LLM ativo, modelo configurado, health check e
             estratégia segura de configuração. Esta tela é read-only e não
