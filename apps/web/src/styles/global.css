@@ -1026,3 +1026,117 @@ code {
     flex-direction: column;
   }
 }
+
+.provider-settings-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.8fr);
+  gap: 1rem;
+}
+
+.provider-settings-card,
+.provider-catalog-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+  padding: 1.25rem;
+}
+
+.provider-settings-card-highlight {
+  display: grid;
+  gap: 1rem;
+}
+
+.provider-settings-card h2,
+.provider-catalog-card h3 {
+  margin: 0.2rem 0 0.5rem;
+  color: #f8fafc;
+}
+
+.provider-settings-card p,
+.provider-catalog-card p {
+  color: #cbd5e1;
+}
+
+.provider-settings-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.provider-settings-meta span {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.3);
+  color: #94a3b8;
+  padding: 0.45rem 0.7rem;
+}
+
+.provider-settings-meta strong {
+  color: #f8fafc;
+}
+
+.provider-warning-panel {
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 1rem;
+  background: rgba(251, 191, 36, 0.08);
+  padding: 1rem;
+}
+
+.provider-warning-panel ul {
+  margin: 0.7rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.provider-settings-list {
+  margin: 0.7rem 0 0;
+  padding-left: 1.2rem;
+  color: #cbd5e1;
+}
+
+.provider-settings-list li + li {
+  margin-top: 0.4rem;
+}
+
+.provider-settings-list code,
+.provider-warning-panel code {
+  border-radius: 0.4rem;
+  background: rgba(2, 6, 23, 0.45);
+  color: #dbeafe;
+  padding: 0.15rem 0.35rem;
+}
+
+.provider-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.provider-catalog-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.provider-catalog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.provider-catalog-card small {
+  color: #94a3b8;
+}
+
+@media (max-width: 1180px) {
+  .provider-settings-grid,
+  .provider-catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .provider-catalog-header {
+    flex-direction: column;
+  }
+}

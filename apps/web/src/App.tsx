@@ -6,6 +6,7 @@ import { EvaluationCenterPage } from "./pages/EvaluationCenterPage";
 import { MultiAgentCopilotConsolePage } from "./pages/MultiAgentCopilotConsolePage";
 import { ObservabilityCenterPage } from "./pages/ObservabilityCenterPage";
 import { ProductPlaceholderPage } from "./pages/ProductPlaceholderPage";
+import { ProviderSettingsPage } from "./pages/ProviderSettingsPage";
 import { QAAgentConsolePage } from "./pages/QAAgentConsolePage";
 import { RAGConsolePage } from "./pages/RAGConsolePage";
 import type { AppPage } from "./types/navigation";
@@ -40,6 +41,10 @@ export default function App() {
 
     if (activePage === "data-analyst") {
       return <DataAnalystConsolePage />;
+    }
+
+    if (activePage === "provider-settings") {
+      return <ProviderSettingsPage />;
     }
 
     return <ProductPlaceholderPage page={activePage} />;
