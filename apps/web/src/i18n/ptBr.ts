@@ -16,6 +16,10 @@ export const navigationItems: NavigationItem[] = [
     label: "Central de Observabilidade",
   },
   {
+    page: "usage-cost",
+    label: "Uso e Custos",
+  },
+  {
     page: "evaluation",
     label: "Central de Avaliação",
   },
@@ -64,9 +68,17 @@ const metricLabels: Record<string, string> = {
   warning_count: "alertas",
   failed_count: "falhas",
   total_tokens: "tokens totais",
+  total_prompt_tokens: "tokens de prompt",
+  total_completion_tokens: "tokens de completion",
+  total_embedding_tokens: "tokens de embedding",
   total_cost_usd: "custo total em USD",
+  average_cost_usd: "custo médio em USD",
   average_quality_score: "qualidade média",
   average_duration_ms: "duração média em ms",
+  provider_coverage: "coverage por provider",
+  model_coverage: "coverage por modelo",
+  component_coverage: "coverage por componente",
+  operation_coverage: "coverage por operação",
 };
 
 const textTranslations: Record<string, string> = {
@@ -107,6 +119,9 @@ const textTranslations: Record<string, string> = {
 
   "No global observability risks detected.":
     "Nenhum risco global de observabilidade detectado.",
+
+  "No AI usage records available.": "Nenhum registro de uso de IA disponível.",
+    "No AI usage risks detected.": "Nenhum risco de uso/custo detectado.",
 };
 
 export function translateStatus(status: DashboardStatus): string {

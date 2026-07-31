@@ -9,6 +9,7 @@ import { ProductPlaceholderPage } from "./pages/ProductPlaceholderPage";
 import { ProviderSettingsPage } from "./pages/ProviderSettingsPage";
 import { QAAgentConsolePage } from "./pages/QAAgentConsolePage";
 import { RAGConsolePage } from "./pages/RAGConsolePage";
+import { UsageCostPage } from "./pages/UsageCostPage";
 import type { AppPage } from "./types/navigation";
 
 export default function App() {
@@ -21,6 +22,10 @@ export default function App() {
 
     if (activePage === "observability") {
       return <ObservabilityCenterPage />;
+    }
+
+    if (activePage === "usage-cost") {
+      return <UsageCostPage />;
     }
 
     if (activePage === "evaluation") {
