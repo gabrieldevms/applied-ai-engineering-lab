@@ -28,6 +28,8 @@ All notable changes to this project will be documented in this file.
 - Added `AI_USAGE_RECORDS_PATH` setting for configurable usage tracking persistence.
 - Added persistent local JSONL storage support for evaluation telemetry events.
 - Added `EVALUATION_TELEMETRY_EVENTS_PATH` setting for configurable evaluation telemetry persistence.
+- Added persistent local JSONL storage support for retrieval quality telemetry records.
+- Added `RETRIEVAL_QUALITY_RECORDS_PATH` setting for configurable retrieval quality persistence.
 
 ### Changed
 
@@ -40,6 +42,8 @@ All notable changes to this project will be documented in this file.
 - Updated Usage & Cost backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 - Updated evaluation telemetry to support persistent storage through the storage foundation.
 - Updated Evaluation Center and observability dashboard backend data flow to survive API restarts for evaluation telemetry when `STORAGE_BACKEND=local_jsonl`.
+- Updated retrieval quality telemetry to support persistent storage through the storage foundation.
+- Updated RAG quality and observability dashboard backend data flow to survive API restarts for retrieval quality records when `STORAGE_BACKEND=local_jsonl`.
 
 ### Notes
 
@@ -51,6 +55,7 @@ All notable changes to this project will be documented in this file.
 - Persistent Storage Foundation introduces reusable storage primitives, but existing observability services are not migrated to persistent storage yet.
 - Usage tracking is the first observability service migrated from in-memory-only storage to the persistent storage foundation.
 - Evaluation telemetry is now the second observability capability migrated to the persistent storage foundation, after usage tracking.
+- Retrieval quality telemetry is now the third observability capability migrated to the persistent storage foundation.
 
 ---
 

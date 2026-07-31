@@ -18,6 +18,7 @@ SETTINGS_ENV_VARS = [
     "STORAGE_BASE_DIR",
     "AI_USAGE_RECORDS_PATH",
     "EVALUATION_TELEMETRY_EVENTS_PATH",
+    "RETRIEVAL_QUALITY_RECORDS_PATH",
 ]
 
 
@@ -42,6 +43,10 @@ def test_settings_should_use_fake_provider_by_default() -> None:
     settings.evaluation_telemetry_events_path
     == "observability/evaluation-telemetry-events.jsonl"
     )
+    assert (
+    settings.retrieval_quality_records_path
+    == "observability/retrieval-quality-records.jsonl"
+)
 
 
 def test_settings_should_accept_openai_provider() -> None:
@@ -124,4 +129,20 @@ def test_settings_should_load_evaluation_telemetry_events_path_from_environment(
     assert (
         settings.evaluation_telemetry_events_path
         == "custom/evaluation-telemetry-events.jsonl"
+    )
+
+
+def test_settings_should_load_retrieval_quality_records_path_from_environment(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv(
+        "RETRIEVAL_QUALITY_RECORDS_PATH",
+        "custom/retrieval-quality-records.jsonl",
+    )
+
+    settings = Settings()
+
+    assert (
+        settings.retrieval_quality_records_path
+        == "custom/retrieval-quality-records.jsonl"
     )

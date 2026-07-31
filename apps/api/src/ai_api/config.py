@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     evaluation_telemetry_events_path: str = (
         "observability/evaluation-telemetry-events.jsonl"
     )
+    retrieval_quality_records_path: str = (
+        "observability/retrieval-quality-records.jsonl"
+    )
 
 
 @lru_cache
