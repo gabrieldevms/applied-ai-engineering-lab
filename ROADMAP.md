@@ -4,9 +4,9 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-**Current module:** M7 — Evaluation and LLMOps completed  
-**Latest completed milestone:** Backend AI Observability Dashboard  
-**Next milestone:** M8 — Cloud, Security and Portfolio  
+**Current module:** M8 — Cloud, Security and Portfolio in progress  
+**Latest completed milestone:** AI Quality Command Center frontend product experience  
+**Next focus:** Persistent Storage Foundation, execution history and live observability  
 
 The short-term implementation order is:
 
@@ -30,7 +30,7 @@ AI Quality Command Center
 | M5 — MCP QA Server                 | Completed   |
 | M6 — Multi-Agent QA Copilot        | Completed   |
 | M7 — Evaluation and LLMOps         | Completed   |
-| M8 — Cloud, Security and Portfolio | Next        |
+| M8 — Cloud, Security and Portfolio | In Progress |
 
 ---
 
@@ -497,6 +497,13 @@ M8 should transform the current backend platform foundation into a more demonstr
 - [ ] Production MCP hosting direction
 - [ ] Production monitoring direction
 
+#### Next implementation focus
+
+- [ ] Persistent Storage Foundation
+- [ ] Execution History
+- [ ] Console Telemetry Integration
+- [ ] Live Observability Dashboard behavior
+
 ### Security and governance
 
 - [ ] Secrets management
@@ -520,11 +527,11 @@ M8 should transform the current backend platform foundation into a more demonstr
 - [x] Multi-Agent QA Copilot Console
 - [x] RAG Console
 - [x] Data Analyst Agent Console
-- [ ] Provider and model settings UI
-- [ ] Usage and cost visualization
-- [ ] Risk and recommendation panels
+- [x] Provider and model settings UI
+- [x] Usage and cost visualization
+- [x] Risk and recommendation panels
 
-> Current note: the AI Quality Command Center is already functional for local product demonstrations, but console executions are still stored in local React page state. Persistent execution history, automatic dashboard refresh, live observability updates, and backend telemetry integration for each frontend console execution remain future M8 work.
+> Current note: the first AI Quality Command Center frontend/product experience is completed for local demonstrations. Console executions are still stored in local React page state, and most backend observability records remain in memory. Persistent execution history, automatic dashboard refresh, live observability updates, backend telemetry integration for each frontend console execution and production-ready storage remain future M8 work.
 
 ### Documentation and portfolio
 
