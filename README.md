@@ -6,9 +6,9 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 
 ## Project Status
 
-**Current module:** M6 — Multi-Agent QA Copilot completed
-**Latest completed milestone:** Multi-Agent QA Copilot with API, MCP exposure and deterministic evaluation
-**Next milestone:** M7 — Evaluation and LLMOps
+**Current module:** M7 — Evaluation and LLMOps completed  
+**Latest completed milestone:** Evaluation, regression suites, AI telemetry, usage tracking and backend observability dashboard  
+**Next milestone:** M8 — Cloud, Security and Portfolio  
 
 The project currently includes:
 
@@ -16,12 +16,12 @@ The project currently includes:
 - LLM provider abstraction with Fake, OpenAI and Ollama providers
 - Structured requirement analysis
 - RAG Knowledge Assistant
+- File ingestion expansion for text, PDF, DOCX, CSV and Excel files
+- Structured table extraction
 - AI Agent runtime foundation
 - QA Agent
 - Data Analyst Agent
 - QA Agent and Data Analyst Agent integration
-- File ingestion expansion for text, PDF, DOCX, CSV and Excel files
-- Structured table extraction
 - Safe read-only SQL generation and execution
 - SQL workflow regression suite
 - MCP QA Server exposing project capabilities through MCP
@@ -31,26 +31,43 @@ The project currently includes:
 - Multi-agent final QA report generation
 - Multi-agent data validation evidence
 - Multi-agent deterministic evaluation
+- Golden evaluation dataset
+- Prompt regression evaluation
+- LLM output evaluation suite
+- RAG regression evaluation suite
+- Agent regression evaluation suite
+- Tool-calling evaluation suite
+- Multi-Agent QA Copilot regression evaluation
+- Controlled LLM-as-judge evaluation prototype
+- CI evaluation pipeline
+- Structured AI execution telemetry
+- Token and cost usage tracking
+- Retrieval quality telemetry metrics
+- Agent execution telemetry metrics
+- Multi-agent execution telemetry metrics
+- Backend AI observability dashboard
 
 For detailed reviews, see:
 
 - [M4 — AI Agents Module Review](docs/study-notes/04-ai-agents-module-review.md)
 - [File Ingestion Expansion Review](docs/study-notes/05-file-ingestion-expansion-review.md)
-- [Multi Agent QA Copilot](docs/study-notes/07-multi-agent-qa-copilot-review.md)
+- [M5 — MCP QA Server Review](docs/study-notes/06-mcp-qa-server-review.md)
+- [M6 — Multi-Agent QA Copilot Review](docs/study-notes/07-multi-agent-qa-copilot-review.md)
+- [M7 — Evaluation and LLMOps Review](docs/study-notes/08-evaluation-and-llmops-review.md)
 
-| Module                             | Status         | Scope                                                                              |
-| ---------------------------------- | -------------- | ---------------------------------------------------------------------------------- |
-| M0 — Foundation                    | ✅ Completed    | Repository, workflow, documentation and architecture foundation                    |
-| M1 — AI API Base                   | ✅ Completed    | FastAPI, schemas, tests, Docker, CI, logging and error handling                    |
-| M2 — LLM Engineering               | ✅ Completed    | Providers, prompts, structured outputs, retries, fallback and requirement analysis |
-| M3 — RAG Knowledge Assistant       | ✅ Completed    | Ingestion, chunking, embeddings, retrieval, answers, citations and evaluation      |
-| M4 — AI Agents                     | ✅ Completed    | Runtime, tools, execution, planning, QA Agent and safety controls                  |
-| Pre-M5 — File Ingestion Expansion  | ✅ Completed    | Multi-format text extraction and structured table extraction                       |
-| Pre-M5 — Data Analyst Agent        | ✅ Completed    | SQL generation, read-only validation, controlled execution and evaluation          |
-| M5 — MCP QA Server                 | ✅ Completed        | MCP tools focused on QA and software engineering                                   |
-| M6 — Multi-Agent QA Copilot        | ✅ Completed       | Specialized QA agents and orchestration                                            |
-| M7 — Evaluation and LLMOps         | ⏳ Next     | Evaluation pipelines, observability, cost and latency tracking                     |
-| M8 — Cloud, Security and Portfolio | ⏳ Planned      | Deployment, security, governance and portfolio presentation                        |
+| Module                             | Status      | Scope                                                                                  |
+| ---------------------------------- | ----------- | -------------------------------------------------------------------------------------- |
+| M0 — Foundation                    | ✅ Completed | Repository, workflow, documentation and architecture foundation                        |
+| M1 — AI API Base                   | ✅ Completed | FastAPI, schemas, tests, Docker, CI, logging and error handling                        |
+| M2 — LLM Engineering               | ✅ Completed | Providers, prompts, structured outputs, retries, fallback and requirement analysis     |
+| M3 — RAG Knowledge Assistant       | ✅ Completed | Ingestion, chunking, embeddings, retrieval, answers, citations and evaluation          |
+| M4 — AI Agents                     | ✅ Completed | Runtime, tools, execution, planning, QA Agent and safety controls                      |
+| Pre-M5 — File Ingestion Expansion  | ✅ Completed | Multi-format text extraction and structured table extraction                           |
+| Pre-M5 — Data Analyst Agent        | ✅ Completed | SQL generation, read-only validation, controlled execution and evaluation              |
+| M5 — MCP QA Server                 | ✅ Completed | MCP tools focused on QA and software engineering                                       |
+| M6 — Multi-Agent QA Copilot        | ✅ Completed | Specialized QA agents, orchestration, MCP exposure and deterministic evaluation        |
+| M7 — Evaluation and LLMOps         | ✅ Completed | Evaluation suites, CI evaluation pipeline, telemetry, usage tracking and observability |
+| M8 — Cloud, Security and Portfolio | ⏭️ Next      | Deployment, security, governance, frontend experience and portfolio presentation       |
 
 See the complete [project roadmap](ROADMAP.md).
 
@@ -60,24 +77,28 @@ Many AI examples stop at a prompt, notebook or direct model call.
 
 This laboratory explores the engineering practices required to build AI systems that are:
 
-* modular and maintainable;
-* provider-independent;
-* validated with structured schemas;
-* observable and testable;
-* grounded in retrieved information;
-* capable of using controlled tools;
-* designed with explicit execution boundaries;
-* prepared for evaluation and production-like operation.
+- modular and maintainable;
+- provider-independent;
+- validated with structured schemas;
+- observable and testable;
+- grounded in retrieved information;
+- capable of using controlled tools;
+- designed with explicit execution boundaries;
+- evaluated through repeatable quality checks;
+- prepared for production-like operation.
 
 The project also connects Applied AI Engineering with practical QA use cases such as:
 
-* software requirement analysis;
-* acceptance criteria identification;
-* risk discovery;
-* test scenario generation;
-* documentation retrieval;
-* test automation support;
-* controlled QA agent workflows.
+- software requirement analysis;
+- acceptance criteria identification;
+- risk discovery;
+- test scenario generation;
+- documentation retrieval;
+- test automation support;
+- controlled QA agent workflows;
+- data validation workflows;
+- AI quality evaluation;
+- agent and multi-agent observability.
 
 ## Current Capabilities
 
@@ -85,16 +106,16 @@ The project also connects Applied AI Engineering with practical QA use cases suc
 
 The API provides a reusable LLM integration layer with:
 
-* provider abstraction;
-* Fake, OpenAI and Ollama providers;
-* environment-based provider selection;
-* prompt builders;
-* structured Pydantic outputs;
-* JSON extraction and normalization;
-* retry strategies;
-* fallback providers;
-* provider diagnostics;
-* provider-level error handling.
+- provider abstraction;
+- Fake, OpenAI and Ollama providers;
+- environment-based provider selection;
+- prompt builders;
+- structured Pydantic outputs;
+- JSON extraction and normalization;
+- retry strategies;
+- fallback providers;
+- provider diagnostics;
+- provider-level error handling.
 
 ### Requirement Analysis
 
@@ -102,38 +123,40 @@ Software requirements can be analyzed through a structured quality-oriented work
 
 The analysis may include:
 
-* requirement summary;
-* business rules;
-* acceptance criteria;
-* risks;
-* open questions;
-* positive test scenarios;
-* negative test scenarios;
-* edge cases;
-* automation opportunities.
+- requirement summary;
+- business rules;
+- acceptance criteria;
+- risks;
+- open questions;
+- positive test scenarios;
+- negative test scenarios;
+- edge cases;
+- automation opportunities.
 
 ### RAG Knowledge Assistant
 
 The RAG foundation currently supports:
 
-* raw text ingestion;
-* text file ingestion;
-* `.txt`, `.md`, `.markdown`, `.pdf`, `.docx`, `.csv` and `.xlsx` text extraction;
-* configurable document chunking;
-* stable document identifiers;
-* chunk and source metadata;
-* deterministic embeddings;
-* in-memory vector storage;
-* cosine similarity search;
-* semantic search;
-* reusable context retrieval;
-* LLM-based answer generation;
-* source citations;
-* deterministic RAG evaluation.
-* structured table extraction for CSV, XLSX and DOCX files;
-* dedicated text and table extraction endpoints.
+- raw text ingestion;
+- text file ingestion;
+- `.txt`, `.md`, `.markdown`, `.pdf`, `.docx`, `.csv` and `.xlsx` text extraction;
+- configurable document chunking;
+- stable document identifiers;
+- chunk and source metadata;
+- deterministic embeddings;
+- in-memory vector storage;
+- cosine similarity search;
+- semantic search;
+- reusable context retrieval;
+- LLM-based answer generation;
+- source citations;
+- deterministic RAG evaluation;
+- structured table extraction for CSV, XLSX and DOCX files;
+- dedicated text and table extraction endpoints.
 
 ### File Ingestion
+
+The file ingestion layer currently supports:
 
 - extensible file extractor registry;
 - normalized text extraction for TXT and Markdown;
@@ -145,6 +168,8 @@ The RAG foundation currently supports:
 - dedicated `/rag/extract-text` and `/rag/extract-tables` extraction paths.
 
 ### AI Agent Foundation
+
+The agent foundation currently supports:
 
 - controlled agent runtime with explicit execution steps;
 - agent request, response and execution trace schemas;
@@ -183,17 +208,17 @@ The project includes a specialized QA Agent that coordinates existing tools arou
 
 The QA Agent currently supports:
 
-* software requirement analysis;
-* optional supporting knowledge documents;
-* RAG retrieval when documents are provided;
-* requirement analysis through the agent tool execution layer;
-* optional data validation through the Data Analyst Agent;
-* automatic data validation selection;
-* data validation modes: `auto`, `required` and `disabled`;
-* structured QA-oriented output;
-* data validation evidence when applicable;
-* full execution trace;
-* deterministic QA Agent evaluation.
+- software requirement analysis;
+- optional supporting knowledge documents;
+- RAG retrieval when documents are provided;
+- requirement analysis through the agent tool execution layer;
+- optional data validation through the Data Analyst Agent;
+- automatic data validation selection;
+- data validation modes: `auto`, `required` and `disabled`;
+- structured QA-oriented output;
+- data validation evidence when applicable;
+- full execution trace;
+- deterministic QA Agent evaluation.
 
 ### Data Analyst Agent
 
@@ -201,18 +226,18 @@ The project includes a specialized Data Analyst Agent for controlled data valida
 
 The Data Analyst Agent currently supports:
 
-* database schema representation;
-* table and column metadata;
-* natural-language SQL generation;
-* structured SQL parsing;
-* read-only SQL safety validation;
-* unsafe SQL blocking;
-* controlled in-memory SQLite execution;
-* SQL workflow generation and execution;
-* query result evidence;
-* deterministic Data Analyst Agent evaluation;
-* execution through the generic Agent Runtime as `data_analysis.agent.run`;
-* SQL workflow regression scenarios.
+- database schema representation;
+- table and column metadata;
+- natural-language SQL generation;
+- structured SQL parsing;
+- read-only SQL safety validation;
+- unsafe SQL blocking;
+- controlled in-memory SQLite execution;
+- SQL workflow generation and execution;
+- query result evidence;
+- deterministic Data Analyst Agent evaluation;
+- execution through the generic Agent Runtime as `data_analysis.agent.run`;
+- SQL workflow regression scenarios.
 
 ### MCP QA Server
 
@@ -229,12 +254,19 @@ Available MCP tools:
 - `run_qa_agent`
 - `run_data_analyst_agent`
 - `run_sql_regression_suite`
+- `run_multi_agent_qa_copilot`
 
 Local MCP smoke test:
 
 ```powershell
 $env:PYTHONPATH = "apps/api/src"
 uv run python scripts/mcp_client_smoke.py
+```
+
+MCP server listing:
+
+```powershell
+uv run fastmcp list scripts/mcp_server_cli.py
 ```
 
 ### Multi-Agent QA Copilot
@@ -252,22 +284,22 @@ Current agents:
 
 Current capabilities:
 
-- shared execution state
-- artifacts and messages
-- execution trace
-- communication contracts
-- contract validation
-- failure handling
-- conflict detection
-- final QA report generation
-- quality gate metadata
-- Requirement Analysis service integration
-- Data Analyst Agent integration
-- data validation evidence
-- deterministic evaluation
-- API execution endpoint
-- API evaluation endpoint
-- MCP tool exposure
+- shared execution state;
+- artifacts and messages;
+- execution trace;
+- communication contracts;
+- contract validation;
+- failure handling;
+- conflict detection;
+- final QA report generation;
+- quality gate metadata;
+- Requirement Analysis service integration;
+- Data Analyst Agent integration;
+- data validation evidence;
+- deterministic evaluation;
+- API execution endpoint;
+- API evaluation endpoint;
+- MCP tool exposure.
 
 API endpoints:
 
@@ -277,6 +309,90 @@ API endpoints:
 MCP tool:
 
 - `run_multi_agent_qa_copilot`
+
+### Evaluation and LLMOps
+
+The project includes an evaluation and LLMOps foundation for continuously validating AI behavior.
+
+Current evaluation capabilities:
+
+- Golden Evaluation Dataset;
+- Golden Evaluation Dataset Runner;
+- Prompt Regression Evaluation;
+- AI Evaluation Report Aggregation;
+- LLM Output Evaluation Suite;
+- RAG Regression Evaluation Suite;
+- Agent Regression Evaluation Suite;
+- Tool-calling Evaluation Suite;
+- Multi-Agent QA Copilot Regression Evaluation;
+- controlled LLM-as-judge Evaluation Prototype;
+- CI Evaluation Pipeline.
+
+The evaluation layer supports:
+
+- deterministic quality checks;
+- scenario-level validation;
+- dataset-level validation;
+- prompt regression safety;
+- RAG regression checks;
+- agent regression checks;
+- tool selection and forbidden-tool validation;
+- multi-agent workflow regression;
+- structured report aggregation;
+- CI quality gates.
+
+### Observability
+
+The project includes an observability foundation for AI workflows.
+
+Current observability capabilities:
+
+- structured AI execution telemetry;
+- latency tracking;
+- error tracking;
+- fallback tracking;
+- token usage tracking;
+- cost tracking;
+- retrieval quality metrics;
+- agent execution metrics;
+- multi-agent execution metrics;
+- backend AI Observability Dashboard.
+
+The backend observability dashboard consolidates:
+
+- evaluation telemetry;
+- token and cost usage;
+- retrieval quality;
+- agent execution health;
+- multi-agent execution health;
+- section-level statuses;
+- global risks;
+- recommendations.
+
+Dashboard endpoint:
+
+- `GET /observability/dashboard`
+
+The dashboard is currently backend-only and acts as the response contract for a future frontend experience.
+
+### Future AI Quality Command Center
+
+The planned frontend direction is an AI Quality Command Center.
+
+The backend dashboard introduced in M7 is designed to support a future portfolio-grade UI with:
+
+- AI quality overview;
+- evaluation center;
+- observability center;
+- QA Agent console;
+- Multi-Agent QA Copilot console;
+- RAG console;
+- Data Analyst Agent console;
+- provider and model configuration;
+- usage and cost views;
+- risk and recommendation panels.
+
+This frontend direction is planned for M8.
 
 ## Architecture
 
@@ -289,9 +405,16 @@ flowchart TB
     API --> RAG[RAG Services]
     API --> Agents[Agent Runtime]
     API --> DataAnalysis[Data Analysis Services]
+    API --> MultiAgent[Multi-Agent QA Copilot]
+    API --> MCP[MCP QA Server]
+    API --> Evals[Evaluation and LLMOps]
+    API --> Observability[Observability Services]
 
     Requirements --> LLM[LLM Provider Abstraction]
     RAG --> LLM
+    Agents --> LLM
+    MultiAgent --> LLM
+    Evals --> LLM
 
     LLM --> FakeLLM[Fake Provider]
     LLM --> Ollama[Ollama Provider]
@@ -304,7 +427,7 @@ flowchart TB
     VectorStore --> Retrieval[Retrieval Service]
     Retrieval --> Answer[RAG Answer Generation]
     Answer --> Citations[Source Citations]
-    Answer --> Evaluation[RAG Evaluation]
+    Answer --> RAGEvaluation[RAG Evaluation]
 
     Agents --> Runtime[Controlled Agent Runtime]
     Runtime --> Registry[Tool Registry]
@@ -328,20 +451,49 @@ flowchart TB
     DataAnalysis --> SQLGeneration
     DataAnalysis --> SQLSafety
     DataAnalysis --> SQLExecution
+
+    MultiAgent --> Orchestrator[Orchestrator Agent]
+    MultiAgent --> RequirementAnalyst[Requirement Analyst Agent]
+    MultiAgent --> FunctionalQA[Functional QA Agent]
+    MultiAgent --> TestAutomation[Test Automation Agent]
+    MultiAgent --> Reviewer[Reviewer Agent]
+    MultiAgent --> Reporter[Report Agent]
+    MultiAgent --> Contracts[Communication Contracts]
+    MultiAgent --> FinalReport[Final QA Report]
+
+    Evals --> GoldenDataset[Golden Evaluation Dataset]
+    Evals --> PromptRegression[Prompt Regression]
+    Evals --> LLMOutputEval[LLM Output Evaluation]
+    Evals --> RAGRegression[RAG Regression]
+    Evals --> AgentRegression[Agent Regression]
+    Evals --> ToolCallingEval[Tool-calling Evaluation]
+    Evals --> MultiAgentRegression[Multi-Agent Regression]
+    Evals --> JudgeEval[LLM-as-judge Prototype]
+    Evals --> CIPipeline[AI Evaluation Pipeline]
+
+    Observability --> Telemetry[Structured Telemetry]
+    Observability --> Usage[Token and Cost Usage]
+    Observability --> RetrievalQuality[Retrieval Quality Metrics]
+    Observability --> AgentMetrics[Agent Execution Metrics]
+    Observability --> MultiAgentMetrics[Multi-Agent Execution Metrics]
+    Observability --> Dashboard[Backend Observability Dashboard]
 ```
 
 The architecture intentionally separates:
 
-* API transport;
-* domain services;
-* model providers;
-* prompts and schemas;
-* retrieval infrastructure;
-* agent runtime;
-* tool registration;
-* tool execution.
+- API transport;
+- domain services;
+- model providers;
+- prompts and schemas;
+- retrieval infrastructure;
+- agent runtime;
+- tool registration;
+- tool execution;
+- multi-agent orchestration;
+- evaluation services;
+- observability services.
 
-This separation allows individual components to be tested and replaced without coupling the entire application to one model provider or framework.
+This separation allows individual components to be tested and replaced without coupling the entire application to one model provider, framework or user interface.
 
 ## API Endpoints
 
@@ -363,85 +515,143 @@ http://127.0.0.1:8000/docs
 
 ### RAG
 
-| Method | Endpoint            | Description                                        |
-| ------ | ------------------- | -------------------------------------------------- |
-| `POST` | `/rag/extract-text` | Extract normalized text from a supported file      |
+| Method | Endpoint              | Description                                             |
+| ------ | --------------------- | ------------------------------------------------------- |
+| `POST` | `/rag/extract-text`   | Extract normalized text from a supported file           |
 | `POST` | `/rag/extract-tables` | Extract structured tables from CSV, XLSX and DOCX files |
-| `POST` | `/rag/chunk`        | Split document text into configurable chunks       |
-| `POST` | `/rag/ingest`       | Ingest raw text and generate document metadata     |
-| `POST` | `/rag/ingest-file`  | Extract, ingest and chunk an uploaded file         |
-| `POST` | `/rag/embed`        | Generate deterministic embedding vectors           |
-| `POST` | `/rag/search`       | Run semantic search over supplied documents        |
-| `POST` | `/rag/retrieve`     | Retrieve the most relevant document chunks         |
-| `POST` | `/rag/answer`       | Generate a grounded answer using retrieved context |
-| `POST` | `/rag/evaluate`     | Evaluate an answer, context and citations          |
+| `POST` | `/rag/chunk`          | Split document text into configurable chunks            |
+| `POST` | `/rag/ingest`         | Ingest raw text and generate document metadata          |
+| `POST` | `/rag/ingest-file`    | Extract, ingest and chunk an uploaded file              |
+| `POST` | `/rag/embed`          | Generate deterministic embedding vectors                |
+| `POST` | `/rag/search`         | Run semantic search over supplied documents             |
+| `POST` | `/rag/retrieve`       | Retrieve the most relevant document chunks              |
+| `POST` | `/rag/answer`         | Generate a grounded answer using retrieved context      |
+| `POST` | `/rag/evaluate`       | Evaluate an answer, context and citations               |
 
 ### Agents
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `POST` | `/agents/run` | Run the deterministic base agent runtime |
-| `GET` | `/agents/tools` | List registered agent tools |
-| `POST` | `/agents/tools/execute` | Execute a registered tool directly |
-| `POST` | `/agents/qa/run` | Run the specialized QA Agent |
-| `POST` | `/agents/plan` | Generate a structured agent plan with an LLM |
-| `POST` | `/agents/tools/select` | Select executable tools from an agent plan |
-| `POST` | `/agents/execute` | Run the complete controlled multi-step agent workflow |
-| `GET` | `/agents/logs` | List persisted agent execution log events |
-| `GET` | `/agents/logs/{run_id}` | List execution log events for a specific run |
-| `POST` | `/agents/evaluate` | Evaluate an agent execution using deterministic quality checks |
-| `GET` | `/agents/specialized` | List specialized agents |
-| `POST` | `/agents/qa/evaluate` | Evaluate a QA Agent response using deterministic quality checks |
+| Method | Endpoint                  | Purpose                                                               |
+| ------ | ------------------------- | --------------------------------------------------------------------- |
+| `POST` | `/agents/run`             | Run the deterministic base agent runtime                              |
+| `GET`  | `/agents/tools`           | List registered agent tools                                           |
+| `POST` | `/agents/tools/execute`   | Execute a registered tool directly                                    |
+| `POST` | `/agents/qa/run`          | Run the specialized QA Agent                                          |
+| `POST` | `/agents/plan`            | Generate a structured agent plan with an LLM                          |
+| `POST` | `/agents/tools/select`    | Select executable tools from an agent plan                            |
+| `POST` | `/agents/execute`         | Run the complete controlled multi-step agent workflow                 |
+| `GET`  | `/agents/logs`            | List persisted agent execution log events                             |
+| `GET`  | `/agents/logs/{run_id}`   | List execution log events for a specific run                          |
+| `POST` | `/agents/evaluate`        | Evaluate an agent execution using deterministic quality checks        |
+| `GET`  | `/agents/specialized`     | List specialized agents                                               |
+| `POST` | `/agents/qa/evaluate`     | Evaluate a QA Agent response using deterministic quality checks       |
 
 ### Data Analysis
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `POST` | `/data-analysis/sql/generate` | Generate a SQL candidate from a natural-language question |
-| `POST` | `/data-analysis/sql/execute` | Execute a read-only SQL query in controlled in-memory SQLite |
-| `POST` | `/data-analysis/sql/run` | Generate, validate and execute a SQL workflow |
-| `POST` | `/data-analysis/agent/run` | Run the specialized Data Analyst Agent |
-| `POST` | `/data-analysis/agent/evaluate` | Evaluate a Data Analyst Agent response |
-| `POST` | `/data-analysis/sql/regression/run` | Run SQL workflow regression scenarios |
+| Method | Endpoint                            | Purpose                                                        |
+| ------ | ----------------------------------- | -------------------------------------------------------------- |
+| `POST` | `/data-analysis/sql/generate`       | Generate a SQL candidate from a natural-language question       |
+| `POST` | `/data-analysis/sql/execute`        | Execute a read-only SQL query in controlled in-memory SQLite    |
+| `POST` | `/data-analysis/sql/run`            | Generate, validate and execute a SQL workflow                   |
+| `POST` | `/data-analysis/agent/run`          | Run the specialized Data Analyst Agent                          |
+| `POST` | `/data-analysis/agent/evaluate`     | Evaluate a Data Analyst Agent response                          |
+| `POST` | `/data-analysis/sql/regression/run` | Run SQL workflow regression scenarios                           |
 
 ### Multi-Agent QA Copilot
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `POST` | `multi-agent/qa-copilot/run` | Run Multi Agent QA Copilot |
-| `POST` | `multi-agent/qa-copilot/evaluate` |  Evaluate a Multi Agent QA Copilot response |
+| Method | Endpoint                            | Purpose                                      |
+| ------ | ----------------------------------- | -------------------------------------------- |
+| `POST` | `/multi-agent/qa-copilot/run`       | Run the Multi-Agent QA Copilot               |
+| `POST` | `/multi-agent/qa-copilot/evaluate`  | Evaluate a Multi-Agent QA Copilot response   |
+
+### Evaluation and LLMOps
+
+| Method | Endpoint                                      | Purpose                                                       |
+| ------ | --------------------------------------------- | ------------------------------------------------------------- |
+| `GET`  | `/evals/golden-dataset`                       | Retrieve the default golden evaluation dataset                 |
+| `GET`  | `/evals/golden-dataset/validation`            | Validate the default golden evaluation dataset                 |
+| `POST` | `/evals/golden-dataset/validate`              | Validate a supplied golden evaluation dataset                  |
+| `POST` | `/evals/golden-dataset/run`                   | Run golden evaluation scenarios                                |
+| `GET`  | `/evals/prompt-regression/suite`              | Retrieve the prompt regression suite                           |
+| `POST` | `/evals/prompt-regression/run`                | Run prompt regression evaluation                               |
+| `POST` | `/evals/reports/aggregate`                    | Aggregate AI evaluation reports                                |
+| `GET`  | `/evals/llm-output/suite`                     | Retrieve the LLM output evaluation suite                       |
+| `POST` | `/evals/llm-output/run`                       | Run LLM output evaluation                                      |
+| `GET`  | `/evals/rag-regression/suite`                 | Retrieve the RAG regression evaluation suite                   |
+| `POST` | `/evals/rag-regression/run`                   | Run RAG regression evaluation                                  |
+| `GET`  | `/evals/agent-regression/suite`               | Retrieve the agent regression evaluation suite                 |
+| `POST` | `/evals/agent-regression/run`                 | Run agent regression evaluation                                |
+| `GET`  | `/evals/tool-calling/suite`                   | Retrieve the tool-calling evaluation suite                     |
+| `POST` | `/evals/tool-calling/run`                     | Run tool-calling evaluation                                    |
+| `GET`  | `/evals/multi-agent-copilot-regression/suite` | Retrieve the Multi-Agent QA Copilot regression suite           |
+| `POST` | `/evals/multi-agent-copilot-regression/run`   | Run Multi-Agent QA Copilot regression evaluation               |
+| `GET`  | `/evals/llm-as-judge/suite`                  | Retrieve the controlled LLM-as-judge evaluation suite          |
+| `POST` | `/evals/llm-as-judge/run`                    | Run controlled LLM-as-judge evaluation                         |
+| `POST` | `/evals/ci/pipeline/run`                     | Run the deterministic AI evaluation pipeline                   |
+
+### Evaluation Telemetry
+
+| Method | Endpoint                   | Purpose                                      |
+| ------ | -------------------------- | -------------------------------------------- |
+| `POST` | `/evals/telemetry/events`  | Record an evaluation telemetry event         |
+| `GET`  | `/evals/telemetry/events`  | List recorded evaluation telemetry events    |
+| `POST` | `/evals/telemetry/summary` | Summarize supplied evaluation telemetry data |
+| `GET`  | `/evals/telemetry/summary` | Summarize stored evaluation telemetry data   |
+
+### Observability
+
+| Method | Endpoint                                             | Purpose                                               |
+| ------ | ---------------------------------------------------- | ----------------------------------------------------- |
+| `POST` | `/observability/usage/records`                       | Record token and cost usage                           |
+| `GET`  | `/observability/usage/records`                       | List token and cost usage records                     |
+| `POST` | `/observability/usage/summary`                       | Summarize supplied usage records                      |
+| `GET`  | `/observability/usage/summary`                       | Summarize stored usage records                        |
+| `POST` | `/observability/retrieval-quality/records`           | Record retrieval quality metrics                      |
+| `GET`  | `/observability/retrieval-quality/records`           | List retrieval quality records                        |
+| `POST` | `/observability/retrieval-quality/summary`           | Summarize supplied retrieval quality records          |
+| `GET`  | `/observability/retrieval-quality/summary`           | Summarize stored retrieval quality records            |
+| `POST` | `/observability/agent-execution/records`             | Record agent execution metrics                        |
+| `GET`  | `/observability/agent-execution/records`             | List agent execution metric records                   |
+| `POST` | `/observability/agent-execution/summary`             | Summarize supplied agent execution records            |
+| `GET`  | `/observability/agent-execution/summary`             | Summarize stored agent execution records              |
+| `POST` | `/observability/multi-agent-execution/records`       | Record multi-agent execution metrics                  |
+| `GET`  | `/observability/multi-agent-execution/records`       | List multi-agent execution metric records             |
+| `POST` | `/observability/multi-agent-execution/summary`       | Summarize supplied multi-agent execution records      |
+| `GET`  | `/observability/multi-agent-execution/summary`       | Summarize stored multi-agent execution records        |
+| `GET`  | `/observability/dashboard`                           | Retrieve the backend AI observability dashboard       |
 
 ## Technology Stack
 
 ### Current stack
 
-* Python 3.12+
-* FastAPI
-* Pydantic
-* Pydantic Settings
-* pytest
-* HTTPX
-* OpenAI Python SDK
-* Ollama
-* uv
-* Docker
-* Docker Compose
-* GitHub Actions
+- Python 3.12+
+- FastAPI
+- Pydantic
+- Pydantic Settings
+- pytest
+- HTTPX
+- OpenAI Python SDK
+- Ollama
+- FastMCP
+- SQLite
+- uv
+- Docker
+- Docker Compose
+- GitHub Actions
 
 ### Planned evolution
 
 Future modules may introduce:
 
-* persistent vector databases;
-* pgvector or Qdrant;
-* LangGraph or equivalent orchestration;
-* Model Context Protocol;
-* OpenTelemetry;
-* Grafana;
-* MLflow;
-* cloud AI services;
-* persistent agent state;
-* evaluation datasets and regression pipelines.
+- persistent vector databases;
+- pgvector or Qdrant;
+- persistent evaluation and telemetry storage;
+- OpenTelemetry;
+- Grafana;
+- MLflow or similar experiment tracking;
+- cloud AI services;
+- authentication and authorization;
+- deployed frontend experience;
+- production-ready monitoring and governance.
 
 Planned technologies are tracked in the [roadmap](ROADMAP.md) and should not be interpreted as current dependencies.
 
@@ -451,6 +661,7 @@ Planned technologies are tracked in the [roadmap](ROADMAP.md) and should not be 
 applied-ai-engineering-lab/
 ├── .github/
 │   └── workflows/
+│       ├── ai-evaluation-pipeline.yml
 │       └── ci.yml
 ├── apps/
 │   └── api/
@@ -458,7 +669,11 @@ applied-ai-engineering-lab/
 │       └── src/
 │           └── ai_api/
 │               ├── agents/
+│               ├── data_analysis/
+│               ├── evals/
 │               ├── llm/
+│               ├── mcp_server/
+│               ├── multi_agent/
 │               ├── rag/
 │               ├── requirements/
 │               ├── config.py
@@ -468,7 +683,9 @@ applied-ai-engineering-lab/
 │   ├── adr/
 │   ├── architecture/
 │   └── study-notes/
+├── scripts/
 ├── tests/
+│   ├── integration/
 │   └── unit/
 ├── .env.example
 ├── CHANGELOG.md
@@ -485,11 +702,11 @@ applied-ai-engineering-lab/
 
 Install the following tools:
 
-* Python 3.12 or newer;
-* uv;
-* Git;
-* Docker and Docker Compose, when using containers;
-* Ollama, when using a local LLM.
+- Python 3.12 or newer;
+- uv;
+- Git;
+- Docker and Docker Compose, when using containers;
+- Ollama, when using a local LLM.
 
 ### Clone the repository
 
@@ -564,11 +781,12 @@ LLM_PROVIDER=fake
 
 It is useful for:
 
-* local development;
-* automated tests;
-* schema validation;
-* retry and fallback tests;
-* deterministic agent tools.
+- local development;
+- automated tests;
+- schema validation;
+- retry and fallback tests;
+- deterministic agent tools;
+- deterministic evaluation workflows.
 
 ### Ollama
 
@@ -636,47 +854,79 @@ uv run pytest
 
 The test suite covers areas such as:
 
-* API behavior;
-* request and response schemas;
-* application settings;
-* LLM providers;
-* provider diagnostics;
-* output normalization;
-* requirement analysis;
-* retry and fallback behavior;
-* document extraction and ingestion;
-* embeddings and vector search;
-* semantic retrieval;
-* RAG answer generation;
-* RAG answer tool execution;
-* citations;
-* RAG evaluation;
-* agent runtime;
-* tool registry;
-* tool execution;
-* agent tool calling;* specialized QA Agent;
-* Data Analyst Agent;
-* SQL safety validation;
-* controlled SQL execution;
-* QA Agent data validation selection;
-* QA Agent evaluation with data evidence;
-* Data Analyst Agent evaluation;
-* SQL workflow regression scenarios.
+- API behavior;
+- request and response schemas;
+- application settings;
+- LLM providers;
+- provider diagnostics;
+- output normalization;
+- requirement analysis;
+- retry and fallback behavior;
+- document extraction and ingestion;
+- structured table extraction;
+- embeddings and vector search;
+- semantic retrieval;
+- RAG answer generation;
+- RAG answer tool execution;
+- citations;
+- RAG evaluation;
+- agent runtime;
+- tool registry;
+- tool execution;
+- agent tool calling;
+- specialized QA Agent;
+- Data Analyst Agent;
+- SQL safety validation;
+- controlled SQL execution;
+- QA Agent data validation selection;
+- QA Agent evaluation with data evidence;
+- Data Analyst Agent evaluation;
+- SQL workflow regression scenarios;
+- MCP tool exposure;
+- MCP client smoke validation;
+- Multi-Agent QA Copilot execution;
+- multi-agent communication contracts;
+- multi-agent failure and conflict handling;
+- multi-agent final report generation;
+- multi-agent deterministic evaluation;
+- golden evaluation dataset validation;
+- prompt regression evaluation;
+- LLM output evaluation;
+- RAG regression evaluation;
+- agent regression evaluation;
+- tool-calling evaluation;
+- Multi-Agent QA Copilot regression evaluation;
+- controlled LLM-as-judge evaluation;
+- AI evaluation report aggregation;
+- CI evaluation pipeline;
+- structured AI execution telemetry;
+- token and cost usage tracking;
+- retrieval quality telemetry;
+- agent execution telemetry;
+- multi-agent execution telemetry;
+- backend observability dashboard aggregation.
 
 ## Continuous Integration
 
-GitHub Actions runs the automated test suite on:
+GitHub Actions runs automated validation on:
 
-* pull requests targeting `main`;
-* pushes to `main`.
+- pull requests targeting `main`;
+- pushes to `main`.
 
-The current CI workflow:
+The project currently includes:
+
+1. a standard CI workflow for the Python test suite;
+2. an AI Evaluation Pipeline workflow for deterministic AI quality checks.
+
+The standard CI workflow:
 
 1. checks out the repository;
 2. configures Python 3.12;
 3. installs uv;
 4. synchronizes locked dependencies;
 5. runs pytest.
+
+The AI Evaluation Pipeline validates AI behavior through deterministic evaluation stages and can fail CI when the configured quality gate is not met.
 
 ## Current Limitations
 
@@ -689,54 +939,58 @@ The current CI workflow:
 - external database connectors are not implemented yet;
 - NoSQL data source support is not implemented yet;
 - execution logs are persisted locally as JSONL files instead of a production database;
+- most evaluation and observability records are currently stored in memory;
+- token and cost tracking depends on caller-provided pricing data;
+- cost calculation is an estimate and not provider billing reconciliation;
+- retrieval quality metrics depend on caller-provided relevance and similarity signals;
 - agent approval is policy-based and synchronous;
 - there is no external human approval interface yet;
-- agent evaluation is currently deterministic and rule-based;
-- LLM-as-judge evaluation is not implemented yet;
-- authentication, authorization and multi-user isolation are not implemented;
-- the project does not yet provide a deployed frontend;
-- MCP server capabilities are not implemented yet.
-- Multi-agent reasoning is still mostly deterministic.
-- Functional QA, Test Automation, Reviewer and Report agents are not yet LLM-backed.
-- Multi-agent conflict detection exists, but automatic conflict resolution is not implemented yet.
-- Multi-agent evaluation is deterministic and does not include LLM-as-judge yet.
-- Production MCP hosting is not defined yet.
+- some specialized agents still use deterministic behavior instead of full LLM-backed reasoning;
+- automatic multi-agent conflict resolution is not implemented yet;
+- production MCP hosting is not defined yet;
+- authentication, authorization and multi-user isolation are not implemented yet;
+- OpenTelemetry, Grafana and external monitoring integrations are not implemented yet;
+- the observability dashboard is currently backend-only;
+- the project does not yet provide a deployed frontend.
 
-These limitations define the boundary between the implemented foundation and the upcoming MCP, orchestration, evaluation and production capabilities.
+These limitations define the boundary between the implemented engineering foundation and the upcoming cloud, security, frontend and production hardening capabilities.
 
-## Next Milestone: M7 — Evaluation and LLMOps
+## Next Milestone: M8 — Cloud, Security and Portfolio
 
-The next milestone will focus on continuously evaluating, observing and improving LLM, RAG and agent behavior.
+The next milestone will focus on turning the project into a more deployable, secure and portfolio-ready AI engineering platform.
 
-Planned capabilities:
+Planned focus areas:
 
-- Prompt regression tests
-- Golden evaluation dataset
-- LLM output evaluation suite
-- RAG regression evaluation suite
-- Agent regression evaluation suite
-- Multi-Agent QA Copilot regression evaluation
-- Tool-calling evaluation
-- LLM-as-judge evaluation prototype
-- CI evaluation pipeline
-- Structured AI execution telemetry
-- Token usage tracking
-- Cost tracking
-- Latency tracking
-- Retrieval quality metrics
-- Agent execution metrics
-- Multi-agent execution metrics
-- Observability dashboard
+- cloud-ready deployment;
+- production-like configuration;
+- authentication and authorization;
+- security hardening;
+- observability persistence;
+- production monitoring direction;
+- frontend architecture;
+- AI Quality Command Center;
+- portfolio presentation;
+- deployment documentation.
 
-The planned short-term implementation order is:
+A natural frontend direction for M8 is:
 
 ```text
-M5 — MCP QA Server
-  ↓
-M6 — Multi-Agent QA Copilot
-  ↓
-M7 — Evaluation and LLMOps
+AI Quality Command Center
 ```
+
+This future interface may consolidate:
+
+- AI quality overview;
+- evaluation run visualization;
+- observability dashboard;
+- token and cost usage;
+- RAG quality metrics;
+- agent execution metrics;
+- multi-agent execution metrics;
+- QA Agent console;
+- Multi-Agent QA Copilot console;
+- Data Analyst Agent console;
+- provider and model settings.
 
 ## Engineering Approach
 
@@ -762,30 +1016,31 @@ The repository favors explicit abstractions and controlled execution over hidden
 
 ## Documentation
 
-* [Roadmap](ROADMAP.md)
-* [Changelog](CHANGELOG.md)
-* [Contributing Guide](CONTRIBUTING.md)
-* [Initial Architecture](docs/architecture/initial-architecture.md)
-* [Architecture Decision Records](docs/adr/)
-* [Study Notes](docs/study-notes/)
+- [Roadmap](ROADMAP.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Initial Architecture](docs/architecture/initial-architecture.md)
+- [Architecture Decision Records](docs/adr/)
+- [Study Notes](docs/study-notes/)
 
 ## Learning Goals
 
 By the end of the roadmap, the project aims to demonstrate practical experience with:
 
-* Applied AI system architecture;
-* LLM provider integration;
-* prompt and structured-output engineering;
-* RAG pipelines;
-* vector retrieval;
-* AI agents and tool use;
-* Model Context Protocol;
-* multi-agent orchestration;
-* AI evaluation and testing;
-* LLMOps and observability;
-* AI security and governance;
-* CI/CD for AI applications;
-* production-oriented engineering practices.
+- Applied AI system architecture;
+- LLM provider integration;
+- prompt and structured-output engineering;
+- RAG pipelines;
+- vector retrieval;
+- AI agents and tool use;
+- Model Context Protocol;
+- multi-agent orchestration;
+- AI evaluation and testing;
+- LLMOps and observability;
+- AI security and governance;
+- CI/CD for AI applications;
+- production-oriented engineering practices;
+- portfolio-grade AI platform design.
 
 ## Project Nature
 
