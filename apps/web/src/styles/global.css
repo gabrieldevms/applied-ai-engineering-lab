@@ -835,3 +835,104 @@ code {
     text-align: left;
   }
 }
+
+.console-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.secondary-button {
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  border-radius: 999px;
+  background: rgba(14, 165, 233, 0.1);
+  color: #e0f2fe;
+  font-weight: 800;
+  padding: 0.8rem 1.1rem;
+}
+
+.secondary-button:hover {
+  background: rgba(14, 165, 233, 0.18);
+}
+
+.secondary-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.rag-provider-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.rag-provider-meta span {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.3);
+  color: #94a3b8;
+  padding: 0.45rem 0.7rem;
+}
+
+.rag-provider-meta strong {
+  color: #f8fafc;
+}
+
+.rag-chunk-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.rag-chunk-card,
+.rag-citation-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+  padding: 1.15rem;
+}
+
+.rag-chunk-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.rag-chunk-card h3,
+.rag-citation-card h3 {
+  margin: 0.2rem 0 0.5rem;
+  color: #f8fafc;
+}
+
+.rag-chunk-card p,
+.rag-citation-card p {
+  color: #cbd5e1;
+}
+
+.rag-chunk-card .json-viewer-card {
+  margin-top: 1rem;
+  box-shadow: none;
+}
+
+.rag-citation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rag-citation-card small {
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .rag-citation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rag-chunk-header {
+    flex-direction: column;
+  }
+}

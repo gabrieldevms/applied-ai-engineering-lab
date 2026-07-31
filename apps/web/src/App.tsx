@@ -6,6 +6,7 @@ import { MultiAgentCopilotConsolePage } from "./pages/MultiAgentCopilotConsolePa
 import { ObservabilityCenterPage } from "./pages/ObservabilityCenterPage";
 import { ProductPlaceholderPage } from "./pages/ProductPlaceholderPage";
 import { QAAgentConsolePage } from "./pages/QAAgentConsolePage";
+import { RAGConsolePage } from "./pages/RAGConsolePage";
 import type { AppPage } from "./types/navigation";
 
 export default function App() {
@@ -30,6 +31,10 @@ export default function App() {
 
     if (activePage === "multi-agent-copilot") {
       return <MultiAgentCopilotConsolePage />;
+    }
+
+    if (activePage === "rag") {
+      return <RAGConsolePage />;
     }
 
     return <ProductPlaceholderPage page={activePage} />;
