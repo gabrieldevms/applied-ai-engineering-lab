@@ -593,3 +593,144 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+.console-layout {
+  display: grid;
+  grid-template-columns: minmax(22rem, 0.85fr) minmax(0, 1.35fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.console-form-card,
+.console-answer-card,
+.console-steps-card,
+.console-step-card,
+.json-viewer-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+}
+
+.console-form-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.console-form-card h2,
+.console-answer-card h2,
+.console-steps-card h2,
+.json-viewer-card h3,
+.console-step-card h3 {
+  margin: 0.2rem 0 0.5rem;
+  color: #f8fafc;
+}
+
+.console-form-card p,
+.console-answer-card p {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-field span {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.form-field small {
+  color: #94a3b8;
+}
+
+.form-field textarea,
+.form-field input {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.9rem;
+  background: rgba(2, 6, 23, 0.5);
+  color: #f8fafc;
+  padding: 0.8rem 0.9rem;
+  outline: none;
+}
+
+.form-field textarea:focus,
+.form-field input:focus {
+  border-color: rgba(125, 211, 252, 0.52);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.console-result-stack {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.console-answer-card,
+.console-steps-card,
+.json-viewer-card {
+  padding: 1.25rem;
+}
+
+.json-viewer-card {
+  min-width: 0;
+}
+
+.json-viewer-card pre,
+.console-step-card pre {
+  overflow: auto;
+  max-height: 28rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 0.9rem;
+  background: rgba(2, 6, 23, 0.48);
+  color: #dbeafe;
+  padding: 1rem;
+  white-space: pre-wrap;
+}
+
+.console-step-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.console-step-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+}
+
+.console-step-card {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.console-step-card pre {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+@media (max-width: 1180px) {
+  .console-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .console-step-card {
+    grid-template-columns: 1fr;
+  }
+}
