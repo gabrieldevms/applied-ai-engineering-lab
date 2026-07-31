@@ -42,10 +42,14 @@ from ai_api.evals.multi_agent_execution_metrics import (
     AIMultiAgentExecutionTelemetryService,
 )
 from ai_api.evals.observability_dashboard import AIObservabilityDashboardService
+from ai_api.config import get_settings
+
+
+_ai_usage_tracking_service = AIUsageTrackingService.from_settings(
+    get_settings(),
+)
 
 _evaluation_telemetry_service = EvaluationTelemetryService()
-
-_ai_usage_tracking_service = AIUsageTrackingService()
 
 _ai_retrieval_quality_telemetry_service = AIRetrievalQualityTelemetryService()
 

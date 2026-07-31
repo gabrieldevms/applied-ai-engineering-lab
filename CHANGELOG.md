@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
 - Added Persistent Storage Foundation with reusable local JSONL storage primitives.
 - Added storage configuration settings for `STORAGE_BACKEND` and `STORAGE_BASE_DIR`.
 - Added generic JSONL store support for append, list, recent listing, field lookup, count, clear and metadata operations.
+- Added persistent local JSONL storage support for AI usage tracking records.
+- Added `AI_USAGE_RECORDS_PATH` setting for configurable usage tracking persistence.
 
 ### Changed
 
@@ -32,6 +34,8 @@ All notable changes to this project will be documented in this file.
 - Introduced reusable frontend structures for API clients, typed responses, JSON viewers, metric cards and console pages.
 - Completed the first local AI Quality Command Center frontend/product experience.
 - Updated the frontend navigation to include provider settings, Usage & Cost and Central de Riscos.
+- Updated AI usage tracking to support persistent storage through the storage foundation.
+- Updated Usage & Cost backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 
 ### Notes
 
@@ -41,6 +45,7 @@ All notable changes to this project will be documented in this file.
 - Most observability records are still stored in backend memory.
 - Persistent execution history, live dashboard updates, production observability integration, security/governance, cloud readiness and portfolio documentation remain future M8 work.
 - Persistent Storage Foundation introduces reusable storage primitives, but existing observability services are not migrated to persistent storage yet.
+- Usage tracking is the first observability service migrated from in-memory-only storage to the persistent storage foundation.
 
 ---
 
