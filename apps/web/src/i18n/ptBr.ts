@@ -1,15 +1,44 @@
+import type { AppPage } from "../types/navigation";
 import type { DashboardStatus } from "../types/observability";
 
-export const navigationLabels = [
-  "Overview",
-  "Dashboard",
-  "Observabilidade",
-  "Central de Avaliação",
-  "QA Agent",
-  "Multi-Agent Copilot",
-  "RAG",
-  "Data Analyst",
-  "Configurações",
+export type NavigationItem = {
+  page: AppPage;
+  label: string;
+};
+
+export const navigationItems: NavigationItem[] = [
+  {
+    page: "overview",
+    label: "Overview",
+  },
+  {
+    page: "observability",
+    label: "Central de Observabilidade",
+  },
+  {
+    page: "evaluation",
+    label: "Central de Avaliação",
+  },
+  {
+    page: "qa-agent",
+    label: "QA Agent",
+  },
+  {
+    page: "multi-agent-copilot",
+    label: "Multi-Agent Copilot",
+  },
+  {
+    page: "rag",
+    label: "RAG",
+  },
+  {
+    page: "data-analyst",
+    label: "Data Analyst",
+  },
+  {
+    page: "provider-settings",
+    label: "Configurações de provider",
+  },
 ];
 
 const statusLabels: Record<DashboardStatus, string> = {
@@ -57,8 +86,7 @@ const textTranslations: Record<string, string> = {
 
   "No evaluation telemetry risks detected.":
     "Nenhum risco de telemetria de avaliação detectado.",
-  "No usage risks detected.":
-    "Nenhum risco de uso detectado.",
+  "No usage risks detected.": "Nenhum risco de uso detectado.",
   "No retrieval quality risks detected.":
     "Nenhum risco de qualidade de recuperação detectado.",
   "No agent execution risks detected.":
