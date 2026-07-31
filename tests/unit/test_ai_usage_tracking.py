@@ -1,5 +1,6 @@
 import pytest
 from pydantic import ValidationError
+from ai_api.evals.usage_tracking import JsonlAIUsageRecordStore
 from ai_api.evals import (
     AIUsageRecord,
     AIUsageRecordRequest,
@@ -240,3 +241,108 @@ def test_ai_usage_tracking_request_should_reject_negative_tokens() -> None:
             operation="llm_call",
             prompt_tokens=-1,
         )
+
+
+def test_ai_usage_tracking_service_should_persist_records_with_jsonl_store(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "usage-records.jsonl"
+
+    first_service = AIUsageTrackingService(
+        record_store=JsonlAIUsageRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    first_service.record(
+        AIUsageRecordRequest(
+            provider="fake",
+            model_name="fake-llm-v1",
+            component="agent",
+            operation="qa_agent_console_demo",
+            prompt_tokens=100,
+            completion_tokens=50,
+            input_cost_per_1k_tokens_usd=0.001,
+            output_cost_per_1k_tokens_usd=0.002,
+        )
+    )
+
+    second_service = AIUsageTrackingService(
+        record_store=JsonlAIUsageRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = second_service.list_records()
+
+    assert response.count == 1
+    assert response.records[0].provider == "fake"
+    assert response.records[0].model_name == "fake-llm-v1"
+    assert response.records[0].component == "agent"
+    assert response.records[0].operation == "qa_agent_console_demo"
+    assert response.records[0].total_tokens == 150
+    assert response.records[0].total_cost_usd == 0.0002
+    assert response.records[0].metadata["storage_backend"] == "local_jsonl"
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_ai_usage_tracking_service_should_summarize_persisted_jsonl_records(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "usage-records.jsonl"
+
+    service = AIUsageTrackingService(
+        record_store=JsonlAIUsageRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        AIUsageRecordRequest(
+            provider="fake",
+            model_name="fake-llm-v1",
+            component="llm",
+            operation="requirement_analysis",
+            prompt_tokens=1000,
+            completion_tokens=500,
+            input_cost_per_1k_tokens_usd=0.001,
+            output_cost_per_1k_tokens_usd=0.002,
+        )
+    )
+
+    restored_service = AIUsageTrackingService(
+        record_store=JsonlAIUsageRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = restored_service.summarize(AIUsageSummaryRequest())
+
+    assert response.record_count == 1
+    assert response.total_prompt_tokens == 1000
+    assert response.total_completion_tokens == 500
+    assert response.total_tokens == 1500
+    assert response.total_cost_usd == 0.002
+    assert response.average_cost_usd == 0.002
+    assert response.provider_coverage["fake"] == 1
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_ai_usage_tracking_service_should_clear_jsonl_records(tmp_path) -> None:
+    file_path = tmp_path / "usage-records.jsonl"
+
+    service = AIUsageTrackingService(
+        record_store=JsonlAIUsageRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        AIUsageRecordRequest(
+            provider="fake",
+            model_name="fake-llm-v1",
+            component="llm",
+            operation="llm_call",
+            prompt_tokens=10,
+        )
+    )
+
+    service.clear()
+
+    assert service.list_records().count == 0
+    assert service.summarize(AIUsageSummaryRequest()).record_count == 0

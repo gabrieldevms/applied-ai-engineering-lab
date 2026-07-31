@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -35,6 +36,7 @@ class Settings(BaseSettings):
     storage_base_dir: str = Field(default=".data")
 
     agent_execution_log_path: str = ".data/agent-execution-logs.jsonl"
+    ai_usage_records_path: str = "observability/usage-records.jsonl"
 
 
 @lru_cache

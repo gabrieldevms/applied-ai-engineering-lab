@@ -16,6 +16,7 @@ SETTINGS_ENV_VARS = [
     "EMBEDDING_DIMENSIONS",
     "STORAGE_BACKEND",
     "STORAGE_BASE_DIR",
+    "AI_USAGE_RECORDS_PATH",
 ]
 
 
@@ -35,6 +36,7 @@ def test_settings_should_use_fake_provider_by_default() -> None:
     assert settings.embedding_dimensions == 32
     assert settings.storage_backend == "local_jsonl"
     assert settings.storage_base_dir == ".data"
+    assert settings.ai_usage_records_path == "observability/usage-records.jsonl"
 
 
 def test_settings_should_accept_openai_provider() -> None:
@@ -89,3 +91,16 @@ def test_settings_should_accept_embedding_settings() -> None:
 def test_settings_should_reject_invalid_embedding_dimensions() -> None:
     with pytest.raises(ValidationError):
         Settings(_env_file=None, embedding_dimensions=0)
+
+
+def test_settings_should_load_ai_usage_records_path_from_environment(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv(
+        "AI_USAGE_RECORDS_PATH",
+        "custom/usage-records.jsonl",
+    )
+
+    settings = Settings()
+
+    assert settings.ai_usage_records_path == "custom/usage-records.jsonl"

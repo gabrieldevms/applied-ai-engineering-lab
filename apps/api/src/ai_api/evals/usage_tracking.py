@@ -1,5 +1,8 @@
 from datetime import UTC, datetime
+from pathlib import Path
+from typing import Protocol
 from uuid import uuid4
+from ai_api.config import Settings
 from ai_api.evals.schemas import (
     AIUsageRecord,
     AIUsageRecordRequest,
@@ -7,11 +10,98 @@ from ai_api.evals.schemas import (
     AIUsageSummaryRequest,
     AIUsageSummaryResponse,
 )
+from ai_api.storage import JsonlStore, resolve_storage_path
+
+
+class AIUsageRecordStore(Protocol):
+    def append(self, record: AIUsageRecord) -> AIUsageRecord:
+        """Append a usage record."""
+        ...
+
+    def list_records(self) -> list[AIUsageRecord]:
+        """List all stored usage records."""
+        ...
+
+    def count(self) -> int:
+        """Return the number of stored usage records."""
+        ...
+
+    def clear(self) -> None:
+        """Clear all stored usage records."""
+        ...
+
+
+class InMemoryAIUsageRecordStore:
+    def __init__(self) -> None:
+        self._records: list[AIUsageRecord] = []
+
+    def append(self, record: AIUsageRecord) -> AIUsageRecord:
+        self._records.append(record)
+
+        return record
+
+    def list_records(self) -> list[AIUsageRecord]:
+        return list(self._records)
+
+    def count(self) -> int:
+        return len(self._records)
+
+    def clear(self) -> None:
+        self._records.clear()
+
+
+class JsonlAIUsageRecordStore:
+    def __init__(
+        self,
+        file_path: str | Path,
+    ) -> None:
+        self._store = JsonlStore(
+            file_path=file_path,
+            record_type=AIUsageRecord,
+        )
+
+    def append(self, record: AIUsageRecord) -> AIUsageRecord:
+        return self._store.append(record)
+
+    def list_records(self) -> list[AIUsageRecord]:
+        return self._store.list_records()
+
+    def count(self) -> int:
+        return self._store.count()
+
+    def clear(self) -> None:
+        self._store.clear()
 
 
 class AIUsageTrackingService:
-    def __init__(self) -> None:
-        self._records: list[AIUsageRecord] = []
+    def __init__(
+        self,
+        record_store: AIUsageRecordStore | None = None,
+        storage_backend: str = "memory",
+    ) -> None:
+        self.record_store = record_store or InMemoryAIUsageRecordStore()
+        self.storage_backend = storage_backend
+
+    @classmethod
+    def from_settings(
+        cls,
+        settings: Settings,
+    ) -> "AIUsageTrackingService":
+        if settings.storage_backend == "local_jsonl":
+            return cls(
+                record_store=JsonlAIUsageRecordStore(
+                    file_path=resolve_storage_path(
+                        settings=settings,
+                        relative_path=settings.ai_usage_records_path,
+                    ),
+                ),
+                storage_backend="local_jsonl",
+            )
+
+        return cls(
+            record_store=InMemoryAIUsageRecordStore(),
+            storage_backend="memory",
+        )
 
     def record(
         self,
@@ -61,13 +151,12 @@ class AIUsageTrackingService:
             metadata={
                 "usage_schema_version": "0.1.0",
                 "pricing_mode": "caller_provided",
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
-        self._records.append(record)
-
-        return record
+        return self.record_store.append(record)
 
     def list_records(
         self,
@@ -76,7 +165,11 @@ class AIUsageTrackingService:
         model_name: str | None = None,
         limit: int = 100,
     ) -> AIUsageRecordsResponse:
-        filtered_records = self._records
+        if limit < 1:
+            raise ValueError("limit must be greater than zero")
+
+        stored_records = self.record_store.list_records()
+        filtered_records = stored_records
 
         if provider is not None:
             filtered_records = [
@@ -106,7 +199,8 @@ class AIUsageTrackingService:
             count=len(limited_records),
             metadata={
                 "source": "ai-usage-tracking-service",
-                "total_stored_records": len(self._records),
+                "storage_backend": self.storage_backend,
+                "total_stored_records": len(stored_records),
                 "applied_filters": {
                     "provider": provider,
                     "component": component,
@@ -120,7 +214,11 @@ class AIUsageTrackingService:
         self,
         request: AIUsageSummaryRequest,
     ) -> AIUsageSummaryResponse:
-        records = request.records if request.records is not None else self._records
+        records = (
+            request.records
+            if request.records is not None
+            else self.record_store.list_records()
+        )
 
         total_cost_usd = self._sum_costs(records)
         record_count_with_cost = len(
@@ -180,12 +278,13 @@ class AIUsageTrackingService:
                 "source": "stored_records"
                 if request.records is None
                 else "request_records",
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
     def clear(self) -> None:
-        self._records.clear()
+        self.record_store.clear()
 
     @staticmethod
     def _calculate_total_tokens(
