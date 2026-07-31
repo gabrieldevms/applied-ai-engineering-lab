@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LLMProviderName = Literal["fake", "openai", "ollama"]
 EmbeddingProviderName = Literal["fake"]
+StorageBackendName = Literal["memory", "local_jsonl"]
 
 
 class Settings(BaseSettings):
@@ -29,6 +30,9 @@ class Settings(BaseSettings):
 
     embedding_provider: EmbeddingProviderName = Field(default="fake")
     embedding_dimensions: int = Field(default=32, ge=4, le=4096)
+
+    storage_backend: StorageBackendName = Field(default="local_jsonl")
+    storage_base_dir: str = Field(default=".data")
 
     agent_execution_log_path: str = ".data/agent-execution-logs.jsonl"
 

@@ -14,6 +14,8 @@ SETTINGS_ENV_VARS = [
     "OLLAMA_TIMEOUT_SECONDS",
     "EMBEDDING_PROVIDER",
     "EMBEDDING_DIMENSIONS",
+    "STORAGE_BACKEND",
+    "STORAGE_BASE_DIR",
 ]
 
 
@@ -31,6 +33,8 @@ def test_settings_should_use_fake_provider_by_default() -> None:
     assert settings.requirement_analysis_retry_attempts == 2
     assert settings.embedding_provider == "fake"
     assert settings.embedding_dimensions == 32
+    assert settings.storage_backend == "local_jsonl"
+    assert settings.storage_base_dir == ".data"
 
 
 def test_settings_should_accept_openai_provider() -> None:

@@ -21,6 +21,9 @@ All notable changes to this project will be documented in this file.
 - Added demo usage record action for local LLMOps demonstration.
 - Added Central de Riscos for risk and recommendation panels.
 - Added consolidated section-level risk, recommendation and status views using `GET /observability/dashboard`.
+- Added Persistent Storage Foundation with reusable local JSONL storage primitives.
+- Added storage configuration settings for `STORAGE_BACKEND` and `STORAGE_BASE_DIR`.
+- Added generic JSONL store support for append, list, recent listing, field lookup, count, clear and metadata operations.
 
 ### Changed
 
@@ -37,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - Console execution results are currently kept in local React state.
 - Most observability records are still stored in backend memory.
 - Persistent execution history, live dashboard updates, production observability integration, security/governance, cloud readiness and portfolio documentation remain future M8 work.
+- Persistent Storage Foundation introduces reusable storage primitives, but existing observability services are not migrated to persistent storage yet.
 
 ---
 
