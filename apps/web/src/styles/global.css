@@ -649,7 +649,8 @@ code {
 }
 
 .form-field textarea,
-.form-field input {
+.form-field input,
+.form-field select {
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: 0.9rem;
@@ -660,7 +661,8 @@ code {
 }
 
 .form-field textarea:focus,
-.form-field input:focus {
+.form-field input:focus,
+.form-field select:focus {
   border-color: rgba(125, 211, 252, 0.52);
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
 }
@@ -732,5 +734,104 @@ code {
 
   .console-step-card {
     grid-template-columns: 1fr;
+  }
+}
+
+.copilot-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.copilot-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.copilot-role-card,
+.copilot-trace-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+}
+
+.copilot-role-card {
+  padding: 1.15rem;
+}
+
+.copilot-role-card h3 {
+  margin: 0.2rem 0 0.5rem;
+  color: #f8fafc;
+}
+
+.copilot-role-card p,
+.copilot-trace-card p,
+.console-step-card p {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.copilot-trace-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.copilot-trace-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.copilot-trace-card h3 {
+  margin: 0.2rem 0 0.5rem;
+  color: #f8fafc;
+}
+
+.copilot-trace-meta {
+  min-width: 10rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.3);
+  padding: 0.8rem;
+  text-align: right;
+}
+
+.copilot-trace-meta strong,
+.copilot-trace-meta span {
+  display: block;
+}
+
+.copilot-trace-meta strong {
+  color: #f8fafc;
+}
+
+.copilot-trace-meta span {
+  color: #94a3b8;
+  text-transform: capitalize;
+}
+
+@media (max-width: 1180px) {
+  .copilot-role-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .copilot-report-grid,
+  .copilot-role-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .copilot-trace-card {
+    flex-direction: column;
+  }
+
+  .copilot-trace-meta {
+    width: 100%;
+    text-align: left;
   }
 }
