@@ -479,3 +479,117 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+.evaluation-signal-card,
+.evaluation-details-card,
+.evaluation-suite-card {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.76);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+}
+
+.evaluation-signal-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.evaluation-signal-card h2,
+.evaluation-details-card h2,
+.evaluation-suite-card h3 {
+  margin: 0.2rem 0 0.5rem;
+  color: #f8fafc;
+}
+
+.evaluation-signal-card p,
+.evaluation-suite-card p {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.evaluation-signal-meta {
+  min-width: 10rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.3);
+  padding: 1rem;
+  text-align: center;
+}
+
+.evaluation-signal-meta strong {
+  display: block;
+  color: #f8fafc;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.evaluation-signal-meta span {
+  color: #94a3b8;
+}
+
+.evaluation-details-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.evaluation-metrics-table {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.evaluation-metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 0.9rem;
+  background: rgba(2, 6, 23, 0.3);
+  padding: 0.8rem 1rem;
+}
+
+.evaluation-metric-row span {
+  color: #94a3b8;
+  text-transform: capitalize;
+}
+
+.evaluation-metric-row strong {
+  color: #f8fafc;
+  text-align: right;
+}
+
+.evaluation-suite-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.evaluation-suite-card {
+  padding: 1.15rem;
+}
+
+@media (max-width: 1180px) {
+  .evaluation-suite-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .evaluation-signal-card,
+  .evaluation-metric-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .evaluation-signal-meta {
+    width: 100%;
+  }
+
+  .evaluation-suite-grid {
+    grid-template-columns: 1fr;
+  }
+}
