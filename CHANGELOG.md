@@ -16,19 +16,27 @@ All notable changes to this project will be documented in this file.
 - Added Multi-Agent QA Copilot Console integrated with `POST /multi-agent/qa-copilot/run`.
 - Added RAG Console integrated with `POST /rag/retrieve` and `POST /rag/answer`.
 - Added Data Analyst Console integrated with `POST /data-analysis/agent/run`.
+- Added Provider and Model Settings UI integrated with `GET /llm/providers` and `GET /llm/health`.
+- Added Usage & Cost visualization integrated with usage tracking observability endpoints.
+- Added demo usage record action for local LLMOps demonstration.
+- Added Central de Riscos for risk and recommendation panels.
+- Added consolidated section-level risk, recommendation and status views using `GET /observability/dashboard`.
 
 ### Changed
 
 - Replaced the old frontend prototype with a clean product-oriented frontend foundation.
 - Organized frontend navigation around product areas and AI engineering workflows.
 - Introduced reusable frontend structures for API clients, typed responses, JSON viewers, metric cards and console pages.
+- Completed the first local AI Quality Command Center frontend/product experience.
+- Updated the frontend navigation to include provider settings, Usage & Cost and Central de Riscos.
 
 ### Notes
 
 - M8 is still in progress.
-- The current frontend is suitable for local demonstrations and portfolio presentation.
+- The first AI Quality Command Center frontend/product experience is completed for local demonstrations and portfolio presentation.
 - Console execution results are currently kept in local React state.
-- Persistent execution history, live dashboard updates, production observability integration, provider/model settings, security/governance, cloud readiness and portfolio documentation remain future M8 work.
+- Most observability records are still stored in backend memory.
+- Persistent execution history, live dashboard updates, production observability integration, security/governance, cloud readiness and portfolio documentation remain future M8 work.
 
 ---
 

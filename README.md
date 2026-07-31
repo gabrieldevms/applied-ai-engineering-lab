@@ -6,9 +6,9 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 
 ## Project Status
 
-**Current module:** M7 — Evaluation and LLMOps completed  
-**Latest completed milestone:** Evaluation, regression suites, AI telemetry, usage tracking and backend observability dashboard  
-**Next milestone:** M8 — Cloud, Security and Portfolio  
+**Current module:** M8 — Cloud, Security and Portfolio in progress  
+**Latest completed milestone:** AI Quality Command Center frontend product experience  
+**Next focus:** Persistent Storage Foundation, execution history and live observability  
 
 The project currently includes:
 
@@ -67,7 +67,7 @@ For detailed reviews, see:
 | M5 — MCP QA Server                 | ✅ Completed | MCP tools focused on QA and software engineering                                       |
 | M6 — Multi-Agent QA Copilot        | ✅ Completed | Specialized QA agents, orchestration, MCP exposure and deterministic evaluation        |
 | M7 — Evaluation and LLMOps         | ✅ Completed | Evaluation suites, CI evaluation pipeline, telemetry, usage tracking and observability |
-| M8 — Cloud, Security and Portfolio | ⏭️ Next      | Deployment, security, governance, frontend experience and portfolio presentation       |
+| M8 — Cloud, Security and Portfolio | 🚧 In Progress | Deployment, security, governance, frontend experience and portfolio presentation       |
 
 See the complete [project roadmap](ROADMAP.md).
 
@@ -375,24 +375,38 @@ Dashboard endpoint:
 
 The dashboard is currently backend-only and acts as the response contract for a future frontend experience.
 
-### Future AI Quality Command Center
+### AI Quality Command Center
 
-The planned frontend direction is an AI Quality Command Center.
+M8 introduced the first product-oriented frontend experience for the project: the AI Quality Command Center.
 
-The backend dashboard introduced in M7 is designed to support a future portfolio-grade UI with:
+The frontend was rebuilt from scratch using Vite, React and TypeScript, replacing the old prototype with a clean local product interface focused on AI quality, observability and agent workflows.
+
+The current Command Center includes:
 
 - AI quality overview;
-- evaluation center;
-- observability center;
-- QA Agent console;
-- Multi-Agent QA Copilot console;
-- RAG console;
-- Data Analyst Agent console;
-- provider and model configuration;
-- usage and cost views;
-- risk and recommendation panels.
+- backend observability dashboard integration;
+- Observability Center;
+- Evaluation Center;
+- QA Agent Console;
+- Multi-Agent QA Copilot Console;
+- RAG Console;
+- Data Analyst Console;
+- provider and model settings view;
+- Usage & Cost visualization;
+- Central de Riscos for risk and recommendation panels.
 
-This frontend direction is planned for M8.
+The current frontend is suitable for local demonstrations and portfolio presentation.
+
+Current limitations:
+
+- console execution results are still stored in local React page state;
+- most observability records are still stored in backend memory;
+- dashboard updates depend on existing backend observability records;
+- frontend console executions do not yet automatically persist execution history;
+- frontend console executions do not yet automatically feed all observability metrics;
+- production authentication, authorization and multi-user isolation are not implemented yet.
+
+These limitations define the next M8 focus: persistent storage, execution history, console telemetry integration and live observability.
 
 ## Architecture
 
@@ -950,47 +964,48 @@ The AI Evaluation Pipeline validates AI behavior through deterministic evaluatio
 - production MCP hosting is not defined yet;
 - authentication, authorization and multi-user isolation are not implemented yet;
 - OpenTelemetry, Grafana and external monitoring integrations are not implemented yet;
-- the observability dashboard is currently backend-only;
-- the project does not yet provide a deployed frontend.
+- the observability dashboard is now consumed by the local AI Quality Command Center frontend;
+- the project does not yet provide a deployed frontend;
+- frontend console execution results are currently kept in local React page state;
+- frontend console executions do not yet automatically persist execution history;
+- frontend console executions do not yet automatically feed all observability metrics.
 
 These limitations define the boundary between the implemented engineering foundation and the upcoming cloud, security, frontend and production hardening capabilities.
 
-## Next Milestone: M8 — Cloud, Security and Portfolio
+## Current Milestone: M8 — Cloud, Security and Portfolio
 
-The next milestone will focus on turning the project into a more deployable, secure and portfolio-ready AI engineering platform.
+M8 is turning the project into a more demonstrable, secure and portfolio-ready AI engineering platform.
 
-Planned focus areas:
+The first M8 frontend/product experience is completed locally through the AI Quality Command Center.
 
-- cloud-ready deployment;
-- production-like configuration;
-- authentication and authorization;
-- security hardening;
-- observability persistence;
-- production monitoring direction;
-- frontend architecture;
-- AI Quality Command Center;
-- portfolio presentation;
-- deployment documentation.
+Completed frontend capabilities:
 
-A natural frontend direction for M8 is:
+- frontend architecture decision;
+- AI Quality Command Center foundation;
+- backend dashboard integration;
+- Observability Center UI;
+- Evaluation Center UI;
+- QA Agent Console;
+- Multi-Agent QA Copilot Console;
+- RAG Console;
+- Data Analyst Agent Console;
+- provider and model settings UI;
+- Usage & Cost visualization;
+- risk and recommendation panels.
 
-```text
-AI Quality Command Center
-```
+Next M8 focus areas:
 
-This future interface may consolidate:
-
-- AI quality overview;
-- evaluation run visualization;
-- observability dashboard;
-- token and cost usage;
-- RAG quality metrics;
-- agent execution metrics;
-- multi-agent execution metrics;
-- QA Agent console;
-- Multi-Agent QA Copilot console;
-- Data Analyst Agent console;
-- provider and model settings.
+- persistent storage foundation;
+- persistent evaluation storage;
+- persistent observability storage;
+- persistent agent state;
+- execution history;
+- console telemetry integration;
+- live observability dashboard behavior;
+- environment-specific configuration;
+- security and governance foundation;
+- cloud/deployment direction;
+- portfolio documentation and final case study.
 
 ## Engineering Approach
 
