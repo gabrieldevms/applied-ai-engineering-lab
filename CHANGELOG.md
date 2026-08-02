@@ -32,6 +32,10 @@ All notable changes to this project will be documented in this file.
 - Added `RETRIEVAL_QUALITY_RECORDS_PATH` setting for configurable retrieval quality persistence.
 - Added persistent local JSONL storage support for agent execution telemetry records.
 - Added `AGENT_EXECUTION_RECORDS_PATH` setting for configurable agent execution persistence.
+- Added persistent local JSONL storage support for multi-agent execution telemetry records.
+- Added `MULTI_AGENT_EXECUTION_RECORDS_PATH` setting for configurable multi-agent execution persistence.
+- Added Execution History backend read model for consolidating persisted observability records.
+- Added `GET /observability/execution-history` to list unified AI execution history records across evaluation, usage, retrieval, agent and multi-agent telemetry.
 
 ### Changed
 
@@ -48,6 +52,8 @@ All notable changes to this project will be documented in this file.
 - Updated RAG quality and observability dashboard backend data flow to survive API restarts for retrieval quality records when `STORAGE_BACKEND=local_jsonl`.
 - Updated agent execution telemetry to support persistent storage through the storage foundation.
 - Updated agent execution observability backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
+- Updated multi-agent execution telemetry to support persistent storage through the storage foundation.
+- Updated multi-agent execution observability backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 
 ### Notes
 
@@ -61,6 +67,8 @@ All notable changes to this project will be documented in this file.
 - Evaluation telemetry is now the second observability capability migrated to the persistent storage foundation, after usage tracking.
 - Retrieval quality telemetry is now the third observability capability migrated to the persistent storage foundation.
 - Agent execution telemetry is now the fourth observability capability migrated to the persistent storage foundation.
+- Multi-agent execution telemetry completes the first persistent storage pass for the core observability telemetry services.
+- Execution History currently works as a backend read model over persisted observability telemetry. It does not create a separate execution-history store yet.
 
 ---
 
