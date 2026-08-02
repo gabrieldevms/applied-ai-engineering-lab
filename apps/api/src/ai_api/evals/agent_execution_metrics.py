@@ -1,5 +1,8 @@
 from datetime import UTC, datetime
+from pathlib import Path
+from typing import Protocol
 from uuid import uuid4
+from ai_api.config import Settings
 from ai_api.evals.schemas import (
     AIAgentExecutionRecord,
     AIAgentExecutionRecordRequest,
@@ -7,11 +10,107 @@ from ai_api.evals.schemas import (
     AIAgentExecutionSummaryRequest,
     AIAgentExecutionSummaryResponse,
 )
+from ai_api.storage import JsonlStore, resolve_storage_path
+
+
+class AIAgentExecutionRecordStore(Protocol):
+    def append(
+        self,
+        record: AIAgentExecutionRecord,
+    ) -> AIAgentExecutionRecord:
+        """Append an agent execution record."""
+        ...
+
+    def list_records(self) -> list[AIAgentExecutionRecord]:
+        """List all stored agent execution records."""
+        ...
+
+    def count(self) -> int:
+        """Return the number of stored agent execution records."""
+        ...
+
+    def clear(self) -> None:
+        """Clear all stored agent execution records."""
+        ...
+
+
+class InMemoryAIAgentExecutionRecordStore:
+    def __init__(self) -> None:
+        self._records: list[AIAgentExecutionRecord] = []
+
+    def append(
+        self,
+        record: AIAgentExecutionRecord,
+    ) -> AIAgentExecutionRecord:
+        self._records.append(record)
+
+        return record
+
+    def list_records(self) -> list[AIAgentExecutionRecord]:
+        return list(self._records)
+
+    def count(self) -> int:
+        return len(self._records)
+
+    def clear(self) -> None:
+        self._records.clear()
+
+
+class JsonlAIAgentExecutionRecordStore:
+    def __init__(
+        self,
+        file_path: str | Path,
+    ) -> None:
+        self._store = JsonlStore(
+            file_path=file_path,
+            record_type=AIAgentExecutionRecord,
+        )
+
+    def append(
+        self,
+        record: AIAgentExecutionRecord,
+    ) -> AIAgentExecutionRecord:
+        return self._store.append(record)
+
+    def list_records(self) -> list[AIAgentExecutionRecord]:
+        return self._store.list_records()
+
+    def count(self) -> int:
+        return self._store.count()
+
+    def clear(self) -> None:
+        self._store.clear()
 
 
 class AIAgentExecutionTelemetryService:
-    def __init__(self) -> None:
-        self._records: list[AIAgentExecutionRecord] = []
+    def __init__(
+        self,
+        record_store: AIAgentExecutionRecordStore | None = None,
+        storage_backend: str = "memory",
+    ) -> None:
+        self.record_store = record_store or InMemoryAIAgentExecutionRecordStore()
+        self.storage_backend = storage_backend
+
+    @classmethod
+    def from_settings(
+        cls,
+        settings: Settings,
+    ) -> "AIAgentExecutionTelemetryService":
+        if settings.storage_backend == "local_jsonl":
+            return cls(
+                record_store=JsonlAIAgentExecutionRecordStore(
+                    file_path=resolve_storage_path(
+                        settings=settings,
+                        relative_path=settings.agent_execution_records_path,
+                    ),
+                ),
+                storage_backend="local_jsonl",
+            )
+
+        return cls(
+            record_store=InMemoryAIAgentExecutionRecordStore(),
+            storage_backend="memory",
+        )
 
     def record(
         self,
@@ -89,13 +188,12 @@ class AIAgentExecutionTelemetryService:
             metadata={
                 "agent_execution_schema_version": "0.1.0",
                 "scoring_mode": "caller_provided_execution_signals",
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
-        self._records.append(record)
-
-        return record
+        return self.record_store.append(record)
 
     def list_records(
         self,
@@ -106,7 +204,11 @@ class AIAgentExecutionTelemetryService:
         run_status: str | None = None,
         limit: int = 100,
     ) -> AIAgentExecutionRecordsResponse:
-        filtered_records = self._records
+        if limit < 1:
+            raise ValueError("limit must be greater than zero")
+
+        stored_records = self.record_store.list_records()
+        filtered_records = stored_records
 
         if component is not None:
             filtered_records = [
@@ -150,7 +252,8 @@ class AIAgentExecutionTelemetryService:
             count=len(limited_records),
             metadata={
                 "source": "ai-agent-execution-telemetry-service",
-                "total_stored_records": len(self._records),
+                "storage_backend": self.storage_backend,
+                "total_stored_records": len(stored_records),
                 "applied_filters": {
                     "component": component,
                     "agent_name": agent_name,
@@ -166,7 +269,11 @@ class AIAgentExecutionTelemetryService:
         self,
         request: AIAgentExecutionSummaryRequest,
     ) -> AIAgentExecutionSummaryResponse:
-        records = request.records if request.records is not None else self._records
+        records = (
+            request.records
+            if request.records is not None
+            else self.record_store.list_records()
+        )
 
         return AIAgentExecutionSummaryResponse(
             record_count=len(records),
@@ -274,12 +381,13 @@ class AIAgentExecutionTelemetryService:
                 "source": "stored_records"
                 if request.records is None
                 else "request_records",
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
     def clear(self) -> None:
-        self._records.clear()
+        self.record_store.clear()
 
     @staticmethod
     def _calculate_rate(

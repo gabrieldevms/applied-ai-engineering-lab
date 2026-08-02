@@ -19,6 +19,7 @@ SETTINGS_ENV_VARS = [
     "AI_USAGE_RECORDS_PATH",
     "EVALUATION_TELEMETRY_EVENTS_PATH",
     "RETRIEVAL_QUALITY_RECORDS_PATH",
+    "AGENT_EXECUTION_RECORDS_PATH",
 ]
 
 
@@ -46,7 +47,11 @@ def test_settings_should_use_fake_provider_by_default() -> None:
     assert (
     settings.retrieval_quality_records_path
     == "observability/retrieval-quality-records.jsonl"
-)
+    )
+    assert (
+    settings.agent_execution_records_path
+    == "observability/agent-execution-records.jsonl"
+    )
 
 
 def test_settings_should_accept_openai_provider() -> None:
@@ -145,4 +150,20 @@ def test_settings_should_load_retrieval_quality_records_path_from_environment(
     assert (
         settings.retrieval_quality_records_path
         == "custom/retrieval-quality-records.jsonl"
+    )
+
+
+def test_settings_should_load_agent_execution_records_path_from_environment(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv(
+        "AGENT_EXECUTION_RECORDS_PATH",
+        "custom/agent-execution-records.jsonl",
+    )
+
+    settings = Settings()
+
+    assert (
+        settings.agent_execution_records_path
+        == "custom/agent-execution-records.jsonl"
     )
