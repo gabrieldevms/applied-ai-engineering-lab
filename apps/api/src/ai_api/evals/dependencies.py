@@ -59,7 +59,11 @@ _ai_retrieval_quality_telemetry_service = (
     )
 )
 
-_ai_agent_execution_telemetry_service = AIAgentExecutionTelemetryService()
+_ai_agent_execution_telemetry_service = (
+    AIAgentExecutionTelemetryService.from_settings(
+        get_settings(),
+    )
+)
 
 _ai_multi_agent_execution_telemetry_service = AIMultiAgentExecutionTelemetryService()
 

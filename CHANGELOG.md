@@ -30,6 +30,8 @@ All notable changes to this project will be documented in this file.
 - Added `EVALUATION_TELEMETRY_EVENTS_PATH` setting for configurable evaluation telemetry persistence.
 - Added persistent local JSONL storage support for retrieval quality telemetry records.
 - Added `RETRIEVAL_QUALITY_RECORDS_PATH` setting for configurable retrieval quality persistence.
+- Added persistent local JSONL storage support for agent execution telemetry records.
+- Added `AGENT_EXECUTION_RECORDS_PATH` setting for configurable agent execution persistence.
 
 ### Changed
 
@@ -44,6 +46,8 @@ All notable changes to this project will be documented in this file.
 - Updated Evaluation Center and observability dashboard backend data flow to survive API restarts for evaluation telemetry when `STORAGE_BACKEND=local_jsonl`.
 - Updated retrieval quality telemetry to support persistent storage through the storage foundation.
 - Updated RAG quality and observability dashboard backend data flow to survive API restarts for retrieval quality records when `STORAGE_BACKEND=local_jsonl`.
+- Updated agent execution telemetry to support persistent storage through the storage foundation.
+- Updated agent execution observability backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 
 ### Notes
 
@@ -56,6 +60,7 @@ All notable changes to this project will be documented in this file.
 - Usage tracking is the first observability service migrated from in-memory-only storage to the persistent storage foundation.
 - Evaluation telemetry is now the second observability capability migrated to the persistent storage foundation, after usage tracking.
 - Retrieval quality telemetry is now the third observability capability migrated to the persistent storage foundation.
+- Agent execution telemetry is now the fourth observability capability migrated to the persistent storage foundation.
 
 ---
 

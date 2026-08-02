@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -41,6 +42,9 @@ class Settings(BaseSettings):
     )
     retrieval_quality_records_path: str = (
         "observability/retrieval-quality-records.jsonl"
+    )
+    agent_execution_records_path: str = (
+        "observability/agent-execution-records.jsonl"
     )
 
 
