@@ -1,6 +1,7 @@
 export type AppPage =
   | "overview"
   | "observability"
+  | "execution-history"
   | "usage-cost"
   | "risk-center"
   | "evaluation"

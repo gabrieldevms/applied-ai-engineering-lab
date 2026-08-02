@@ -25,6 +25,13 @@ const pageContent: Record<
     description: "Área de observabilidade de sistemas de IA.",
     plannedItems: [],
   },
+    "execution-history": {
+    eyebrow: "Execution History",
+    title: "Histórico de Execuções",
+    description:
+      "Linha do tempo operacional consolidada a partir das telemetrias persistidas de avaliação, usage, RAG, agentes e execução multiagente.",
+    plannedItems: [],
+  },
     "usage-cost": {
     eyebrow: "LLMOps",
     title: "Usage & Cost",

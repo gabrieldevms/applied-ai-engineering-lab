@@ -16,6 +16,10 @@ export const navigationItems: NavigationItem[] = [
     label: "Central de Observabilidade",
   },
   {
+    page: "execution-history",
+    label: "Histórico de Execuções",
+  },
+  {
     page: "usage-cost",
     label: "Uso e Custos",
   },

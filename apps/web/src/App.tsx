@@ -3,6 +3,7 @@ import { AppShell } from "./components/layout/AppShell";
 import { CommandCenterPage } from "./pages/CommandCenterPage";
 import { DataAnalystConsolePage } from "./pages/DataAnalystConsolePage";
 import { EvaluationCenterPage } from "./pages/EvaluationCenterPage";
+import { ExecutionHistoryPage } from "./pages/ExecutionHistoryPage";
 import { MultiAgentCopilotConsolePage } from "./pages/MultiAgentCopilotConsolePage";
 import { ObservabilityCenterPage } from "./pages/ObservabilityCenterPage";
 import { ProductPlaceholderPage } from "./pages/ProductPlaceholderPage";
@@ -23,6 +24,10 @@ export default function App() {
 
     if (activePage === "observability") {
       return <ObservabilityCenterPage />;
+    }
+
+    if (activePage === "execution-history") {
+      return <ExecutionHistoryPage />;
     }
 
     if (activePage === "usage-cost") {
