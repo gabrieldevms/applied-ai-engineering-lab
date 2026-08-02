@@ -1,5 +1,8 @@
 from datetime import UTC, datetime
+from pathlib import Path
+from typing import Protocol
 from uuid import uuid4
+from ai_api.config import Settings
 from ai_api.evals.schemas import (
     AIMultiAgentExecutionRecord,
     AIMultiAgentExecutionRecordRequest,
@@ -7,11 +10,111 @@ from ai_api.evals.schemas import (
     AIMultiAgentExecutionSummaryRequest,
     AIMultiAgentExecutionSummaryResponse,
 )
+from ai_api.storage import JsonlStore, resolve_storage_path
+
+
+class AIMultiAgentExecutionRecordStore(Protocol):
+    def append(
+        self,
+        record: AIMultiAgentExecutionRecord,
+    ) -> AIMultiAgentExecutionRecord:
+        """Append a multi-agent execution record."""
+        ...
+
+    def list_records(self) -> list[AIMultiAgentExecutionRecord]:
+        """List all stored multi-agent execution records."""
+        ...
+
+    def count(self) -> int:
+        """Return the number of stored multi-agent execution records."""
+        ...
+
+    def clear(self) -> None:
+        """Clear all stored multi-agent execution records."""
+        ...
+
+
+class InMemoryAIMultiAgentExecutionRecordStore:
+    def __init__(self) -> None:
+        self._records: list[AIMultiAgentExecutionRecord] = []
+
+    def append(
+        self,
+        record: AIMultiAgentExecutionRecord,
+    ) -> AIMultiAgentExecutionRecord:
+        self._records.append(record)
+
+        return record
+
+    def list_records(self) -> list[AIMultiAgentExecutionRecord]:
+        return list(self._records)
+
+    def count(self) -> int:
+        return len(self._records)
+
+    def clear(self) -> None:
+        self._records.clear()
+
+
+class JsonlAIMultiAgentExecutionRecordStore:
+    def __init__(
+        self,
+        file_path: str | Path,
+    ) -> None:
+        self._store = JsonlStore(
+            file_path=file_path,
+            record_type=AIMultiAgentExecutionRecord,
+        )
+
+    def append(
+        self,
+        record: AIMultiAgentExecutionRecord,
+    ) -> AIMultiAgentExecutionRecord:
+        return self._store.append(record)
+
+    def list_records(self) -> list[AIMultiAgentExecutionRecord]:
+        return self._store.list_records()
+
+    def count(self) -> int:
+        return self._store.count()
+
+    def clear(self) -> None:
+        self._store.clear()
 
 
 class AIMultiAgentExecutionTelemetryService:
-    def __init__(self) -> None:
-        self._records: list[AIMultiAgentExecutionRecord] = []
+    def __init__(
+        self,
+        record_store: AIMultiAgentExecutionRecordStore | None = None,
+        storage_backend: str = "memory",
+    ) -> None:
+        self.record_store = (
+            record_store or InMemoryAIMultiAgentExecutionRecordStore()
+        )
+        self.storage_backend = storage_backend
+
+    @classmethod
+    def from_settings(
+        cls,
+        settings: Settings,
+    ) -> "AIMultiAgentExecutionTelemetryService":
+        if settings.storage_backend == "local_jsonl":
+            return cls(
+                record_store=JsonlAIMultiAgentExecutionRecordStore(
+                    file_path=resolve_storage_path(
+                        settings=settings,
+                        relative_path=(
+                            settings.multi_agent_execution_records_path
+                        ),
+                    ),
+                ),
+                storage_backend="local_jsonl",
+            )
+
+        return cls(
+            record_store=InMemoryAIMultiAgentExecutionRecordStore(),
+            storage_backend="memory",
+        )
 
     def record(
         self,
@@ -42,8 +145,12 @@ class AIMultiAgentExecutionTelemetryService:
             expected_min_count=request.expected_min_final_report_sections,
         )
         data_validation_score = self._calculate_data_validation_score(
-            require_data_validation_evidence=request.require_data_validation_evidence,
-            data_validation_evidence_count=request.data_validation_evidence_count,
+            require_data_validation_evidence=(
+                request.require_data_validation_evidence
+            ),
+            data_validation_evidence_count=(
+                request.data_validation_evidence_count
+            ),
         )
         quality_score = self._calculate_quality_score(
             run_status=request.run_status,
@@ -105,7 +212,9 @@ class AIMultiAgentExecutionTelemetryService:
                 request.expected_min_final_report_sections
             ),
             data_validation_evidence_count=request.data_validation_evidence_count,
-            require_data_validation_evidence=request.require_data_validation_evidence,
+            require_data_validation_evidence=(
+                request.require_data_validation_evidence
+            ),
             retry_count=request.retry_count,
             fallback_count=request.fallback_count,
             agent_success_rate=agent_success_rate,
@@ -131,14 +240,15 @@ class AIMultiAgentExecutionTelemetryService:
             trace_id=request.trace_id,
             metadata={
                 "multi_agent_execution_schema_version": "0.1.0",
-                "scoring_mode": "caller_provided_multi_agent_execution_signals",
+                "scoring_mode": (
+                    "caller_provided_multi_agent_execution_signals"
+                ),
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
-        self._records.append(record)
-
-        return record
+        return self.record_store.append(record)
 
     def list_records(
         self,
@@ -149,7 +259,11 @@ class AIMultiAgentExecutionTelemetryService:
         run_status: str | None = None,
         limit: int = 100,
     ) -> AIMultiAgentExecutionRecordsResponse:
-        filtered_records = self._records
+        if limit < 1:
+            raise ValueError("limit must be greater than zero")
+
+        stored_records = self.record_store.list_records()
+        filtered_records = stored_records
 
         if component is not None:
             filtered_records = [
@@ -193,7 +307,8 @@ class AIMultiAgentExecutionTelemetryService:
             count=len(limited_records),
             metadata={
                 "source": "ai-multi-agent-execution-telemetry-service",
-                "total_stored_records": len(self._records),
+                "storage_backend": self.storage_backend,
+                "total_stored_records": len(stored_records),
                 "applied_filters": {
                     "component": component,
                     "workflow_name": workflow_name,
@@ -209,7 +324,11 @@ class AIMultiAgentExecutionTelemetryService:
         self,
         request: AIMultiAgentExecutionSummaryRequest,
     ) -> AIMultiAgentExecutionSummaryResponse:
-        records = request.records if request.records is not None else self._records
+        records = (
+            request.records
+            if request.records is not None
+            else self.record_store.list_records()
+        )
 
         return AIMultiAgentExecutionSummaryResponse(
             record_count=len(records),
@@ -357,12 +476,13 @@ class AIMultiAgentExecutionTelemetryService:
                 "source": "stored_records"
                 if request.records is None
                 else "request_records",
+                "storage_backend": self.storage_backend,
                 **request.metadata,
             },
         )
 
     def clear(self) -> None:
-        self._records.clear()
+        self.record_store.clear()
 
     @staticmethod
     def _calculate_rate(
@@ -496,9 +616,7 @@ class AIMultiAgentExecutionTelemetryService:
                 "Error count exceeded the configured maximum."
             )
 
-        if (
-            request.artifact_count < request.expected_min_artifacts
-        ):
+        if request.artifact_count < request.expected_min_artifacts:
             risks.append(
                 "Artifact count is below the expected minimum."
             )

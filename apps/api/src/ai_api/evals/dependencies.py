@@ -65,7 +65,11 @@ _ai_agent_execution_telemetry_service = (
     )
 )
 
-_ai_multi_agent_execution_telemetry_service = AIMultiAgentExecutionTelemetryService()
+_ai_multi_agent_execution_telemetry_service = (
+    AIMultiAgentExecutionTelemetryService.from_settings(
+        get_settings(),
+    )
+)
 
 
 def get_golden_evaluation_dataset_service() -> GoldenEvaluationDatasetService:

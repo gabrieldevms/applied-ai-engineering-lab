@@ -20,6 +20,7 @@ SETTINGS_ENV_VARS = [
     "EVALUATION_TELEMETRY_EVENTS_PATH",
     "RETRIEVAL_QUALITY_RECORDS_PATH",
     "AGENT_EXECUTION_RECORDS_PATH",
+    "MULTI_AGENT_EXECUTION_RECORDS_PATH",
 ]
 
 
@@ -51,6 +52,10 @@ def test_settings_should_use_fake_provider_by_default() -> None:
     assert (
     settings.agent_execution_records_path
     == "observability/agent-execution-records.jsonl"
+    )
+    assert (
+    settings.multi_agent_execution_records_path
+    == "observability/multi-agent-execution-records.jsonl"
     )
 
 
@@ -166,4 +171,20 @@ def test_settings_should_load_agent_execution_records_path_from_environment(
     assert (
         settings.agent_execution_records_path
         == "custom/agent-execution-records.jsonl"
+    )
+
+
+def test_settings_should_load_multi_agent_execution_records_path_from_environment(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv(
+        "MULTI_AGENT_EXECUTION_RECORDS_PATH",
+        "custom/multi-agent-execution-records.jsonl",
+    )
+
+    settings = Settings()
+
+    assert (
+        settings.multi_agent_execution_records_path
+        == "custom/multi-agent-execution-records.jsonl"
     )

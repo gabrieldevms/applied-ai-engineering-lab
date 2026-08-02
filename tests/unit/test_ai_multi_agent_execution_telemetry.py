@@ -6,6 +6,9 @@ from ai_api.evals import (
     AIMultiAgentExecutionSummaryRequest,
     AIMultiAgentExecutionTelemetryService,
 )
+from ai_api.evals.multi_agent_execution_metrics import (
+    JsonlAIMultiAgentExecutionRecordStore,
+)
 
 
 def test_multi_agent_execution_service_should_record_passed_metrics() -> None:
@@ -422,3 +425,193 @@ def test_multi_agent_execution_request_should_reject_negative_agent_count() -> N
             run_status="completed",
             agent_count=-1,
         )
+
+
+def test_multi_agent_execution_service_should_persist_records_with_jsonl_store(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "multi-agent-execution-records.jsonl"
+
+    first_service = AIMultiAgentExecutionTelemetryService(
+        record_store=JsonlAIMultiAgentExecutionRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    first_service.record(
+        AIMultiAgentExecutionRecordRequest(
+            component="multi_agent",
+            operation="qa_copilot_run",
+            workflow_name="multi-agent-qa-copilot-v1",
+            run_status="completed",
+            duration_ms=2500.0,
+            agent_count=6,
+            completed_agent_count=6,
+            failed_agent_count=0,
+            skipped_agent_count=0,
+            task_count=6,
+            successful_task_count=6,
+            failed_task_count=0,
+            artifact_count=6,
+            expected_min_artifacts=6,
+            handoff_count=5,
+            failed_handoff_count=0,
+            contract_check_count=6,
+            passed_contract_check_count=6,
+            failed_contract_check_count=0,
+            conflict_count=0,
+            critical_conflict_count=0,
+            failure_count=0,
+            error_count=0,
+            final_report_section_count=6,
+            expected_min_final_report_sections=6,
+            data_validation_evidence_count=1,
+            require_data_validation_evidence=True,
+            max_duration_ms=3000.0,
+            run_id="multi-agent-run-001",
+            metadata={
+                "source_detail": "persistence-test",
+            },
+        )
+    )
+
+    second_service = AIMultiAgentExecutionTelemetryService(
+        record_store=JsonlAIMultiAgentExecutionRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = second_service.list_records()
+
+    assert response.count == 1
+    assert response.records[0].component == "multi_agent"
+    assert response.records[0].operation == "qa_copilot_run"
+    assert response.records[0].workflow_name == "multi-agent-qa-copilot-v1"
+    assert response.records[0].run_status == "completed"
+    assert response.records[0].status == "passed"
+    assert response.records[0].quality_score == 1.0
+    assert response.records[0].run_id == "multi-agent-run-001"
+    assert response.records[0].metadata["storage_backend"] == "local_jsonl"
+    assert response.records[0].metadata["source_detail"] == "persistence-test"
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_multi_agent_execution_service_should_summarize_persisted_jsonl_records(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "multi-agent-execution-records.jsonl"
+
+    service = AIMultiAgentExecutionTelemetryService(
+        record_store=JsonlAIMultiAgentExecutionRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        AIMultiAgentExecutionRecordRequest(
+            component="multi_agent",
+            operation="qa_copilot_run",
+            workflow_name="multi-agent-qa-copilot-v1",
+            run_status="completed",
+            duration_ms=2500.0,
+            agent_count=6,
+            completed_agent_count=6,
+            failed_agent_count=0,
+            skipped_agent_count=0,
+            task_count=6,
+            successful_task_count=6,
+            failed_task_count=0,
+            artifact_count=6,
+            expected_min_artifacts=6,
+            handoff_count=5,
+            failed_handoff_count=0,
+            contract_check_count=6,
+            passed_contract_check_count=6,
+            failed_contract_check_count=0,
+            conflict_count=0,
+            critical_conflict_count=0,
+            failure_count=0,
+            error_count=0,
+            final_report_section_count=6,
+            expected_min_final_report_sections=6,
+            data_validation_evidence_count=1,
+            require_data_validation_evidence=True,
+            run_id="multi-agent-run-001",
+        )
+    )
+
+    restored_service = AIMultiAgentExecutionTelemetryService(
+        record_store=JsonlAIMultiAgentExecutionRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    response = restored_service.summarize(
+        AIMultiAgentExecutionSummaryRequest()
+    )
+
+    assert response.record_count == 1
+    assert response.passed_count == 1
+    assert response.warning_count == 0
+    assert response.failed_count == 0
+    assert response.total_agents == 6
+    assert response.total_completed_agents == 6
+    assert response.total_failed_agents == 0
+    assert response.total_skipped_agents == 0
+    assert response.total_tasks == 6
+    assert response.total_successful_tasks == 6
+    assert response.total_failed_tasks == 0
+    assert response.total_artifacts == 6
+    assert response.total_handoffs == 5
+    assert response.total_failed_handoffs == 0
+    assert response.total_contract_checks == 6
+    assert response.total_passed_contract_checks == 6
+    assert response.total_failed_contract_checks == 0
+    assert response.total_final_report_sections == 6
+    assert response.total_data_validation_evidence == 1
+    assert response.average_duration_ms == 2500.0
+    assert response.average_agent_success_rate == 1.0
+    assert response.average_task_success_rate == 1.0
+    assert response.average_handoff_success_rate == 1.0
+    assert response.average_contract_success_rate == 1.0
+    assert response.average_artifact_coverage_score == 1.0
+    assert response.average_final_report_coverage_score == 1.0
+    assert response.average_data_validation_score == 1.0
+    assert response.average_quality_score == 1.0
+    assert response.workflow_coverage["multi-agent-qa-copilot-v1"] == 1
+    assert response.operation_coverage["qa_copilot_run"] == 1
+    assert response.run_status_coverage["completed"] == 1
+    assert response.metadata["storage_backend"] == "local_jsonl"
+
+
+def test_multi_agent_execution_service_should_clear_jsonl_records(tmp_path) -> None:
+    file_path = tmp_path / "multi-agent-execution-records.jsonl"
+
+    service = AIMultiAgentExecutionTelemetryService(
+        record_store=JsonlAIMultiAgentExecutionRecordStore(file_path=file_path),
+        storage_backend="local_jsonl",
+    )
+
+    service.record(
+        AIMultiAgentExecutionRecordRequest(
+            component="multi_agent",
+            operation="qa_copilot_run",
+            workflow_name="multi-agent-qa-copilot-v1",
+            run_status="completed",
+            duration_ms=1000.0,
+            agent_count=1,
+            completed_agent_count=1,
+            task_count=1,
+            successful_task_count=1,
+            artifact_count=1,
+            expected_min_artifacts=1,
+            final_report_section_count=1,
+            expected_min_final_report_sections=1,
+        )
+    )
+
+    service.clear()
+
+    assert service.list_records().count == 0
+    assert (
+        service.summarize(
+            AIMultiAgentExecutionSummaryRequest()
+        ).record_count
+        == 0
+    )

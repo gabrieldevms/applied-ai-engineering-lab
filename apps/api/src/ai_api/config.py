@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     agent_execution_records_path: str = (
         "observability/agent-execution-records.jsonl"
     )
+    multi_agent_execution_records_path: str = (
+        "observability/multi-agent-execution-records.jsonl"
+    )
 
 
 @lru_cache
