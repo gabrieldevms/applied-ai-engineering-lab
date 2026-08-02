@@ -248,6 +248,11 @@ from ai_api.evals import (
     AIObservabilityDashboardService,
     get_ai_observability_dashboard_service,
 )
+from ai_api.evals.dependencies import get_ai_execution_history_service
+from ai_api.evals.execution_history import (
+    AIExecutionHistoryResponse,
+    AIExecutionHistoryService,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -1673,3 +1678,24 @@ def get_ai_observability_dashboard(
     ],
 ) -> AIObservabilityDashboardResponse:
     return service.get_dashboard()
+
+
+@app.get("/observability/execution-history", response_model=AIExecutionHistoryResponse,)
+def get_ai_execution_history(
+    service: Annotated[
+        AIExecutionHistoryService,
+        Depends(get_ai_execution_history_service),
+    ],
+    execution_type: str | None = None,
+    status: str | None = None,
+    component: str | None = None,
+    run_id: str | None = None,
+    limit: int = 100,
+) -> AIExecutionHistoryResponse:
+    return service.list_history(
+        execution_type=execution_type,
+        status=status,
+        component=component,
+        run_id=run_id,
+        limit=limit,
+    )
