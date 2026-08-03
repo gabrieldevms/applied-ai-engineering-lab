@@ -1078,6 +1078,7 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Architecture](docs/architecture/initial-architecture.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
+- [Prompt Injection Protection Baseline](docs/security/prompt-injection-protection-baseline.md)
 - [Architecture Decision Records](docs/adr/)
 - [Study Notes](docs/study-notes/)
 
