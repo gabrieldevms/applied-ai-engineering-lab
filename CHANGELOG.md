@@ -41,6 +41,8 @@ All notable changes to this project will be documented in this file.
 - Added filters for execution type, status, component, run ID and limit in the Execution History page.
 - Added QA Agent Console telemetry integration with agent execution observability.
 - Added frontend API client and types for `POST /observability/agent-execution/records`.
+- Added Multi-Agent Copilot Console telemetry integration with multi-agent execution observability.
+- Added frontend API client and types for `POST /observability/multi-agent-execution/records`.
 
 ### Changed
 
@@ -60,6 +62,7 @@ All notable changes to this project will be documented in this file.
 - Updated multi-agent execution telemetry to support persistent storage through the storage foundation.
 - Updated multi-agent execution observability backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 - Updated QA Agent Console to automatically register agent execution telemetry after successful or failed backend executions.
+- Updated Multi-Agent Copilot Console to automatically register multi-agent execution telemetry after successful or failed backend executions.
 
 ### Notes
 
@@ -77,6 +80,7 @@ All notable changes to this project will be documented in this file.
 - Execution History currently works as a backend read model over persisted observability telemetry. It does not create a separate execution-history store yet.
 - Execution History UI currently consumes the backend read model and does not persist frontend console state yet.
 - QA Agent Console executions can now appear in Execution History through the persisted agent execution telemetry read model.
+- Multi-Agent Copilot Console executions can now appear in Execution History through the persisted multi-agent execution telemetry read model.
 
 ---
 
