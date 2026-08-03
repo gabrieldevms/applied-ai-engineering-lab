@@ -43,6 +43,8 @@ All notable changes to this project will be documented in this file.
 - Added frontend API client and types for `POST /observability/agent-execution/records`.
 - Added Multi-Agent Copilot Console telemetry integration with multi-agent execution observability.
 - Added frontend API client and types for `POST /observability/multi-agent-execution/records`.
+- Added RAG Console telemetry integration with retrieval quality observability.
+- Added frontend API client and types for `POST /observability/retrieval-quality/records`.
 
 ### Changed
 
@@ -63,6 +65,7 @@ All notable changes to this project will be documented in this file.
 - Updated multi-agent execution observability backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 - Updated QA Agent Console to automatically register agent execution telemetry after successful or failed backend executions.
 - Updated Multi-Agent Copilot Console to automatically register multi-agent execution telemetry after successful or failed backend executions.
+- Updated RAG Console to automatically register retrieval quality telemetry after retrieve and answer executions.
 
 ### Notes
 
@@ -81,6 +84,7 @@ All notable changes to this project will be documented in this file.
 - Execution History UI currently consumes the backend read model and does not persist frontend console state yet.
 - QA Agent Console executions can now appear in Execution History through the persisted agent execution telemetry read model.
 - Multi-Agent Copilot Console executions can now appear in Execution History through the persisted multi-agent execution telemetry read model.
+- RAG Console executions can now appear in Execution History through the persisted retrieval quality telemetry read model.
 
 ---
 
