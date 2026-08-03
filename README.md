@@ -422,6 +422,7 @@ Current capabilities:
 - prompt injection assessment endpoint.
 - tool authorization boundaries documentation;
 - tool risk classification metadata;
+- tool authorization checks enforced during tool execution;
 
 ### AI Quality Command Center
 
@@ -1128,3 +1129,7 @@ By the end of the roadmap, the project aims to demonstrate practical experience 
 This repository is an educational and portfolio project developed incrementally.
 
 It is production-oriented, but it should not be considered a complete production system yet. Each module introduces additional reliability, persistence, observability, security and operational capabilities.
+
+--- 
+
+Developer by Gabriel Moreira

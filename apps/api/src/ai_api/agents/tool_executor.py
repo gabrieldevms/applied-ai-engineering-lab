@@ -6,6 +6,7 @@ from typing import Any, Protocol
 from ai_api.agents.exceptions import ToolExecutionError
 from ai_api.agents.schemas import ToolExecutionResponse
 from ai_api.agents.tool_registry import ToolRegistry
+from ai_api.agents.tool_authorization import ToolAuthorizationService
 from ai_api.data_analysis import (
     DataAnalystAgentRequest,
     DataAnalystAgentService,
@@ -136,8 +137,13 @@ class ToolExecutionService:
         self,
         registry: ToolRegistry | None = None,
         handlers: Mapping[str, ToolHandler] | None = None,
+        authorization_service: ToolAuthorizationService | None = None,
     ) -> None:
         self.registry = registry or ToolRegistry()
+
+        self.authorization_service = (
+            authorization_service or ToolAuthorizationService()
+        )
 
         default_handlers = {
             RAGRetrieveTool.tool_name: RAGRetrieveTool(),
@@ -174,6 +180,17 @@ class ToolExecutionService:
         if handler is None:
             raise ToolExecutionError(
                 f"Tool has no execution handler: {cleaned_tool_name}"
+            )
+
+        authorization_decision = self.authorization_service.authorize(
+            tool=tool_definition,
+            metadata=metadata,
+        )
+
+        if authorization_decision.status == "blocked":
+            raise ToolExecutionError(
+                "Tool execution blocked by authorization policy: "
+                + "; ".join(authorization_decision.violations)
             )
 
         execution_arguments = dict(arguments or {})
@@ -220,7 +237,14 @@ class ToolExecutionService:
                 "requires_prompt_injection_assessment": (
                     tool_definition.security.requires_prompt_injection_assessment
                 ),
-                "authorization_enforced": False,
+                "authorization_enforced": True,
+                "authorization_status": authorization_decision.status,
+                "authorization_reason": authorization_decision.reason,
+                "authorization_policy": authorization_decision.metadata[
+                    "authorization_policy"
+                ],
+                "caller_type": authorization_decision.caller_type,
+                "environment": authorization_decision.environment,
             },
         )
 
