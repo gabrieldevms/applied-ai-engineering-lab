@@ -1103,6 +1103,7 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
 - [Prompt Injection Protection Baseline](docs/security/prompt-injection-protection-baseline.md)
 - [Sensitive Data Handling Policy](docs/security/sensitive-data-handling-policy.md)
+- [Audit Log Schema](docs/security/audit-log-schema.md)
 - [Tool Authorization Boundaries](docs/security/tool-authorization-boundaries.md)
 - [Architecture Decision Records](docs/adr/)
 - [Study Notes](docs/study-notes/)
