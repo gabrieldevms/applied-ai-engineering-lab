@@ -194,7 +194,12 @@ def test_llm_health_endpoint_should_return_provider_status() -> None:
 
         assert body["provider"] == "openai"
         assert body["status"] == "missing_configuration"
-        assert body["missing_settings"] == ["OPENAI_API_KEY", "OPENAI_MODEL"]
+        assert body["configured"] is False
+        assert body["missing_settings"] == ["credentials", "model"]
+        assert "OPENAI_API_KEY" not in str(body)
+        assert "OPENAI_MODEL" not in str(body)
+        assert "api_key" not in str(body).lower()
+        assert body["safe_metadata"]["secrets_exposed"] == "false"
     finally:
         app.dependency_overrides.clear()
 

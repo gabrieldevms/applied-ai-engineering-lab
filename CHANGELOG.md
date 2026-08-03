@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
 - Added Data Analyst Console telemetry integration with agent execution observability.
 - Added live Observability Dashboard behavior with manual refresh, last updated timestamp and auto-refresh toggle.
 - Added Execution History run details panel with selected execution drill-down.
+- Added safe LLM provider configuration fields to provider health responses.
 
 ### Changed
 
@@ -72,6 +73,8 @@ All notable changes to this project will be documented in this file.
 - Updated Data Analyst Console to automatically register agent execution telemetry after successful, blocked or failed backend executions.
 - Updated Observability Center to refresh dashboard data without clearing the currently displayed dashboard.
 - Updated Execution History timeline to support selecting records and inspecting execution metadata.
+- Hardened provider health responses to avoid exposing sensitive environment variable names, API key values or internal provider URLs.
+- Updated the Provider Settings UI to display only sanitized provider metadata and logical configuration fields.
 
 ### Notes
 

@@ -34,7 +34,15 @@ def test_llm_health_status_should_detect_missing_openai_settings() -> None:
 
     assert response.provider == "openai"
     assert response.status == "missing_configuration"
-    assert response.missing_settings == ["OPENAI_API_KEY", "OPENAI_MODEL"]
+    assert response.configured is False
+    assert response.missing_settings == ["credentials", "model"]
+
+    serialized_response = str(response.model_dump(mode="json"))
+
+    assert "OPENAI_API_KEY" not in serialized_response
+    assert "OPENAI_MODEL" not in serialized_response
+    assert "api_key" not in serialized_response.lower()
+    assert response.safe_metadata["secrets_exposed"] == "false"
 
 
 def test_llm_health_status_should_return_openai_as_configured() -> None:
@@ -66,4 +74,9 @@ def test_llm_health_status_should_return_ollama_as_configured() -> None:
     assert response.provider == "ollama"
     assert response.model == "llama3.1"
     assert response.status == "configured"
-    assert response.safe_metadata["base_url"] == "http://localhost:11434"
+    serialized_response = str(response.model_dump(mode="json"))
+
+    assert response.configured is True
+    assert response.safe_metadata["base_url_configured"] == "true"
+    assert response.safe_metadata["secrets_exposed"] == "false"
+    assert "http://localhost:11434" not in serialized_response
