@@ -9,6 +9,7 @@ from ai_api.llm.schemas import (
     LLMHealthResponse,
     LLMProvidersResponse,
     LLMProviderStatus,
+    LLMSafeConfigurationField,
 )
 from ai_api.llm.status import (
     SUPPORTED_LLM_PROVIDERS,
@@ -32,5 +33,6 @@ __all__ = [
     "get_llm_health_status",
     "get_llm_providers_status",
     "build_llm_provider",
+    "LLMSafeConfigurationField",
 ]
 

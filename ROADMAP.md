@@ -539,6 +539,7 @@ M8 transforms the backend platform foundation into a more demonstrable and portf
 - [ ] Audit logs
 - [ ] AI governance documentation
 - [x] Safe provider configuration strategy
+- [x] Hardened provider settings exposure
 
 ### Frontend and product experience
 

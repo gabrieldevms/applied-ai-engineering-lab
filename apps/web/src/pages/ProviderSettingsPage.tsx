@@ -4,6 +4,7 @@ import { StatusBadge } from "../components/ui/StatusBadge";
 import { useLLMSettings } from "../hooks/useLLMSettings";
 import type {
   LLMHealthResponse,
+  LLMSafeConfigurationField,
   ProviderSettingsViewModel,
 } from "../types/llmSettings";
 
@@ -17,19 +18,24 @@ const providerCatalog: ProviderSettingsViewModel[] = [
     safeNotes: [
       "Não exige secrets.",
       "Ideal para testes determinísticos.",
-      "Não representa qualidade real de resposta de um modelo externo.",
+      "Não chama serviços externos.",
+      "Não representa a qualidade real de resposta de um modelo externo.",
     ],
   },
   {
     provider: "openai",
     label: "OpenAI",
     description:
-      "Provider externo para execução real de chamadas LLM usando a configuração segura do backend.",
-    requiredSettings: ["OPENAI_API_KEY", "OPENAI_MODEL"],
+      "Provider externo para execução real de chamadas LLM usando configuração segura do backend.",
+    requiredSettings: [
+      "Credencial backend configurada",
+      "Modelo backend configurado",
+    ],
     safeNotes: [
-      "A chave deve ficar somente no backend.",
-      "A UI não deve exibir secrets.",
+      "A credencial deve ficar somente no backend.",
+      "A UI não exibe API keys, tokens ou valores de env vars.",
       "A troca de modelo deve respeitar estratégia de configuração por ambiente.",
+      "O uso pode gerar custo em provedor externo.",
     ],
   },
   {
@@ -37,10 +43,14 @@ const providerCatalog: ProviderSettingsViewModel[] = [
     label: "Ollama",
     description:
       "Provider local para execução de modelos via Ollama, útil para desenvolvimento, privacidade local e experimentação offline.",
-    requiredSettings: ["OLLAMA_BASE_URL", "OLLAMA_MODEL"],
+    requiredSettings: [
+      "Base URL backend configurada",
+      "Modelo local configurado",
+    ],
     safeNotes: [
       "Não exige chave externa.",
       "Depende do serviço Ollama estar ativo.",
+      "A UI não exibe a URL interna configurada.",
       "O modelo configurado precisa estar disponível localmente.",
     ],
   },
@@ -79,15 +89,15 @@ function getActiveProviderCard(
 
 function renderRequiredSettings(provider: ProviderSettingsViewModel) {
   if (provider.requiredSettings.length === 0) {
-    return <p className="muted">Nenhuma variável obrigatória para este provider.</p>;
+    return (
+      <p className="muted">Nenhuma configuração obrigatória para este provider.</p>
+    );
   }
 
   return (
     <ul className="provider-settings-list">
       {provider.requiredSettings.map((setting) => (
-        <li key={setting}>
-          <code>{setting}</code>
-        </li>
+        <li key={setting}>{setting}</li>
       ))}
     </ul>
   );
@@ -108,6 +118,26 @@ function renderProviderStatus(
   return <span className="status-badge status-warning">missing config</span>;
 }
 
+function renderSafeSettings(settings: LLMSafeConfigurationField[]) {
+  if (settings.length === 0) {
+    return <p className="muted">Nenhum campo de configuração retornado.</p>;
+  }
+
+  return (
+    <ul className="provider-settings-list">
+      {settings.map((setting) => (
+        <li key={setting.name}>
+          <strong>{setting.label}</strong>{" "}
+          <span>
+            — {setting.configured ? "configurado" : "pendente"}
+            {setting.sensitive ? " · sensível · valor oculto" : ""}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function ProviderSettingsPage() {
   const { errorMessage, health, providers, refresh, requestState } =
     useLLMSettings();
@@ -122,8 +152,8 @@ export function ProviderSettingsPage() {
           <h1>Configurações de Provider e Modelo</h1>
           <p>
             Visualize o provider LLM ativo, modelo configurado, health check e
-            estratégia segura de configuração. Esta tela é read-only e não
-            altera secrets ou variáveis de ambiente.
+            estratégia segura de configuração. Esta tela é read-only e não altera
+            secrets, credenciais ou variáveis de ambiente.
           </p>
         </div>
 
@@ -177,7 +207,9 @@ export function ProviderSettingsPage() {
           </div>
 
           {health ? (
-            <StatusBadge status={health.status === "configured" ? "healthy" : "warning"} />
+            <StatusBadge
+              status={health.status === "configured" ? "healthy" : "warning"}
+            />
           ) : (
             <span className="status-badge status-empty">loading</span>
           )}
@@ -189,18 +221,27 @@ export function ProviderSettingsPage() {
             <span>
               Model: <strong>{health?.model ?? "not_configured"}</strong>
             </span>
+            <span>
+              Configured:{" "}
+              <strong>{health?.configured ? "yes" : "no"}</strong>
+            </span>
           </div>
 
           {health && health.missing_settings.length > 0 ? (
             <div className="provider-warning-panel">
-              <span className="eyebrow">Missing settings</span>
+              <span className="eyebrow">Missing safe settings</span>
               <ul>
                 {health.missing_settings.map((setting) => (
-                  <li key={setting}>
-                    <code>{setting}</code>
-                  </li>
+                  <li key={setting}>{setting}</li>
                 ))}
               </ul>
+            </div>
+          ) : null}
+
+          {health ? (
+            <div>
+              <span className="eyebrow">Safe configuration fields</span>
+              {renderSafeSettings(health.safe_settings)}
             </div>
           ) : null}
 
@@ -214,16 +255,20 @@ export function ProviderSettingsPage() {
           <h2>Estratégia segura</h2>
           <p>
             Esta tela mostra apenas dados seguros retornados pelo backend. Secrets
-            como API keys não devem ser enviados para o frontend nem editados
-            diretamente pela UI nesta etapa do M8.
+            como API keys, tokens e valores de variáveis de ambiente não devem ser
+            enviados para o frontend nem editados diretamente pela UI nesta etapa
+            do M8.
           </p>
 
           <ul className="provider-settings-list">
             <li>Configuração real deve ser feita por variáveis de ambiente.</li>
             <li>Secrets devem ficar no backend ou em secret manager.</li>
-            <li>A UI pode mostrar status, modelo e campos ausentes.</li>
+            <li>A UI pode mostrar status, modelo e campos lógicos ausentes.</li>
+            <li>Valores sensíveis devem ser ocultados mesmo quando configurados.</li>
             <li>Alterações write-enabled devem exigir autenticação e auditoria.</li>
           </ul>
+
+          {health ? <p className="muted">{health.security_note}</p> : null}
         </article>
       </section>
 
@@ -256,7 +301,7 @@ export function ProviderSettingsPage() {
                 <p>{provider.description}</p>
 
                 <div>
-                  <span className="eyebrow">Required settings</span>
+                  <span className="eyebrow">Required safe settings</span>
                   {renderRequiredSettings(provider)}
                 </div>
 
@@ -282,7 +327,7 @@ export function ProviderSettingsPage() {
 
       <section className="content-grid">
         <JsonViewer title="Providers response" value={providers} />
-        <JsonViewer title="Health response" value={health} />
+        <JsonViewer title="Sanitized health response" value={health} />
       </section>
 
       {activeProvider ? (
