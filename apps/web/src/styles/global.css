@@ -1511,3 +1511,115 @@ code {
     width: 100%;
   }
 }
+
+.execution-history-row {
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.execution-history-row:hover,
+.execution-history-row.is-selected {
+  background: rgba(14, 165, 233, 0.08);
+}
+
+.execution-history-detail-button {
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  border-radius: 999px;
+  color: #e0f2fe;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 0.55rem 0.8rem;
+  white-space: nowrap;
+}
+
+.execution-history-detail-button:hover {
+  background: rgba(14, 165, 233, 0.18);
+}
+
+.execution-history-details-panel,
+.execution-history-details-empty {
+  background: rgba(15, 23, 42, 0.76);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+  padding: 1.25rem;
+}
+
+.execution-history-details-empty h2,
+.execution-history-details-panel h2 {
+  color: #f8fafc;
+  margin: 0.2rem 0 0.5rem;
+}
+
+.execution-history-details-empty p,
+.execution-history-details-panel p {
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.execution-history-details-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.execution-history-details-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.execution-history-details-meta-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.execution-history-details-meta-grid article {
+  background: rgba(2, 6, 23, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1rem;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.execution-history-details-meta-grid span {
+  color: #94a3b8;
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-bottom: 0.45rem;
+}
+
+.execution-history-details-meta-grid code {
+  color: #dbeafe;
+  display: block;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@media (max-width: 1180px) {
+  .execution-history-details-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .execution-history-details-header {
+    flex-direction: column;
+  }
+
+  .execution-history-details-actions {
+    justify-content: flex-start;
+  }
+
+  .execution-history-details-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
