@@ -59,6 +59,7 @@ All notable changes to this project will be documented in this file.
 - Added tool authorization service for registered agent tools.
 - Added caller and environment checks during tool execution.
 - Added tests for allowed and blocked tool execution authorization decisions.
+- Added sensitive data handling policy covering prompts, RAG documents, table data, telemetry, logs, Execution History, MCP inputs and provider usage.
 
 ### Changed
 

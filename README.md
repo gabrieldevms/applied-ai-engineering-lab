@@ -423,6 +423,7 @@ Current capabilities:
 - tool authorization boundaries documentation;
 - tool risk classification metadata;
 - tool authorization checks enforced during tool execution;
+- sensitive data handling policy;
 
 ### AI Quality Command Center
 
@@ -1101,6 +1102,7 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
 - [Prompt Injection Protection Baseline](docs/security/prompt-injection-protection-baseline.md)
+- [Sensitive Data Handling Policy](docs/security/sensitive-data-handling-policy.md)
 - [Tool Authorization Boundaries](docs/security/tool-authorization-boundaries.md)
 - [Architecture Decision Records](docs/adr/)
 - [Study Notes](docs/study-notes/)
