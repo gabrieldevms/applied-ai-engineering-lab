@@ -115,6 +115,15 @@ The project also connects Applied AI Engineering with practical QA use cases suc
 - AI quality evaluation;
 - agent and multi-agent observability.
 
+## Who This Project Is For
+
+This project is designed for:
+
+- QA Engineers who want to understand how AI can be applied to software quality.
+- Developers who want to learn how to build LLM applications beyond simple prompts.
+- AI Engineering learners who want a practical roadmap covering RAG, agents, evaluation, observability and LLMOps.
+- Recruiters and technical reviewers who want to assess a complete portfolio project.
+
 ## Current Capabilities
 
 ### LLM Engineering
@@ -1068,6 +1077,7 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Contributing Guide](CONTRIBUTING.md)
 - [Architecture](docs/architecture/initial-architecture.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
+- [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
 - [Architecture Decision Records](docs/adr/)
 - [Study Notes](docs/study-notes/)
 
