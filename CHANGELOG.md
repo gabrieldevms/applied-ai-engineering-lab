@@ -53,6 +53,9 @@ All notable changes to this project will be documented in this file.
 - Added `POST /security/prompt-injection/assess` endpoint.
 - Added prompt injection detection and API tests.
 - Added tool authorization boundaries documentation covering tool risk levels, caller types, environment boundaries and future authorization controls.
+- Added tool risk classification metadata to registered agent tools.
+- Added tool security metadata to `/agents/tools` responses.
+- Added tests for default tool risk classification and API exposure.
 
 ### Changed
 
@@ -79,6 +82,7 @@ All notable changes to this project will be documented in this file.
 - Updated Execution History timeline to support selecting records and inspecting execution metadata.
 - Hardened provider health responses to avoid exposing sensitive environment variable names, API key values or internal provider URLs.
 - Updated the Provider Settings UI to display only sanitized provider metadata and logical configuration fields.
+- Tool execution metadata now includes tool risk classification fields.
 
 ### Notes
 
