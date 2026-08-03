@@ -36,6 +36,11 @@ All notable changes to this project will be documented in this file.
 - Added `MULTI_AGENT_EXECUTION_RECORDS_PATH` setting for configurable multi-agent execution persistence.
 - Added Execution History backend read model for consolidating persisted observability records.
 - Added `GET /observability/execution-history` to list unified AI execution history records across evaluation, usage, retrieval, agent and multi-agent telemetry.
+- Added Execution History UI to the AI Quality Command Center.
+- Added frontend API client, hook and types for `GET /observability/execution-history`.
+- Added filters for execution type, status, component, run ID and limit in the Execution History page.
+- Added QA Agent Console telemetry integration with agent execution observability.
+- Added frontend API client and types for `POST /observability/agent-execution/records`.
 
 ### Changed
 
@@ -54,6 +59,7 @@ All notable changes to this project will be documented in this file.
 - Updated agent execution observability backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 - Updated multi-agent execution telemetry to support persistent storage through the storage foundation.
 - Updated multi-agent execution observability backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
+- Updated QA Agent Console to automatically register agent execution telemetry after successful or failed backend executions.
 
 ### Notes
 
@@ -69,6 +75,8 @@ All notable changes to this project will be documented in this file.
 - Agent execution telemetry is now the fourth observability capability migrated to the persistent storage foundation.
 - Multi-agent execution telemetry completes the first persistent storage pass for the core observability telemetry services.
 - Execution History currently works as a backend read model over persisted observability telemetry. It does not create a separate execution-history store yet.
+- Execution History UI currently consumes the backend read model and does not persist frontend console state yet.
+- QA Agent Console executions can now appear in Execution History through the persisted agent execution telemetry read model.
 
 ---
 
