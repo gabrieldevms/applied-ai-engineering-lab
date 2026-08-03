@@ -253,6 +253,11 @@ from ai_api.evals.execution_history import (
     AIExecutionHistoryResponse,
     AIExecutionHistoryService,
 )
+from ai_api.security import (
+    PromptInjectionAssessmentRequest,
+    PromptInjectionAssessmentResponse,
+    PromptInjectionDetectionService,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -1456,6 +1461,13 @@ def run_ci_evaluation_pipeline(
             **payload.metadata,
         },
     )
+
+
+@app.post("/security/prompt-injection/assess", response_model=PromptInjectionAssessmentResponse,)
+def assess_prompt_injection(
+    request: PromptInjectionAssessmentRequest,
+) -> PromptInjectionAssessmentResponse:
+    return PromptInjectionDetectionService().assess(request)
 
 
 @app.post("/observability/usage/records", response_model=AIUsageRecord,)

@@ -49,6 +49,11 @@ All notable changes to this project will be documented in this file.
 - Added live Observability Dashboard behavior with manual refresh, last updated timestamp and auto-refresh toggle.
 - Added Execution History run details panel with selected execution drill-down.
 - Added safe LLM provider configuration fields to provider health responses.
+### Added
+
+- Added deterministic prompt injection detection baseline.
+- Added `POST /security/prompt-injection/assess` endpoint.
+- Added prompt injection detection and API tests.
 
 ### Changed
 
