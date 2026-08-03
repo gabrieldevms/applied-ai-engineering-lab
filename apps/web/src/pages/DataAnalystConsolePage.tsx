@@ -1,7 +1,12 @@
 import { useMemo, useState } from "react";
+import { recordAIAgentExecutionTelemetry } from "../api/agentExecutionTelemetryApi";
 import { runDataAnalystAgent } from "../api/dataAnalystApi";
 import { JsonViewer } from "../components/ui/JsonViewer";
 import { MetricCard } from "../components/ui/MetricCard";
+import type {
+  AIAgentExecutionRecordRequest,
+  AIAgentTelemetryRunStatus,
+} from "../types/agentExecutionTelemetry";
 import type {
   DataAnalystAgentRequest,
   DataAnalystAgentResponse,
@@ -12,6 +17,7 @@ import type {
 import type { JsonValue } from "../types/qaAgent";
 
 type RequestState = "idle" | "loading" | "error";
+type TelemetryState = "idle" | "recording" | "recorded" | "failed";
 
 const defaultObjective =
   "Quais acordos de renegociação estão pendentes de emissão de boleto?";
@@ -131,6 +137,24 @@ function getErrorMessage(error: unknown): string {
   return "Erro inesperado ao executar o Data Analyst Agent.";
 }
 
+function generateConsoleRunId(): string {
+  return `data-analyst-console-${Date.now()}-${Math.round(
+    Math.random() * 10000,
+  )}`;
+}
+
+function mergeRequestMetadata(
+  metadata: Record<string, JsonValue> | undefined,
+  consoleRunId: string,
+): Record<string, JsonValue> {
+  return {
+    ...(metadata ?? {}),
+    source: "ai-quality-command-center",
+    console: "data-analyst",
+    frontend_console_run_id: consoleRunId,
+  };
+}
+
 function formatStatusLabel(status: string): string {
   return status.replaceAll("_", " ");
 }
@@ -143,7 +167,9 @@ function getSqlExplanation(response: DataAnalystAgentResponse): string {
   return response.workflow.generation.candidate.explanation;
 }
 
-function getExecution(response: DataAnalystAgentResponse): SQLExecutionResponse | null {
+function getExecution(
+  response: DataAnalystAgentResponse,
+): SQLExecutionResponse | null {
   return response.workflow.execution ?? null;
 }
 
@@ -163,6 +189,176 @@ function getInputRowCount(tableDataJson: string): number {
   } catch {
     return 0;
   }
+}
+
+function getInputRowCountFromTableData(tableData: DatabaseTableData[]): number {
+  return tableData.reduce((total, table) => {
+    return total + table.rows.length;
+  }, 0);
+}
+
+function isFailedTraceStatus(status: string): boolean {
+  return ["blocked", "failed", "error"].includes(status.toLowerCase());
+}
+
+function getFailedTraceStepCount(response: DataAnalystAgentResponse): number {
+  return response.trace.filter((step) => isFailedTraceStatus(step.status))
+    .length;
+}
+
+function getToolCallCount(response: DataAnalystAgentResponse): number {
+  return response.workflow.execution ? 3 : 2;
+}
+
+function getFailedToolCallCount(response: DataAnalystAgentResponse): number {
+  let failedToolCallCount = 0;
+
+  if (response.workflow.generation.status === "blocked") {
+    failedToolCallCount += 1;
+  }
+
+  if (response.workflow.generation.validation.status === "blocked") {
+    failedToolCallCount += 1;
+  }
+
+  if (response.workflow.execution?.status === "blocked") {
+    failedToolCallCount += 1;
+  }
+
+  return Math.min(failedToolCallCount, getToolCallCount(response));
+}
+
+function mapDataAnalystStatusToTelemetryStatus(
+  status: DataAnalystAgentResponse["status"],
+): AIAgentTelemetryRunStatus {
+  if (status === "completed") {
+    return "completed";
+  }
+
+  if (status === "blocked") {
+    return "blocked";
+  }
+
+  return "partial";
+}
+
+function buildSuccessTelemetryPayload(
+  request: DataAnalystAgentRequest,
+  response: DataAnalystAgentResponse,
+  durationMs: number,
+  consoleRunId: string,
+): AIAgentExecutionRecordRequest {
+  const failedStepCount = getFailedTraceStepCount(response);
+  const toolCallCount = getToolCallCount(response);
+  const failedToolCallCount = getFailedToolCallCount(response);
+  const execution = getExecution(response);
+  const evidence = response.evidence ?? execution?.evidence ?? null;
+
+  return {
+    component: "agent",
+    operation: "data_analyst_console_run",
+    agent_name: response.agent_name || "data-analyst-agent-v1",
+    run_status: mapDataAnalystStatusToTelemetryStatus(response.status),
+    duration_ms: Math.round(durationMs),
+    step_count: response.trace.length,
+    successful_step_count: response.trace.length - failedStepCount,
+    failed_step_count: failedStepCount,
+    tool_call_count: toolCallCount,
+    successful_tool_call_count: toolCallCount - failedToolCallCount,
+    failed_tool_call_count: failedToolCallCount,
+    retry_count: 0,
+    fallback_count: 0,
+    error_count: response.status === "blocked" ? 1 : failedStepCount,
+    human_approval_request_count: 0,
+    human_approval_granted_count: 0,
+    max_failed_steps: 0,
+    max_failed_tool_calls: 0,
+    max_error_count: 0,
+    min_quality_score: 0.7,
+    run_id: consoleRunId,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "data-analyst",
+      telemetry_source: "frontend_console",
+      response_status: response.status,
+      workflow_status: response.workflow.status,
+      generation_status: response.workflow.generation.status,
+      validation_status: response.workflow.generation.validation.status,
+      execution_status: execution?.status ?? null,
+      schema_name: request.database_schema.name,
+      table_count: request.database_schema.tables.length,
+      input_row_count: getInputRowCountFromTableData(request.table_data ?? []),
+      result_row_count: evidence?.row_count ?? 0,
+      result_column_count: evidence?.column_count ?? 0,
+      result_truncated: evidence?.truncated ?? false,
+      generated_sql_length: getGeneratedSql(response).length,
+      objective_length: request.objective.length,
+      language: request.language ?? "unknown",
+      max_rows: request.max_rows ?? 0,
+      frontend_console_run_id: consoleRunId,
+    },
+  };
+}
+
+function buildFailureTelemetryPayload(
+  request: DataAnalystAgentRequest,
+  error: unknown,
+  durationMs: number,
+  consoleRunId: string,
+): AIAgentExecutionRecordRequest {
+  return {
+    component: "agent",
+    operation: "data_analyst_console_run",
+    agent_name: "data-analyst-agent-v1",
+    run_status: "failed",
+    duration_ms: Math.round(durationMs),
+    step_count: 0,
+    successful_step_count: 0,
+    failed_step_count: 0,
+    tool_call_count: 0,
+    successful_tool_call_count: 0,
+    failed_tool_call_count: 0,
+    retry_count: 0,
+    fallback_count: 0,
+    error_count: 1,
+    human_approval_request_count: 0,
+    human_approval_granted_count: 0,
+    max_failed_steps: 0,
+    max_failed_tool_calls: 0,
+    max_error_count: 0,
+    min_quality_score: 0.7,
+    run_id: consoleRunId,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "data-analyst",
+      telemetry_source: "frontend_console",
+      failure_mode: "data_analyst_console_request_failed",
+      error_message: getErrorMessage(error),
+      schema_name: request.database_schema.name,
+      table_count: request.database_schema.tables.length,
+      input_row_count: getInputRowCountFromTableData(request.table_data ?? []),
+      objective_length: request.objective.length,
+      language: request.language ?? "unknown",
+      max_rows: request.max_rows ?? 0,
+      frontend_console_run_id: consoleRunId,
+    },
+  };
+}
+
+function getTelemetryMessage(state: TelemetryState): string {
+  if (state === "recording") {
+    return "Registrando telemetria da execução do Data Analyst...";
+  }
+
+  if (state === "recorded") {
+    return "Telemetria registrada. A execução já pode aparecer no Histórico de Execuções.";
+  }
+
+  if (state === "failed") {
+    return "A análise foi processada, mas não foi possível registrar a telemetria automaticamente.";
+  }
+
+  return "";
 }
 
 function renderRowsTable(rows: Record<string, JsonValue>[]) {
@@ -205,6 +401,10 @@ export function DataAnalystConsolePage() {
   const [language, setLanguage] = useState("pt-BR");
   const [maxRows, setMaxRows] = useState(100);
   const [requestState, setRequestState] = useState<RequestState>("idle");
+  const [telemetryState, setTelemetryState] = useState<TelemetryState>("idle");
+  const [telemetryErrorMessage, setTelemetryErrorMessage] = useState<
+    string | null
+  >(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [response, setResponse] = useState<DataAnalystAgentResponse | null>(
     null,
@@ -218,34 +418,80 @@ export function DataAnalystConsolePage() {
     return getInputRowCount(tableDataJson);
   }, [tableDataJson]);
 
+  async function recordTelemetry(
+    payload: AIAgentExecutionRecordRequest,
+  ): Promise<void> {
+    setTelemetryState("recording");
+    setTelemetryErrorMessage(null);
+
+    try {
+      await recordAIAgentExecutionTelemetry(payload);
+      setTelemetryState("recorded");
+    } catch (error) {
+      setTelemetryState("failed");
+      setTelemetryErrorMessage(getErrorMessage(error));
+    }
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setRequestState("loading");
+    setTelemetryState("idle");
+    setTelemetryErrorMessage(null);
     setErrorMessage(null);
     setResponse(null);
+
+    let payload: DataAnalystAgentRequest | null = null;
+    let startedAt = 0;
+    const consoleRunId = generateConsoleRunId();
 
     try {
       const databaseSchema = parseDatabaseSchema(databaseSchemaJson);
       const tableData = parseTableData(tableDataJson);
 
-      const payload: DataAnalystAgentRequest = {
+      payload = {
         objective,
         database_schema: databaseSchema,
         table_data: tableData,
         language,
         max_rows: maxRows,
-        metadata: {
-          source: "ai-quality-command-center",
-          console: "data-analyst",
-        },
+        metadata: mergeRequestMetadata(
+          databaseSchema.metadata,
+          consoleRunId,
+        ),
       };
 
+      startedAt = performance.now();
+
       const result = await runDataAnalystAgent(payload);
+      const durationMs = performance.now() - startedAt;
 
       setResponse(result);
       setRequestState("idle");
+
+      await recordTelemetry(
+        buildSuccessTelemetryPayload(
+          payload,
+          result,
+          durationMs,
+          consoleRunId,
+        ),
+      );
     } catch (error) {
+      const durationMs = startedAt > 0 ? performance.now() - startedAt : 0;
+
+      if (payload && startedAt > 0) {
+        await recordTelemetry(
+          buildFailureTelemetryPayload(
+            payload,
+            error,
+            durationMs,
+            consoleRunId,
+          ),
+        );
+      }
+
       setRequestState("error");
       setErrorMessage(getErrorMessage(error));
     }
@@ -268,13 +514,18 @@ export function DataAnalystConsolePage() {
       </section>
 
       <section className="console-layout">
-        <form className="console-form-card" onSubmit={(event) => void handleSubmit(event)}>
+        <form
+          className="console-form-card"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <div>
             <span className="eyebrow">Input</span>
             <h2>Executar Data Analyst Agent</h2>
             <p>
               Informe objetivo, schema e dados de tabela. O console envia o
-              payload para <code>POST /data-analysis/agent/run</code>.
+              payload para <code>POST /data-analysis/agent/run</code> e
+              registra telemetria em{" "}
+              <code>POST /observability/agent-execution/records</code>.
             </p>
           </div>
 
@@ -338,6 +589,19 @@ export function DataAnalystConsolePage() {
         </form>
 
         <section className="console-result-stack">
+          {telemetryState !== "idle" ? (
+            <article
+              className={
+                telemetryState === "failed" ? "alert-card" : "empty-state"
+              }
+            >
+              <strong>{getTelemetryMessage(telemetryState)}</strong>
+              {telemetryErrorMessage ? (
+                <small>{telemetryErrorMessage}</small>
+              ) : null}
+            </article>
+          ) : null}
+
           {requestState === "error" ? (
             <article className="alert-card">
               <strong>Não foi possível executar o Data Analyst Agent.</strong>
