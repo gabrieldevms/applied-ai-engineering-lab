@@ -408,6 +408,19 @@ Current observability endpoints include:
 
 The local AI Quality Command Center consumes these signals through the Observability Center, Execution History, Usage and Cost view, Risk Center and run details panel.
 
+### Security and Governance
+
+The project includes an initial security and governance foundation.
+
+Current capabilities:
+
+- provider configuration strategy;
+- security and governance baseline;
+- hardened provider settings exposure;
+- prompt injection protection baseline documentation;
+- deterministic prompt injection detection baseline;
+- prompt injection assessment endpoint.
+
 ### AI Quality Command Center
 
 M8 introduced the product-oriented frontend experience for the project: the AI Quality Command Center.
@@ -618,6 +631,12 @@ http://127.0.0.1:8000/docs
 | `GET`  | `/evals/telemetry/events`  | List recorded evaluation telemetry events    |
 | `POST` | `/evals/telemetry/summary` | Summarize supplied evaluation telemetry data |
 | `GET`  | `/evals/telemetry/summary` | Summarize stored evaluation telemetry data   |
+
+### Security
+
+| Method | Endpoint                                | Purpose                                  |
+| ------ | --------------------------------------- | ---------------------------------------- |
+| `POST` | `/security/prompt-injection/assess`     | Assess prompt injection risk for a text  |
 
 ### Observability
 
