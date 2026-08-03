@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { MetricCard } from "../components/ui/MetricCard";
 import { SectionPanel } from "../components/ui/SectionPanel";
 import { StatusBadge } from "../components/ui/StatusBadge";
-import { translateDashboardText, translateStatus } from "../i18n/ptBr";
 import { useObservabilityDashboard } from "../hooks/useObservabilityDashboard";
+import { translateDashboardText, translateStatus } from "../i18n/ptBr";
 import type {
   DashboardSectionStatus,
   ObservabilityDashboardSection,
@@ -58,9 +58,55 @@ function getRecommendationCount(
   }, 0);
 }
 
+function formatDateTime(value: string | null): string {
+  if (!value) {
+    return "Ainda não atualizado";
+  }
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "medium",
+  }).format(new Date(value));
+}
+
+function formatRefreshInterval(intervalMs: number): string {
+  return `${Math.round(intervalMs / 1000)}s`;
+}
+
+function getDashboardFreshnessLabel(
+  requestState: string,
+  isAutoRefreshEnabled: boolean,
+): string {
+  if (requestState === "loading") {
+    return "Carregando dados iniciais";
+  }
+
+  if (requestState === "refreshing") {
+    return "Atualizando dados";
+  }
+
+  if (requestState === "error") {
+    return "Erro na última atualização";
+  }
+
+  if (isAutoRefreshEnabled) {
+    return "Auto-refresh ativo";
+  }
+
+  return "Atualização manual";
+}
+
 export function ObservabilityCenterPage() {
-  const { dashboard, errorMessage, refreshDashboard, requestState } =
-    useObservabilityDashboard();
+  const {
+    dashboard,
+    errorMessage,
+    isAutoRefreshEnabled,
+    lastUpdatedAt,
+    refreshDashboard,
+    refreshIntervalMs,
+    requestState,
+    toggleAutoRefresh,
+  } = useObservabilityDashboard();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const filteredSections = useMemo(() => {
@@ -78,6 +124,7 @@ export function ObservabilityCenterPage() {
   }, [dashboard, statusFilter]);
 
   const sections = dashboard?.sections ?? [];
+  const isRefreshing = requestState === "loading" || requestState === "refreshing";
 
   return (
     <div className="page">
@@ -95,15 +142,39 @@ export function ObservabilityCenterPage() {
           {dashboard ? <StatusBadge status={dashboard.status} /> : null}
 
           <button
+            className="secondary-button"
+            onClick={toggleAutoRefresh}
+            type="button"
+          >
+            {isAutoRefreshEnabled
+              ? "Desativar auto-refresh"
+              : "Ativar auto-refresh"}
+          </button>
+
+          <button
             className="primary-button"
-            disabled={requestState === "loading"}
+            disabled={isRefreshing}
             onClick={() => void refreshDashboard()}
             type="button"
           >
-            {requestState === "loading"
-              ? "Atualizando..."
-              : "Atualizar observability"}
+            {isRefreshing ? "Atualizando..." : "Atualizar dashboard"}
           </button>
+        </div>
+      </section>
+
+      <section className="dashboard-live-status-card">
+        <div>
+          <span className="eyebrow">Live dashboard</span>
+          <h2>{getDashboardFreshnessLabel(requestState, isAutoRefreshEnabled)}</h2>
+          <p>
+            Última atualização: <strong>{formatDateTime(lastUpdatedAt)}</strong>
+          </p>
+        </div>
+
+        <div className="dashboard-live-status-meta">
+          <span>Auto-refresh</span>
+          <strong>{isAutoRefreshEnabled ? "Ativo" : "Inativo"}</strong>
+          <small>Intervalo: {formatRefreshInterval(refreshIntervalMs)}</small>
         </div>
       </section>
 
