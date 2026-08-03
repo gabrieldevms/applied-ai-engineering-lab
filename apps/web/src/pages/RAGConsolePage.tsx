@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { generateRAGAnswer, retrieveRAGContext } from "../api/ragApi";
+import { recordAIRetrievalQualityTelemetry } from "../api/retrievalQualityTelemetryApi";
 import { JsonViewer } from "../components/ui/JsonViewer";
 import { MetricCard } from "../components/ui/MetricCard";
 import type {
@@ -11,8 +12,10 @@ import type {
   SourceCitation,
   VectorSearchResult,
 } from "../types/rag";
+import type { AIRetrievalQualityRecordRequest } from "../types/retrievalQualityTelemetry";
 
 type RequestState = "idle" | "retrieving" | "answering" | "error";
+type TelemetryState = "idle" | "recording" | "recorded" | "failed";
 
 const defaultQuery =
   "Quais regras, riscos e cenários de teste são relevantes para a renegociação de dívida com emissão de boleto?";
@@ -75,6 +78,12 @@ function getErrorMessage(error: unknown): string {
   return "Erro inesperado ao executar o RAG Console.";
 }
 
+function generateConsoleRunId(operation: string): string {
+  return `rag-console-${operation}-${Date.now()}-${Math.round(
+    Math.random() * 10000,
+  )}`;
+}
+
 function formatScore(score: number): string {
   return score.toFixed(4);
 }
@@ -93,6 +102,16 @@ function getChunkTitle(chunk: VectorSearchResult): string {
   }
 
   return chunk.record_id;
+}
+
+function getChunkSource(chunk: VectorSearchResult): string | null {
+  const source = chunk.metadata.source;
+
+  if (typeof source === "string" && source.trim()) {
+    return source;
+  }
+
+  return null;
 }
 
 function getCitationTitle(citation: SourceCitation): string {
@@ -115,6 +134,213 @@ function buildBasePayload(
   };
 }
 
+function getSimilarityScores(chunks: VectorSearchResult[]): number[] {
+  return chunks
+    .map((chunk) => chunk.score)
+    .filter((score) => Number.isFinite(score));
+}
+
+function getAverageScore(scores: number[]): number | null {
+  if (scores.length === 0) {
+    return null;
+  }
+
+  return Number(
+    (scores.reduce((total, score) => total + score, 0) / scores.length).toFixed(
+      4,
+    ),
+  );
+}
+
+function getUniqueSources(
+  chunks: VectorSearchResult[],
+  citations: SourceCitation[] = [],
+): Set<string> {
+  const sources = new Set<string>();
+
+  for (const chunk of chunks) {
+    const source = getChunkSource(chunk);
+
+    if (source) {
+      sources.add(source);
+    }
+  }
+
+  for (const citation of citations) {
+    if (citation.source.trim()) {
+      sources.add(citation.source);
+    }
+  }
+
+  return sources;
+}
+
+function getRequiredSources(documents: SemanticSearchDocument[]): Set<string> {
+  return new Set(
+    documents
+      .map((document) => document.source)
+      .filter((source) => source.trim().length > 0),
+  );
+}
+
+function getMatchedRequiredSourceCount(
+  documents: SemanticSearchDocument[],
+  chunks: VectorSearchResult[],
+  citations: SourceCitation[] = [],
+): number {
+  const requiredSources = getRequiredSources(documents);
+  const retrievedSources = getUniqueSources(chunks, citations);
+
+  return [...requiredSources].filter((source) => retrievedSources.has(source))
+    .length;
+}
+
+function buildRetrievalTelemetryPayload(
+  payload: RetrievalRequest,
+  result: RetrievalResponse,
+  runId: string,
+): AIRetrievalQualityRecordRequest {
+  const scores = getSimilarityScores(result.retrieved_chunks);
+  const requiredSources = getRequiredSources(payload.documents);
+  const uniqueSources = getUniqueSources(result.retrieved_chunks);
+
+  return {
+    component: "rag",
+    operation: "rag_console_retrieve",
+    query: result.query,
+    requested_top_k: payload.top_k ?? result.total_retrieved_chunks,
+    retrieved_chunks_count: result.total_retrieved_chunks,
+    relevant_chunks_count: result.total_retrieved_chunks,
+    citation_count: 0,
+    unique_source_count: uniqueSources.size,
+    required_source_count: requiredSources.size,
+    matched_required_source_count: getMatchedRequiredSourceCount(
+      payload.documents,
+      result.retrieved_chunks,
+    ),
+    min_similarity_score: scores.length > 0 ? Math.min(...scores) : null,
+    max_similarity_score: scores.length > 0 ? Math.max(...scores) : null,
+    average_similarity_score: getAverageScore(scores),
+    expected_min_retrieved_chunks: 1,
+    expected_min_citations: 0,
+    min_quality_score: 0.2,
+    run_id: runId,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "rag",
+      telemetry_source: "frontend_console",
+      retrieval_mode: "retrieve_context",
+      document_count: payload.documents.length,
+      chunk_size: payload.chunk_size ?? 0,
+      chunk_overlap: payload.chunk_overlap ?? 0,
+      total_indexed_chunks: result.total_indexed_chunks,
+      frontend_console_run_id: runId,
+    },
+  };
+}
+
+function buildAnswerTelemetryPayload(
+  payload: RAGAnswerRequest,
+  result: RAGAnswerResponse,
+  runId: string,
+): AIRetrievalQualityRecordRequest {
+  const scores = getSimilarityScores(result.context_chunks);
+  const requiredSources = getRequiredSources(payload.documents);
+  const uniqueSources = getUniqueSources(result.context_chunks, result.citations);
+
+  return {
+    component: "rag",
+    operation: "rag_console_answer",
+    query: result.query,
+    requested_top_k: payload.top_k ?? result.total_context_chunks,
+    retrieved_chunks_count: result.total_context_chunks,
+    relevant_chunks_count: result.total_context_chunks,
+    citation_count: result.citations.length,
+    unique_source_count: uniqueSources.size,
+    required_source_count: requiredSources.size,
+    matched_required_source_count: getMatchedRequiredSourceCount(
+      payload.documents,
+      result.context_chunks,
+      result.citations,
+    ),
+    min_similarity_score: scores.length > 0 ? Math.min(...scores) : null,
+    max_similarity_score: scores.length > 0 ? Math.max(...scores) : null,
+    average_similarity_score: getAverageScore(scores),
+    expected_min_retrieved_chunks: 1,
+    expected_min_citations: 1,
+    min_quality_score: 0.2,
+    run_id: runId,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "rag",
+      telemetry_source: "frontend_console",
+      retrieval_mode: "answer_generation",
+      provider: result.provider,
+      model: result.model,
+      document_count: payload.documents.length,
+      chunk_size: payload.chunk_size ?? 0,
+      chunk_overlap: payload.chunk_overlap ?? 0,
+      language: payload.language ?? "unknown",
+      answer_length: result.answer.length,
+      frontend_console_run_id: runId,
+    },
+  };
+}
+
+function buildFailureTelemetryPayload(
+  payload: RetrievalRequest | RAGAnswerRequest,
+  error: unknown,
+  operation: "rag_console_retrieve" | "rag_console_answer",
+  runId: string,
+): AIRetrievalQualityRecordRequest {
+  return {
+    component: "rag",
+    operation,
+    query: payload.query,
+    requested_top_k: payload.top_k ?? 0,
+    retrieved_chunks_count: 0,
+    relevant_chunks_count: 0,
+    citation_count: 0,
+    unique_source_count: 0,
+    required_source_count: payload.documents.length,
+    matched_required_source_count: 0,
+    min_similarity_score: null,
+    max_similarity_score: null,
+    average_similarity_score: null,
+    expected_min_retrieved_chunks: 1,
+    expected_min_citations: operation === "rag_console_answer" ? 1 : 0,
+    min_quality_score: 0.2,
+    run_id: runId,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "rag",
+      telemetry_source: "frontend_console",
+      failure_mode: "rag_console_request_failed",
+      error_message: getErrorMessage(error),
+      document_count: payload.documents.length,
+      chunk_size: payload.chunk_size ?? 0,
+      chunk_overlap: payload.chunk_overlap ?? 0,
+      frontend_console_run_id: runId,
+    },
+  };
+}
+
+function getTelemetryMessage(state: TelemetryState): string {
+  if (state === "recording") {
+    return "Registrando telemetria de retrieval quality...";
+  }
+
+  if (state === "recorded") {
+    return "Telemetria registrada. A consulta RAG já pode aparecer no Histórico de Execuções.";
+  }
+
+  if (state === "failed") {
+    return "A consulta foi processada, mas não foi possível registrar a telemetria de retrieval quality automaticamente.";
+  }
+
+  return "";
+}
+
 export function RAGConsolePage() {
   const [query, setQuery] = useState(defaultQuery);
   const [documentsJson, setDocumentsJson] = useState(defaultDocumentsJson);
@@ -123,6 +349,10 @@ export function RAGConsolePage() {
   const [chunkSize, setChunkSize] = useState(800);
   const [chunkOverlap, setChunkOverlap] = useState(120);
   const [requestState, setRequestState] = useState<RequestState>("idle");
+  const [telemetryState, setTelemetryState] = useState<TelemetryState>("idle");
+  const [telemetryErrorMessage, setTelemetryErrorMessage] = useState<
+    string | null
+  >(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [retrievalResponse, setRetrievalResponse] =
     useState<RetrievalResponse | null>(null);
@@ -137,26 +367,50 @@ export function RAGConsolePage() {
     }
   }, [documentsJson]);
 
+  async function recordTelemetry(
+    payload: AIRetrievalQualityRecordRequest,
+  ): Promise<void> {
+    setTelemetryState("recording");
+    setTelemetryErrorMessage(null);
+
+    try {
+      await recordAIRetrievalQualityTelemetry(payload);
+      setTelemetryState("recorded");
+    } catch (error) {
+      setTelemetryState("failed");
+      setTelemetryErrorMessage(getErrorMessage(error));
+    }
+  }
+
   async function handleRetrieveContext() {
     setRequestState("retrieving");
+    setTelemetryState("idle");
+    setTelemetryErrorMessage(null);
     setErrorMessage(null);
     setRetrievalResponse(null);
 
+    const runId = generateConsoleRunId("retrieve");
+    let payload: RetrievalRequest | null = null;
+
     try {
       const documents = parseDocumentsJson(documentsJson);
-      const payload = buildBasePayload(
-        query,
-        documents,
-        topK,
-        chunkSize,
-        chunkOverlap,
-      );
+      payload = buildBasePayload(query, documents, topK, chunkSize, chunkOverlap);
 
       const result = await retrieveRAGContext(payload);
 
       setRetrievalResponse(result);
       setRequestState("idle");
+
+      await recordTelemetry(
+        buildRetrievalTelemetryPayload(payload, result, runId),
+      );
     } catch (error) {
+      if (payload) {
+        await recordTelemetry(
+          buildFailureTelemetryPayload(payload, error, "rag_console_retrieve", runId),
+        );
+      }
+
       setRequestState("error");
       setErrorMessage(getErrorMessage(error));
     }
@@ -164,8 +418,13 @@ export function RAGConsolePage() {
 
   async function handleGenerateAnswer() {
     setRequestState("answering");
+    setTelemetryState("idle");
+    setTelemetryErrorMessage(null);
     setErrorMessage(null);
     setAnswerResponse(null);
+
+    const runId = generateConsoleRunId("answer");
+    let payload: RAGAnswerRequest | null = null;
 
     try {
       const documents = parseDocumentsJson(documentsJson);
@@ -177,7 +436,7 @@ export function RAGConsolePage() {
         chunkOverlap,
       );
 
-      const payload: RAGAnswerRequest = {
+      payload = {
         ...basePayload,
         language,
       };
@@ -196,7 +455,15 @@ export function RAGConsolePage() {
         metadata: result.metadata,
       });
       setRequestState("idle");
+
+      await recordTelemetry(buildAnswerTelemetryPayload(payload, result, runId));
     } catch (error) {
+      if (payload) {
+        await recordTelemetry(
+          buildFailureTelemetryPayload(payload, error, "rag_console_answer", runId),
+        );
+      }
+
       setRequestState("error");
       setErrorMessage(getErrorMessage(error));
     }
@@ -223,7 +490,9 @@ export function RAGConsolePage() {
             <h2>Consultar base de conhecimento</h2>
             <p>
               Informe uma pergunta e documentos em JSON. O console pode chamar{" "}
-              <code>POST /rag/retrieve</code> ou <code>POST /rag/answer</code>.
+              <code>POST /rag/retrieve</code> ou <code>POST /rag/answer</code> e
+              registra telemetria em{" "}
+              <code>POST /observability/retrieval-quality/records</code>.
             </p>
           </div>
 
@@ -319,6 +588,19 @@ export function RAGConsolePage() {
         </form>
 
         <section className="console-result-stack">
+          {telemetryState !== "idle" ? (
+            <article
+              className={
+                telemetryState === "failed" ? "alert-card" : "empty-state"
+              }
+            >
+              <strong>{getTelemetryMessage(telemetryState)}</strong>
+              {telemetryErrorMessage ? (
+                <small>{telemetryErrorMessage}</small>
+              ) : null}
+            </article>
+          ) : null}
+
           {requestState === "error" ? (
             <article className="alert-card">
               <strong>Não foi possível executar o RAG Console.</strong>

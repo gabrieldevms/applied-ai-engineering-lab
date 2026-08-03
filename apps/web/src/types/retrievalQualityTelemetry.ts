@@ -1,0 +1,53 @@
+import type { JsonValue } from "./qaAgent";
+import type { AIUsageComponent } from "./usageCost";
+
+export type AIRetrievalQualityRecordRequest = {
+  component?: AIUsageComponent;
+  operation: string;
+  query: string;
+  requested_top_k: number;
+  retrieved_chunks_count: number;
+  relevant_chunks_count?: number | null;
+  citation_count?: number;
+  unique_source_count?: number;
+  required_source_count?: number | null;
+  matched_required_source_count?: number | null;
+  min_similarity_score?: number | null;
+  max_similarity_score?: number | null;
+  average_similarity_score?: number | null;
+  expected_min_retrieved_chunks?: number;
+  expected_min_citations?: number;
+  min_quality_score?: number;
+  run_id?: string | null;
+  trace_id?: string | null;
+  metadata?: Record<string, JsonValue>;
+};
+
+export type AIRetrievalQualityRecord = {
+  record_id: string;
+  component: AIUsageComponent;
+  operation: string;
+  query: string;
+  status: "passed" | "warning" | "failed";
+  requested_top_k: number;
+  retrieved_chunks_count: number;
+  relevant_chunks_count?: number | null;
+  citation_count: number;
+  unique_source_count: number;
+  required_source_count?: number | null;
+  matched_required_source_count?: number | null;
+  precision_at_k?: number | null;
+  source_coverage_score?: number | null;
+  quality_score?: number | null;
+  min_similarity_score?: number | null;
+  max_similarity_score?: number | null;
+  average_similarity_score?: number | null;
+  expected_min_retrieved_chunks: number;
+  expected_min_citations: number;
+  min_quality_score: number;
+  risks: string[];
+  recorded_at: string;
+  run_id?: string | null;
+  trace_id?: string | null;
+  metadata: Record<string, JsonValue>;
+};
