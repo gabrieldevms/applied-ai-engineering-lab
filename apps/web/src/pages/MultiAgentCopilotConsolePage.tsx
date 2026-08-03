@@ -1,17 +1,25 @@
 import { useMemo, useState } from "react";
+import { recordAIMultiAgentExecutionTelemetry } from "../api/multiAgentExecutionTelemetryApi";
 import { runMultiAgentQACopilot } from "../api/multiAgentCopilotApi";
 import { JsonViewer } from "../components/ui/JsonViewer";
 import { MetricCard } from "../components/ui/MetricCard";
+import type {
+  AIMultiAgentExecutionRecordRequest,
+  AIMultiAgentTelemetryRunStatus,
+} from "../types/multiAgentExecutionTelemetry";
 import type {
   MultiAgentFailureStrategy,
   MultiAgentFinalReport,
   MultiAgentQACopilotRequest,
   MultiAgentQACopilotResponse,
+  MultiAgentStepStatus,
   MultiAgentTaskResult,
   MultiAgentTraceStep,
 } from "../types/multiAgentCopilot";
+import type { JsonValue } from "../types/qaAgent";
 
 type RequestState = "idle" | "loading" | "success" | "error";
+type TelemetryState = "idle" | "recording" | "recorded" | "failed";
 
 const defaultRequirement = `Como cliente autenticado,
 quero renegociar uma dívida em atraso,
@@ -58,6 +66,22 @@ function getErrorMessage(error: unknown): string {
   return "Erro inesperado ao executar o Multi-Agent Copilot.";
 }
 
+function generateConsoleRunId(): string {
+  return `multi-agent-console-${Date.now()}-${Math.round(Math.random() * 10000)}`;
+}
+
+function mergeRequestMetadata(
+  metadata: Record<string, JsonValue> | undefined,
+  consoleRunId: string,
+): Record<string, JsonValue> {
+  return {
+    ...metadata,
+    source: "ai-quality-command-center",
+    console: "multi-agent-copilot",
+    frontend_console_run_id: consoleRunId,
+  };
+}
+
 function getQualityGate(report: MultiAgentFinalReport | null): string {
   if (!report) {
     return "N/A";
@@ -82,6 +106,266 @@ function getMessageCount(taskResults: MultiAgentTaskResult[]): number {
   return taskResults.reduce((total, taskResult) => {
     return total + taskResult.messages.length;
   }, 0);
+}
+
+function isSuccessfulTaskStatus(status: MultiAgentStepStatus): boolean {
+  return ["completed", "warning"].includes(status);
+}
+
+function isFailedTaskStatus(status: MultiAgentStepStatus): boolean {
+  return ["failed", "blocked"].includes(status);
+}
+
+function isSkippedTaskStatus(status: MultiAgentStepStatus): boolean {
+  return status === "skipped";
+}
+
+function getFinalReportSectionCount(report: MultiAgentFinalReport): number {
+  const reportSections = [
+    report.summary.trim(),
+    ...report.requirement_understanding,
+    ...report.functional_coverage,
+    ...report.automation_strategy,
+    ...report.data_validation_evidence,
+    ...report.review_notes,
+    ...report.next_steps,
+  ];
+
+  return reportSections.filter((item) => item.trim().length > 0).length;
+}
+
+function getContractCheckCount(response: MultiAgentQACopilotResponse): number {
+  return response.contract_validation?.total_contracts ?? 0;
+}
+
+function getPassedContractCheckCount(
+  response: MultiAgentQACopilotResponse,
+): number {
+  return response.contract_validation?.passed_contracts ?? 0;
+}
+
+function getFailedContractCheckCount(
+  response: MultiAgentQACopilotResponse,
+): number {
+  return response.contract_validation?.failed_contracts ?? 0;
+}
+
+function getConflictCount(response: MultiAgentQACopilotResponse): number {
+  return response.conflict_analysis?.conflict_count ?? 0;
+}
+
+function getCriticalConflictCount(response: MultiAgentQACopilotResponse): number {
+  return response.conflict_analysis?.critical_count ?? 0;
+}
+
+function mapCopilotStatusToTelemetryStatus(
+  status: MultiAgentQACopilotResponse["status"],
+): AIMultiAgentTelemetryRunStatus {
+  if (status === "completed") {
+    return "completed";
+  }
+
+  if (status === "partial") {
+    return "partial";
+  }
+
+  if (status === "failed") {
+    return "failed";
+  }
+
+  if (status === "blocked") {
+    return "blocked";
+  }
+
+  return "partial";
+}
+
+function buildSuccessTelemetryPayload(
+  request: MultiAgentQACopilotRequest,
+  response: MultiAgentQACopilotResponse,
+  durationMs: number,
+  consoleRunId: string,
+): AIMultiAgentExecutionRecordRequest {
+  const successfulTaskCount = response.task_results.filter((taskResult) =>
+    isSuccessfulTaskStatus(taskResult.status),
+  ).length;
+  const failedTaskCount = response.task_results.filter((taskResult) =>
+    isFailedTaskStatus(taskResult.status),
+  ).length;
+  const skippedAgentCount = response.task_results.filter((taskResult) =>
+    isSkippedTaskStatus(taskResult.status),
+  ).length;
+
+  const agentCount = response.roles.length;
+  const completedAgentCount = successfulTaskCount;
+  const failedAgentCount = failedTaskCount;
+  const artifactCount = getArtifactCount(response.task_results);
+  const messageCount = getMessageCount(response.task_results);
+  const finalReportSectionCount = getFinalReportSectionCount(
+    response.final_report,
+  );
+  const failureCount = response.failures.length;
+  const criticalFailureCount = response.failures.filter((failure) => {
+    return ["critical", "error", "high"].includes(
+      failure.severity.toLowerCase(),
+    );
+  }).length;
+
+  return {
+    component: "multi_agent",
+    operation: "multi_agent_copilot_console_run",
+    workflow_name: response.copilot_name || "multi-agent-qa-copilot-v1",
+    run_status: mapCopilotStatusToTelemetryStatus(response.status),
+    duration_ms: Math.round(durationMs),
+
+    agent_count: agentCount,
+    completed_agent_count: completedAgentCount,
+    failed_agent_count: failedAgentCount,
+    skipped_agent_count: skippedAgentCount,
+
+    task_count: response.task_results.length,
+    successful_task_count: successfulTaskCount,
+    failed_task_count: failedTaskCount,
+
+    artifact_count: artifactCount,
+    expected_min_artifacts: Math.max(1, response.task_results.length),
+
+    handoff_count: messageCount,
+    failed_handoff_count: 0,
+
+    contract_check_count: getContractCheckCount(response),
+    passed_contract_check_count: getPassedContractCheckCount(response),
+    failed_contract_check_count: getFailedContractCheckCount(response),
+
+    conflict_count: getConflictCount(response),
+    critical_conflict_count: getCriticalConflictCount(response),
+
+    failure_count: failureCount,
+    error_count: criticalFailureCount,
+
+    final_report_section_count: finalReportSectionCount,
+    expected_min_final_report_sections: 4,
+
+    data_validation_evidence_count:
+      response.final_report.data_validation_evidence.length,
+    require_data_validation_evidence: Boolean(request.data_validation),
+
+    retry_count: 0,
+    fallback_count: response.status === "partial" ? 1 : 0,
+
+    max_failed_agents: 0,
+    max_failed_tasks: 0,
+    max_failed_handoffs: 0,
+    max_failed_contract_checks: 0,
+    max_critical_conflicts: 0,
+    max_failures: 0,
+    max_errors: 0,
+    min_quality_score: 0.7,
+
+    run_id: consoleRunId,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "multi-agent-copilot",
+      telemetry_source: "frontend_console",
+      response_status: response.status,
+      quality_gate: getQualityGate(response.final_report),
+      requirement_length: request.requirement_text.length,
+      objective_length: request.objective?.length ?? 0,
+      language: request.language ?? "unknown",
+      max_agents: request.max_agents ?? 0,
+      failure_strategy: request.failure_strategy ?? "unknown",
+      frontend_console_run_id: consoleRunId,
+    },
+  };
+}
+
+function buildFailureTelemetryPayload(
+  request: MultiAgentQACopilotRequest,
+  error: unknown,
+  durationMs: number,
+  consoleRunId: string,
+): AIMultiAgentExecutionRecordRequest {
+  return {
+    component: "multi_agent",
+    operation: "multi_agent_copilot_console_run",
+    workflow_name: "multi-agent-qa-copilot-v1",
+    run_status: "failed",
+    duration_ms: Math.round(durationMs),
+
+    agent_count: request.max_agents ?? 0,
+    completed_agent_count: 0,
+    failed_agent_count: 0,
+    skipped_agent_count: 0,
+
+    task_count: 0,
+    successful_task_count: 0,
+    failed_task_count: 0,
+
+    artifact_count: 0,
+    expected_min_artifacts: 0,
+
+    handoff_count: 0,
+    failed_handoff_count: 0,
+
+    contract_check_count: 0,
+    passed_contract_check_count: 0,
+    failed_contract_check_count: 0,
+
+    conflict_count: 0,
+    critical_conflict_count: 0,
+
+    failure_count: 1,
+    error_count: 1,
+
+    final_report_section_count: 0,
+    expected_min_final_report_sections: 0,
+
+    data_validation_evidence_count: 0,
+    require_data_validation_evidence: Boolean(request.data_validation),
+
+    retry_count: 0,
+    fallback_count: 0,
+
+    max_failed_agents: 0,
+    max_failed_tasks: 0,
+    max_failed_handoffs: 0,
+    max_failed_contract_checks: 0,
+    max_critical_conflicts: 0,
+    max_failures: 0,
+    max_errors: 0,
+    min_quality_score: 0.7,
+
+    run_id: consoleRunId,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "multi-agent-copilot",
+      telemetry_source: "frontend_console",
+      failure_mode: "multi_agent_copilot_console_request_failed",
+      error_message: getErrorMessage(error),
+      requirement_length: request.requirement_text.length,
+      objective_length: request.objective?.length ?? 0,
+      language: request.language ?? "unknown",
+      max_agents: request.max_agents ?? 0,
+      failure_strategy: request.failure_strategy ?? "unknown",
+      frontend_console_run_id: consoleRunId,
+    },
+  };
+}
+
+function getTelemetryMessage(state: TelemetryState): string {
+  if (state === "recording") {
+    return "Registrando telemetria da execução multiagente...";
+  }
+
+  if (state === "recorded") {
+    return "Telemetria registrada. A execução multiagente já pode aparecer no Histórico de Execuções.";
+  }
+
+  if (state === "failed") {
+    return "A execução foi processada, mas não foi possível registrar a telemetria multiagente automaticamente.";
+  }
+
+  return "";
 }
 
 function formatListItems(items: string[]) {
@@ -128,6 +412,10 @@ export function MultiAgentCopilotConsolePage() {
     useState<MultiAgentFailureStrategy>("stop_on_failure");
   const [advancedPayload, setAdvancedPayload] = useState(defaultAdvancedPayload);
   const [requestState, setRequestState] = useState<RequestState>("idle");
+  const [telemetryState, setTelemetryState] = useState<TelemetryState>("idle");
+  const [telemetryErrorMessage, setTelemetryErrorMessage] = useState<
+    string | null
+  >(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [response, setResponse] = useState<MultiAgentQACopilotResponse | null>(
     null,
@@ -137,30 +425,80 @@ export function MultiAgentCopilotConsolePage() {
     return getQualityGate(response?.final_report ?? null);
   }, [response]);
 
+  async function recordTelemetry(
+    payload: AIMultiAgentExecutionRecordRequest,
+  ): Promise<void> {
+    setTelemetryState("recording");
+    setTelemetryErrorMessage(null);
+
+    try {
+      await recordAIMultiAgentExecutionTelemetry(payload);
+      setTelemetryState("recorded");
+    } catch (error) {
+      setTelemetryState("failed");
+      setTelemetryErrorMessage(getErrorMessage(error));
+    }
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setRequestState("loading");
+    setTelemetryState("idle");
+    setTelemetryErrorMessage(null);
     setErrorMessage(null);
     setResponse(null);
+
+    let payload: MultiAgentQACopilotRequest | null = null;
+    let startedAt = 0;
+    const consoleRunId = generateConsoleRunId();
 
     try {
       const parsedAdvancedPayload = parseAdvancedPayload(advancedPayload);
 
-      const payload: MultiAgentQACopilotRequest = {
+      payload = {
         requirement_text: requirementText,
         objective,
         language,
         max_agents: maxAgents,
         failure_strategy: failureStrategy,
         ...parsedAdvancedPayload,
+        metadata: mergeRequestMetadata(
+          parsedAdvancedPayload.metadata,
+          consoleRunId,
+        ),
       };
 
+      startedAt = performance.now();
+
       const result = await runMultiAgentQACopilot(payload);
+      const durationMs = performance.now() - startedAt;
 
       setResponse(result);
       setRequestState("success");
+
+      await recordTelemetry(
+        buildSuccessTelemetryPayload(
+          payload,
+          result,
+          durationMs,
+          consoleRunId,
+        ),
+      );
     } catch (error) {
+      const durationMs = startedAt > 0 ? performance.now() - startedAt : 0;
+
+      if (payload && startedAt > 0) {
+        await recordTelemetry(
+          buildFailureTelemetryPayload(
+            payload,
+            error,
+            durationMs,
+            consoleRunId,
+          ),
+        );
+      }
+
       setRequestState("error");
       setErrorMessage(getErrorMessage(error));
     }
@@ -181,13 +519,18 @@ export function MultiAgentCopilotConsolePage() {
       </section>
 
       <section className="console-layout">
-        <form className="console-form-card" onSubmit={(event) => void handleSubmit(event)}>
+        <form
+          className="console-form-card"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <div>
             <span className="eyebrow">Input</span>
             <h2>Executar Multi-Agent Copilot</h2>
             <p>
               Informe o requisito e o objetivo do fluxo. O console envia o
-              payload para <code>POST /multi-agent/qa-copilot/run</code>.
+              payload para <code>POST /multi-agent/qa-copilot/run</code> e
+              registra telemetria em{" "}
+              <code>POST /observability/multi-agent-execution/records</code>.
             </p>
           </div>
 
@@ -273,6 +616,19 @@ export function MultiAgentCopilotConsolePage() {
         </form>
 
         <section className="console-result-stack">
+          {telemetryState !== "idle" ? (
+            <article
+              className={
+                telemetryState === "failed" ? "alert-card" : "empty-state"
+              }
+            >
+              <strong>{getTelemetryMessage(telemetryState)}</strong>
+              {telemetryErrorMessage ? (
+                <small>{telemetryErrorMessage}</small>
+              ) : null}
+            </article>
+          ) : null}
+
           {requestState === "error" ? (
             <article className="alert-card">
               <strong>Não foi possível executar o Multi-Agent Copilot.</strong>
