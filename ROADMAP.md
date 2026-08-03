@@ -5,17 +5,21 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M8 — Cloud, Security and Portfolio in progress  
-**Latest completed milestone:** AI Quality Command Center frontend product experience  
-**Next focus:** Persistent Storage Foundation, execution history and live observability  
+**Latest completed milestone:** Execution History run details and live Observability Dashboard behavior  
+**Next focus:** Roadmap synchronization, architecture documentation, demonstration scenarios and portfolio presentation  
 
 The short-term implementation order is:
 
 ```text
 M7 — Evaluation and LLMOps
   ↓
-M8 — Cloud, Security and Portfolio
+M8 — AI Quality Command Center product experience
   ↓
-AI Quality Command Center
+Persistent observability and execution history
+  ↓
+Security, governance and portfolio documentation
+  ↓
+Cloud and production deployment direction
 ```
 
 | Module                             | Status      |
@@ -465,12 +469,11 @@ M7 introduced the evaluation, regression, telemetry and observability foundation
 Current limitations:
 
 - Evaluation datasets are still small and deterministic.
-- Most evaluation and observability records are currently stored in memory.
+- Historical telemetry is persisted locally through JSONL files for key observability records, but production database storage is not implemented yet.
 - Token and cost tracking depends on caller-provided pricing data.
 - Cost calculation is an estimate and not provider billing reconciliation.
 - Retrieval quality metrics depend on caller-provided relevance and similarity signals.
-- Observability dashboard is backend-only.
-- Dashboard output is not yet connected to a persistent database.
+- The Observability Dashboard is available through backend APIs and the frontend Command Center, but external monitoring integrations are not implemented yet.
 - OpenTelemetry, Grafana and external monitoring integrations are not implemented yet.
 - Authentication, authorization and multi-user isolation are not implemented yet.
 
@@ -482,27 +485,48 @@ Current limitations:
 
 **Goal:** Prepare the project for production-like deployment, governance, frontend experience and professional presentation.
 
-M8 should transform the current backend platform foundation into a more demonstrable and portfolio-ready AI engineering product.
+M8 transforms the backend platform foundation into a more demonstrable and portfolio-ready AI engineering product through the AI Quality Command Center, persistent local observability, execution history, security planning and portfolio documentation.
 
 ### Cloud and operations
 
 - [ ] Cloud deployment
-- [ ] Environment-specific configuration
+- [x] Environment-based local storage configuration
+- [ ] Environment-specific deployment configuration
 - [ ] Persistent vector storage
-- [ ] Persistent evaluation storage
-- [ ] Persistent observability storage
+- [x] Persistent evaluation telemetry storage
+- [ ] Persistent evaluation result and artifact storage
+- [x] Persistent observability storage foundation
+- [x] Persistent usage tracking storage
+- [x] Persistent retrieval quality telemetry storage
+- [x] Persistent agent execution telemetry storage
+- [x] Persistent multi-agent execution telemetry storage
 - [ ] Persistent agent state
 - [ ] Deployment pipeline
 - [ ] Production health checks
 - [ ] Production MCP hosting direction
 - [ ] Production monitoring direction
 
+#### Completed implementation focus
+
+- [x] Persistent Storage Foundation
+- [x] Usage Tracking persistence
+- [x] Evaluation Telemetry persistence
+- [x] Retrieval Quality Telemetry persistence
+- [x] Agent Execution Telemetry persistence
+- [x] Multi-Agent Execution Telemetry persistence
+- [x] Execution History backend read model
+- [x] Execution History UI
+- [x] Execution History run details
+- [x] Console Telemetry Integration
+- [x] Live Observability Dashboard behavior
+
 #### Next implementation focus
 
-- [ ] Persistent Storage Foundation
-- [ ] Execution History
-- [ ] Console Telemetry Integration
-- [ ] Live Observability Dashboard behavior
+- [ ] Updated architecture documentation
+- [ ] Demonstration scenarios
+- [ ] Portfolio-oriented README
+- [ ] Safe provider configuration strategy
+- [ ] Security and governance baseline
 
 ### Security and governance
 
@@ -523,6 +547,8 @@ M8 should transform the current backend platform foundation into a more demonstr
 - [x] Backend dashboard integration
 - [x] Evaluation Center UI
 - [x] Observability Center UI
+- [x] Execution History UI
+- [x] Execution History run details
 - [x] QA Agent Console
 - [x] Multi-Agent QA Copilot Console
 - [x] RAG Console
@@ -530,8 +556,13 @@ M8 should transform the current backend platform foundation into a more demonstr
 - [x] Provider and model settings UI
 - [x] Usage and cost visualization
 - [x] Risk and recommendation panels
+- [x] QA Agent Console telemetry integration
+- [x] Multi-Agent QA Copilot Console telemetry integration
+- [x] RAG Console telemetry integration
+- [x] Data Analyst Console telemetry integration
+- [x] Live Observability Dashboard behavior
 
-> Current note: the first AI Quality Command Center frontend/product experience is completed for local demonstrations. Console executions are still stored in local React page state, and most backend observability records remain in memory. Persistent execution history, automatic dashboard refresh, live observability updates, backend telemetry integration for each frontend console execution and production-ready storage remain future M8 work.
+> Current note: the first AI Quality Command Center frontend/product experience is completed for local demonstrations. The backend now has a persistent local JSONL storage foundation for usage tracking, evaluation telemetry, retrieval quality telemetry, agent execution telemetry and multi-agent execution telemetry. Execution History is available as a backend read model, frontend timeline and run details drill-down. The main frontend consoles now register telemetry automatically, and the Observability Center supports manual refresh and auto-refresh behavior. Production cloud deployment, persistent vector storage, persistent agent state, production monitoring, security/governance controls and portfolio documentation remain future M8 work.
 
 ### Documentation and portfolio
 
@@ -600,11 +631,13 @@ Multi-Agent QA Copilot
         ↓
 Evaluation and LLMOps
         ↓
-AI Observability Dashboard
-        ↓
-Cloud, Security and Portfolio
-        ↓
 AI Quality Command Center
+        ↓
+Persistent observability and execution history
+        ↓
+Security, governance and portfolio documentation
+        ↓
+Cloud and production deployment direction
 ```
 
 Each module builds on the contracts, tests and architectural decisions introduced by the previous modules.
