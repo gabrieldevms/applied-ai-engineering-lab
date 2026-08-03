@@ -56,6 +56,9 @@ All notable changes to this project will be documented in this file.
 - Added tool risk classification metadata to registered agent tools.
 - Added tool security metadata to `/agents/tools` responses.
 - Added tests for default tool risk classification and API exposure.
+- Added tool authorization service for registered agent tools.
+- Added caller and environment checks during tool execution.
+- Added tests for allowed and blocked tool execution authorization decisions.
 
 ### Changed
 
@@ -83,6 +86,8 @@ All notable changes to this project will be documented in this file.
 - Hardened provider health responses to avoid exposing sensitive environment variable names, API key values or internal provider URLs.
 - Updated the Provider Settings UI to display only sanitized provider metadata and logical configuration fields.
 - Tool execution metadata now includes tool risk classification fields.
+- Tool execution now enforces authorization checks before running handlers.
+- Tool Registry metadata now reports authorization enforcement as enabled.
 
 ### Notes
 

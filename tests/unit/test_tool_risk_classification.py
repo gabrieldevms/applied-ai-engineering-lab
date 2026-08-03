@@ -54,7 +54,7 @@ def test_tool_registry_response_should_expose_security_classification_metadata()
     assert payload["metadata"]["security_classification"] == (
         "tool-risk-classification-v1"
     )
-    assert payload["metadata"]["authorization_enforced"] is False
+    assert payload["metadata"]["authorization_enforced"] is True
 
     for tool in payload["tools"]:
         assert "security" in tool
@@ -81,4 +81,4 @@ def test_tool_execution_metadata_should_include_security_classification() -> Non
     assert response.metadata["requires_audit_log"] is False
     assert response.metadata["allows_state_change"] is False
     assert response.metadata["allows_external_network"] is False
-    assert response.metadata["authorization_enforced"] is False
+    assert response.metadata["authorization_enforced"] is True

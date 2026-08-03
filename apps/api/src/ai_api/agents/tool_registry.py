@@ -334,7 +334,7 @@ class ToolRegistry:
                 "registry": "agent-tool-registry-v1",
                 "default_tools_loaded": True,
                 "security_classification": "tool-risk-classification-v1",
-                "authorization_enforced": False,
+                "authorization_enforced": True,
             },
         )
 

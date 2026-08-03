@@ -15,7 +15,7 @@ def test_agents_tools_endpoint_should_return_tool_security_metadata() -> None:
     assert body["metadata"]["security_classification"] == (
         "tool-risk-classification-v1"
     )
-    assert body["metadata"]["authorization_enforced"] is False
+    assert body["metadata"]["authorization_enforced"] is True
 
     tools = body["tools"]
 

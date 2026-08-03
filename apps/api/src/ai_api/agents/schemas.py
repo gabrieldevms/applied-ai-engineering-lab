@@ -32,6 +32,8 @@ ToolEnvironment = Literal[
     "production",
 ]
 
+ToolAuthorizationStatus = Literal["allowed", "blocked"]
+
 class AgentToolCall(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -146,6 +148,19 @@ class ToolSecurityMetadata(BaseModel):
     allows_sensitive_data: bool = False
     requires_prompt_injection_assessment: bool = False
     authorization_notes: list[str] = Field(default_factory=list)
+
+
+class ToolAuthorizationDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: ToolAuthorizationStatus
+    tool_name: str = Field(min_length=1)
+    caller_type: ToolCallerType
+    environment: ToolEnvironment
+    risk_level: ToolRiskLevel
+    reason: str = Field(min_length=1)
+    violations: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class ToolDefinition(BaseModel):
