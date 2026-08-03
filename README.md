@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M8 — Cloud, Security and Portfolio in progress  
-**Latest completed milestone:** AI Quality Command Center frontend product experience  
-**Next focus:** Persistent Storage Foundation, execution history and live observability  
+**Latest completed milestone:** Execution History run details and live Observability Dashboard behavior  
+**Next focus:** Portfolio documentation, security and governance baseline, and production deployment direction  
 
 The project currently includes:
 
@@ -46,6 +46,21 @@ The project currently includes:
 - Agent execution telemetry metrics
 - Multi-agent execution telemetry metrics
 - Backend AI observability dashboard
+- AI Quality Command Center frontend product experience
+- Persistent local JSONL storage foundation
+- Persistent evaluation telemetry storage
+- Persistent usage tracking storage
+- Persistent retrieval quality telemetry storage
+- Persistent agent execution telemetry storage
+- Persistent multi-agent execution telemetry storage
+- Execution History backend read model
+- Execution History UI
+- Execution History run details
+- QA Agent Console telemetry integration
+- Multi-Agent QA Copilot Console telemetry integration
+- RAG Console telemetry integration
+- Data Analyst Console telemetry integration
+- Live Observability Dashboard behavior
 
 For detailed reviews, see:
 
@@ -356,9 +371,13 @@ Current observability capabilities:
 - retrieval quality metrics;
 - agent execution metrics;
 - multi-agent execution metrics;
-- backend AI Observability Dashboard.
+- persistent local JSONL telemetry storage;
+- Execution History backend read model;
+- Execution History frontend timeline;
+- execution run details drill-down;
+- live Observability Dashboard behavior.
 
-The backend observability dashboard consolidates:
+The observability layer consolidates:
 
 - evaluation telemetry;
 - token and cost usage;
@@ -369,56 +388,73 @@ The backend observability dashboard consolidates:
 - global risks;
 - recommendations.
 
-Dashboard endpoint:
+Current observability endpoints include:
 
 - `GET /observability/dashboard`
+- `GET /observability/execution-history`
+- `POST /observability/usage/records`
+- `POST /observability/retrieval-quality/records`
+- `POST /observability/agent-execution/records`
+- `POST /observability/multi-agent-execution/records`
 
-The dashboard is currently backend-only and acts as the response contract for a future frontend experience.
+The local AI Quality Command Center consumes these signals through the Observability Center, Execution History, Usage and Cost view, Risk Center and run details panel.
 
 ### AI Quality Command Center
 
-M8 introduced the first product-oriented frontend experience for the project: the AI Quality Command Center.
+M8 introduced the product-oriented frontend experience for the project: the AI Quality Command Center.
 
-The frontend was rebuilt from scratch using Vite, React and TypeScript, replacing the old prototype with a clean local product interface focused on AI quality, observability and agent workflows.
+The frontend was rebuilt from scratch using Vite, React and TypeScript, replacing the old prototype with a clean local product interface focused on AI quality, observability, evaluation and agent workflows.
 
 The current Command Center includes:
 
 - AI quality overview;
 - backend observability dashboard integration;
 - Observability Center;
+- Execution History;
+- Execution History run details;
 - Evaluation Center;
 - QA Agent Console;
 - Multi-Agent QA Copilot Console;
 - RAG Console;
 - Data Analyst Console;
 - provider and model settings view;
-- Usage & Cost visualization;
-- Central de Riscos for risk and recommendation panels.
+- Usage and Cost visualization;
+- Risk Center for risk and recommendation panels;
+- live Observability Dashboard behavior.
+
+The main frontend consoles now register telemetry automatically:
+
+- QA Agent Console → agent execution telemetry;
+- Multi-Agent QA Copilot Console → multi-agent execution telemetry;
+- RAG Console → retrieval quality telemetry;
+- Data Analyst Console → agent execution telemetry.
 
 The current frontend is suitable for local demonstrations and portfolio presentation.
 
 Current limitations:
 
 - console execution results are still stored in local React page state;
-- most observability records are still stored in backend memory;
-- dashboard updates depend on existing backend observability records;
-- frontend console executions do not yet automatically persist execution history;
-- frontend console executions do not yet automatically feed all observability metrics;
-- production authentication, authorization and multi-user isolation are not implemented yet.
+- production authentication, authorization and multi-user isolation are not implemented yet;
+- persistent agent state is not implemented yet;
+- persistent vector storage is not implemented yet;
+- production database storage is not implemented yet;
+- deployed frontend hosting is not implemented yet.
 
-These limitations define the next M8 focus: persistent storage, execution history, console telemetry integration and live observability.
+The next M8 focus areas are portfolio documentation, security and governance baseline, safe provider configuration strategy and production deployment direction.
 
 ## Architecture
 
 ```mermaid
 flowchart TB
-    Client[Client / API Consumer] --> API[FastAPI Application]
+    User[User / QA Engineer / AI Engineer] --> Frontend[AI Quality Command Center]
+
+    Frontend --> API[FastAPI Backend]
 
     API --> Diagnostics[Health and Provider Diagnostics]
     API --> Requirements[Requirement Analysis]
     API --> RAG[RAG Services]
-    API --> Agents[Agent Runtime]
-    API --> DataAnalysis[Data Analysis Services]
+    API --> Agents[Agent Runtime and QA Agent]
+    API --> DataAnalysis[Data Analyst Services]
     API --> MultiAgent[Multi-Agent QA Copilot]
     API --> MCP[MCP QA Server]
     API --> Evals[Evaluation and LLMOps]
@@ -434,67 +470,28 @@ flowchart TB
     LLM --> Ollama[Ollama Provider]
     LLM --> OpenAI[OpenAI Provider]
 
-    RAG --> Ingestion[Ingestion and Text Extraction]
-    Ingestion --> Chunking[Document Chunking]
-    Chunking --> Embeddings[Embedding Service]
-    Embeddings --> VectorStore[In-Memory Vector Store]
-    VectorStore --> Retrieval[Retrieval Service]
-    Retrieval --> Answer[RAG Answer Generation]
-    Answer --> Citations[Source Citations]
-    Answer --> RAGEvaluation[RAG Evaluation]
+    RAG --> RetrievalQuality[Retrieval Quality Telemetry]
+    Agents --> AgentTelemetry[Agent Execution Telemetry]
+    MultiAgent --> MultiAgentTelemetry[Multi-Agent Execution Telemetry]
+    Evals --> EvalTelemetry[Evaluation Telemetry]
+    Observability --> Usage[Usage and Cost Telemetry]
 
-    Agents --> Runtime[Controlled Agent Runtime]
-    Runtime --> Registry[Tool Registry]
-    Registry --> Executor[Tool Execution Service]
-    Executor --> RetrieveTool[rag.retrieve]
-    Executor --> RequirementTool[requirements.analyze]
-    Executor --> RAGAnswerTool[rag.answer]
-    Executor --> DataAnalystTool[data_analysis.agent.run]
+    RetrievalQuality --> Storage[Local JSONL Persistent Storage]
+    AgentTelemetry --> Storage
+    MultiAgentTelemetry --> Storage
+    EvalTelemetry --> Storage
+    Usage --> Storage
 
-    Agents --> QAAgent[QA Agent]
-    QAAgent --> RequirementTool
-    QAAgent --> RetrieveTool
-    QAAgent --> DataAnalystTool
+    Storage --> ExecutionHistory[Execution History Read Model]
+    Storage --> Dashboard[Observability Dashboard]
 
-    DataAnalystTool --> DataAnalystAgent[Data Analyst Agent]
-    DataAnalystAgent --> SQLGeneration[SQL Generation]
-    DataAnalystAgent --> SQLSafety[Read-Only SQL Validation]
-    DataAnalystAgent --> SQLExecution[Controlled SQLite Execution]
-    DataAnalystAgent --> SQLEvidence[Query Evidence]
-
-    DataAnalysis --> SQLGeneration
-    DataAnalysis --> SQLSafety
-    DataAnalysis --> SQLExecution
-
-    MultiAgent --> Orchestrator[Orchestrator Agent]
-    MultiAgent --> RequirementAnalyst[Requirement Analyst Agent]
-    MultiAgent --> FunctionalQA[Functional QA Agent]
-    MultiAgent --> TestAutomation[Test Automation Agent]
-    MultiAgent --> Reviewer[Reviewer Agent]
-    MultiAgent --> Reporter[Report Agent]
-    MultiAgent --> Contracts[Communication Contracts]
-    MultiAgent --> FinalReport[Final QA Report]
-
-    Evals --> GoldenDataset[Golden Evaluation Dataset]
-    Evals --> PromptRegression[Prompt Regression]
-    Evals --> LLMOutputEval[LLM Output Evaluation]
-    Evals --> RAGRegression[RAG Regression]
-    Evals --> AgentRegression[Agent Regression]
-    Evals --> ToolCallingEval[Tool-calling Evaluation]
-    Evals --> MultiAgentRegression[Multi-Agent Regression]
-    Evals --> JudgeEval[LLM-as-judge Prototype]
-    Evals --> CIPipeline[AI Evaluation Pipeline]
-
-    Observability --> Telemetry[Structured Telemetry]
-    Observability --> Usage[Token and Cost Usage]
-    Observability --> RetrievalQuality[Retrieval Quality Metrics]
-    Observability --> AgentMetrics[Agent Execution Metrics]
-    Observability --> MultiAgentMetrics[Multi-Agent Execution Metrics]
-    Observability --> Dashboard[Backend Observability Dashboard]
+    ExecutionHistory --> Frontend
+    Dashboard --> Frontend
 ```
 
 The architecture intentionally separates:
 
+- frontend product experience;
 - API transport;
 - domain services;
 - model providers;
@@ -505,9 +502,11 @@ The architecture intentionally separates:
 - tool execution;
 - multi-agent orchestration;
 - evaluation services;
-- observability services.
+- observability services;
+- local persistent telemetry storage;
+- execution history read models.
 
-This separation allows individual components to be tested and replaced without coupling the entire application to one model provider, framework or user interface.
+This separation allows individual components to be tested, observed and replaced without coupling the entire application to one model provider, framework, storage strategy or user interface.
 
 ## API Endpoints
 
@@ -678,24 +677,35 @@ applied-ai-engineering-lab/
 │       ├── ai-evaluation-pipeline.yml
 │       └── ci.yml
 ├── apps/
-│   └── api/
-│       ├── Dockerfile
+│   ├── api/
+│   │   ├── Dockerfile
+│   │   └── src/
+│   │       └── ai_api/
+│   │           ├── agents/
+│   │           ├── data_analysis/
+│   │           ├── evals/
+│   │           ├── llm/
+│   │           ├── mcp_server/
+│   │           ├── multi_agent/
+│   │           ├── rag/
+│   │           ├── requirements/
+│   │           ├── storage/
+│   │           ├── config.py
+│   │           ├── main.py
+│   │           └── schemas.py
+│   └── web/
 │       └── src/
-│           └── ai_api/
-│               ├── agents/
-│               ├── data_analysis/
-│               ├── evals/
-│               ├── llm/
-│               ├── mcp_server/
-│               ├── multi_agent/
-│               ├── rag/
-│               ├── requirements/
-│               ├── config.py
-│               ├── main.py
-│               └── schemas.py
+│           ├── api/
+│           ├── components/
+│           ├── hooks/
+│           ├── pages/
+│           ├── styles/
+│           └── types/
 ├── docs/
 │   ├── adr/
 │   ├── architecture/
+│   ├── demos/
+│   ├── diagrams/
 │   └── study-notes/
 ├── scripts/
 ├── tests/
@@ -765,6 +775,16 @@ Open:
 http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs
 ```
+
+### Run the frontend
+
+```powershell
+cd apps\web
+npm run dev
+```
+Open the local Vite URL shown in the terminal.
+The frontend provides the AI Quality Command Center product experience.
+
 
 ## Environment Configuration
 
@@ -944,16 +964,21 @@ The AI Evaluation Pipeline validates AI behavior through deterministic evaluatio
 
 ## Current Limitations
 
+The project is currently optimized for local development, learning and portfolio demonstration.
+
+Known limitations:
+
 - PDF extraction depends on text being extractable from the PDF;
 - scanned PDFs and OCR are not supported;
 - legacy `.doc` and `.xls` files are not supported;
 - structured table extraction does not yet infer semantic column types;
 - embeddings and vector storage still use deterministic local implementations intended for development and testing;
+- persistent vector database storage is not implemented yet;
 - SQL execution is currently limited to controlled in-memory SQLite;
 - external database connectors are not implemented yet;
 - NoSQL data source support is not implemented yet;
-- execution logs are persisted locally as JSONL files instead of a production database;
-- most evaluation and observability records are currently stored in memory;
+- local observability telemetry is persisted through JSONL files instead of a production database;
+- persistent agent state is not implemented yet;
 - token and cost tracking depends on caller-provided pricing data;
 - cost calculation is an estimate and not provider billing reconciliation;
 - retrieval quality metrics depend on caller-provided relevance and similarity signals;
@@ -963,49 +988,56 @@ The AI Evaluation Pipeline validates AI behavior through deterministic evaluatio
 - automatic multi-agent conflict resolution is not implemented yet;
 - production MCP hosting is not defined yet;
 - authentication, authorization and multi-user isolation are not implemented yet;
+- prompt injection protection requires a dedicated baseline;
+- tool authorization boundaries need to be formalized;
 - OpenTelemetry, Grafana and external monitoring integrations are not implemented yet;
-- the observability dashboard is now consumed by the local AI Quality Command Center frontend;
 - the project does not yet provide a deployed frontend;
-- frontend console execution results are currently kept in local React page state;
-- frontend console executions do not yet automatically persist execution history;
-- frontend console executions do not yet automatically feed all observability metrics.
+- frontend console execution results are currently kept in local React page state.
 
-These limitations define the boundary between the implemented engineering foundation and the upcoming cloud, security, frontend and production hardening capabilities.
+These limitations define the boundary between the implemented local AI engineering product and the upcoming cloud, security, governance and production hardening capabilities.
 
 ## Current Milestone: M8 — Cloud, Security and Portfolio
 
 M8 is turning the project into a more demonstrable, secure and portfolio-ready AI engineering platform.
 
-The first M8 frontend/product experience is completed locally through the AI Quality Command Center.
+The first M8 product experience is completed locally through the AI Quality Command Center.
 
-Completed frontend capabilities:
+Completed M8 capabilities:
 
 - frontend architecture decision;
 - AI Quality Command Center foundation;
 - backend dashboard integration;
 - Observability Center UI;
 - Evaluation Center UI;
+- Execution History UI;
+- Execution History run details;
 - QA Agent Console;
 - Multi-Agent QA Copilot Console;
 - RAG Console;
 - Data Analyst Agent Console;
 - provider and model settings UI;
-- Usage & Cost visualization;
-- risk and recommendation panels.
+- Usage and Cost visualization;
+- Risk Center and recommendation panels;
+- Persistent Storage Foundation;
+- persistent local usage telemetry;
+- persistent local evaluation telemetry;
+- persistent local retrieval quality telemetry;
+- persistent local agent execution telemetry;
+- persistent local multi-agent execution telemetry;
+- console telemetry integration;
+- live Observability Dashboard behavior.
 
 Next M8 focus areas:
 
-- persistent storage foundation;
-- persistent evaluation storage;
-- persistent observability storage;
+- portfolio-oriented README;
+- final technical case study;
+- complete API usage examples;
+- safe provider configuration strategy;
+- security and governance baseline;
+- persistent vector storage;
 - persistent agent state;
-- execution history;
-- console telemetry integration;
-- live observability dashboard behavior;
-- environment-specific configuration;
-- security and governance foundation;
 - cloud/deployment direction;
-- portfolio documentation and final case study.
+- production monitoring direction.
 
 ## Engineering Approach
 
@@ -1034,7 +1066,8 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
 - [Contributing Guide](CONTRIBUTING.md)
-- [Initial Architecture](docs/architecture/initial-architecture.md)
+- [Architecture](docs/architecture/initial-architecture.md)
+- [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Architecture Decision Records](docs/adr/)
 - [Study Notes](docs/study-notes/)
 
