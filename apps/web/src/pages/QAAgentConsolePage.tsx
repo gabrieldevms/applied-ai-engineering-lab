@@ -1,14 +1,21 @@
 import { useMemo, useState } from "react";
+import { recordAIAgentExecutionTelemetry } from "../api/agentExecutionTelemetryApi";
 import { runQAAgent } from "../api/qaAgentApi";
 import { JsonViewer } from "../components/ui/JsonViewer";
 import { MetricCard } from "../components/ui/MetricCard";
 import type {
+  AIAgentExecutionRecordRequest,
+  AIAgentTelemetryRunStatus,
+} from "../types/agentExecutionTelemetry";
+import type {
+  AgentStep,
   JsonValue,
   QAAgentRunRequest,
   QAAgentRunResponse,
 } from "../types/qaAgent";
 
 type RequestState = "idle" | "loading" | "success" | "error";
+type TelemetryState = "idle" | "recording" | "recorded" | "failed";
 
 const defaultRequirement = `Como cliente autenticado,
 quero renegociar uma dívida em atraso,
@@ -81,6 +88,136 @@ function getStepStatus(step: Record<string, JsonValue | undefined>): string {
   return "unknown";
 }
 
+function isFailedStep(step: AgentStep): boolean {
+  const status = getStepStatus(step).toLowerCase();
+
+  return ["failed", "error", "blocked"].includes(status);
+}
+
+function hasToolCall(step: AgentStep): boolean {
+  return typeof step.tool_name === "string" && step.tool_name.trim().length > 0;
+}
+
+function mapAgentStatusToTelemetryStatus(
+  status: QAAgentRunResponse["status"],
+): AIAgentTelemetryRunStatus {
+  if (status === "completed") {
+    return "completed";
+  }
+
+  if (status === "failed") {
+    return "failed";
+  }
+
+  if (status === "blocked") {
+    return "blocked";
+  }
+
+  return "partial";
+}
+
+function buildSuccessTelemetryPayload(
+  request: QAAgentRunRequest,
+  response: QAAgentRunResponse,
+  durationMs: number,
+): AIAgentExecutionRecordRequest {
+  const failedSteps = response.steps.filter(isFailedStep);
+  const toolSteps = response.steps.filter(hasToolCall);
+  const failedToolSteps = toolSteps.filter(isFailedStep);
+
+  return {
+    component: "agent",
+    operation: "qa_agent_console_run",
+    agent_name: "qa-agent-v1",
+    run_status: mapAgentStatusToTelemetryStatus(response.status),
+    duration_ms: Math.round(durationMs),
+    step_count: response.steps.length,
+    successful_step_count: response.steps.length - failedSteps.length,
+    failed_step_count: failedSteps.length,
+    tool_call_count: toolSteps.length,
+    successful_tool_call_count: toolSteps.length - failedToolSteps.length,
+    failed_tool_call_count: failedToolSteps.length,
+    retry_count: 0,
+    fallback_count: 0,
+    error_count: failedSteps.length,
+    human_approval_request_count:
+      response.status === "requires_approval" ? 1 : 0,
+    human_approval_granted_count: 0,
+    max_failed_steps: 0,
+    max_failed_tool_calls: 0,
+    max_error_count: 0,
+    min_quality_score: 0.7,
+    run_id: response.run_id,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "qa-agent",
+      telemetry_source: "frontend_console",
+      response_status: response.status,
+      requirement_length: request.requirement_text.length,
+      language: request.language ?? "unknown",
+      top_k: request.top_k ?? 0,
+      max_steps: request.max_steps ?? 0,
+    },
+  };
+}
+
+function buildFailureTelemetryPayload(
+  request: QAAgentRunRequest,
+  error: unknown,
+  durationMs: number,
+): AIAgentExecutionRecordRequest {
+  return {
+    component: "agent",
+    operation: "qa_agent_console_run",
+    agent_name: "qa-agent-v1",
+    run_status: "failed",
+    duration_ms: Math.round(durationMs),
+    step_count: 0,
+    successful_step_count: 0,
+    failed_step_count: 0,
+    tool_call_count: 0,
+    successful_tool_call_count: 0,
+    failed_tool_call_count: 0,
+    retry_count: 0,
+    fallback_count: 0,
+    error_count: 1,
+    human_approval_request_count: 0,
+    human_approval_granted_count: 0,
+    max_failed_steps: 0,
+    max_failed_tool_calls: 0,
+    max_error_count: 0,
+    min_quality_score: 0.7,
+    run_id: null,
+    metadata: {
+      source: "ai-quality-command-center",
+      console: "qa-agent",
+      telemetry_source: "frontend_console",
+      failure_mode: "qa_agent_console_request_failed",
+      error_message: getErrorMessage(error),
+      requirement_length: request.requirement_text.length,
+      language: request.language ?? "unknown",
+      top_k: request.top_k ?? 0,
+      max_steps: request.max_steps ?? 0,
+    },
+  };
+}
+
+function getTelemetryMessage(state: TelemetryState): string {
+  if (state === "recording") {
+    return "Registrando telemetria da execução...";
+  }
+
+  if (state === "recorded") {
+    return "Telemetria registrada. A execução já pode aparecer no Histórico de Execuções.";
+  }
+
+  if (state === "failed") {
+    return "A execução foi processada, mas não foi possível registrar a telemetria automaticamente.";
+  }
+
+  return "";
+}
+
 export function QAAgentConsolePage() {
   const [requirementText, setRequirementText] = useState(defaultRequirement);
   const [language, setLanguage] = useState("pt-BR");
@@ -88,6 +225,10 @@ export function QAAgentConsolePage() {
   const [maxSteps, setMaxSteps] = useState(6);
   const [advancedPayload, setAdvancedPayload] = useState(defaultAdvancedPayload);
   const [requestState, setRequestState] = useState<RequestState>("idle");
+  const [telemetryState, setTelemetryState] = useState<TelemetryState>("idle");
+  const [telemetryErrorMessage, setTelemetryErrorMessage] = useState<
+    string | null
+  >(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [response, setResponse] = useState<QAAgentRunResponse | null>(null);
 
@@ -99,17 +240,37 @@ export function QAAgentConsolePage() {
     return response.steps.map((step) => getStepTitle(step));
   }, [response]);
 
+  async function recordTelemetry(
+    payload: AIAgentExecutionRecordRequest,
+  ): Promise<void> {
+    setTelemetryState("recording");
+    setTelemetryErrorMessage(null);
+
+    try {
+      await recordAIAgentExecutionTelemetry(payload);
+      setTelemetryState("recorded");
+    } catch (error) {
+      setTelemetryState("failed");
+      setTelemetryErrorMessage(getErrorMessage(error));
+    }
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setRequestState("loading");
+    setTelemetryState("idle");
+    setTelemetryErrorMessage(null);
     setErrorMessage(null);
     setResponse(null);
+
+    let payload: QAAgentRunRequest | null = null;
+    let startedAt = 0;
 
     try {
       const parsedAdvancedPayload = parseAdvancedPayload(advancedPayload);
 
-      const payload: QAAgentRunRequest = {
+      payload = {
         requirement_text: requirementText,
         language,
         top_k: topK,
@@ -119,11 +280,27 @@ export function QAAgentConsolePage() {
         ...parsedAdvancedPayload,
       };
 
+      startedAt = performance.now();
+
       const result = await runQAAgent(payload);
+      const durationMs = performance.now() - startedAt;
 
       setResponse(result);
       setRequestState("success");
+
+      await recordTelemetry(
+        buildSuccessTelemetryPayload(payload, result, durationMs),
+      );
     } catch (error) {
+      const durationMs =
+        startedAt > 0 ? performance.now() - startedAt : 0;
+
+      if (payload && startedAt > 0) {
+        await recordTelemetry(
+          buildFailureTelemetryPayload(payload, error, durationMs),
+        );
+      }
+
       setRequestState("error");
       setErrorMessage(getErrorMessage(error));
     }
@@ -144,13 +321,18 @@ export function QAAgentConsolePage() {
       </section>
 
       <section className="console-layout">
-        <form className="console-form-card" onSubmit={(event) => void handleSubmit(event)}>
+        <form
+          className="console-form-card"
+          onSubmit={(event) => void handleSubmit(event)}
+        >
           <div>
             <span className="eyebrow">Input</span>
             <h2>Executar QA Agent</h2>
             <p>
               Informe um requisito ou cenário de negócio. O console envia o
-              payload para <code>POST /agents/qa/run</code>.
+              payload para <code>POST /agents/qa/run</code> e registra
+              telemetria em{" "}
+              <code>POST /observability/agent-execution/records</code>.
             </p>
           </div>
 
@@ -219,6 +401,17 @@ export function QAAgentConsolePage() {
         </form>
 
         <section className="console-result-stack">
+          {telemetryState !== "idle" ? (
+            <article
+              className={
+                telemetryState === "failed" ? "alert-card" : "empty-state"
+              }
+            >
+              <strong>{getTelemetryMessage(telemetryState)}</strong>
+              {telemetryErrorMessage ? <small>{telemetryErrorMessage}</small> : null}
+            </article>
+          ) : null}
+
           {requestState === "error" ? (
             <article className="alert-card">
               <strong>Não foi possível executar o QA Agent.</strong>
@@ -296,7 +489,10 @@ export function QAAgentConsolePage() {
 
                 <div className="console-step-list">
                   {response.steps.map((step, index) => (
-                    <article className="console-step-card" key={`${index}-${getStepTitle(step)}`}>
+                    <article
+                      className="console-step-card"
+                      key={`${index}-${getStepTitle(step)}`}
+                    >
                       <div>
                         <span className="eyebrow">Step {index + 1}</span>
                         <h3>{getStepTitle(step)}</h3>
