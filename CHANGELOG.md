@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
 - Added RAG Console telemetry integration with retrieval quality observability.
 - Added frontend API client and types for `POST /observability/retrieval-quality/records`.
 - Added Data Analyst Console telemetry integration with agent execution observability.
+- Added live Observability Dashboard behavior with manual refresh, last updated timestamp and auto-refresh toggle.
 
 ### Changed
 
@@ -68,6 +69,7 @@ All notable changes to this project will be documented in this file.
 - Updated Multi-Agent Copilot Console to automatically register multi-agent execution telemetry after successful or failed backend executions.
 - Updated RAG Console to automatically register retrieval quality telemetry after retrieve and answer executions.
 - Updated Data Analyst Console to automatically register agent execution telemetry after successful, blocked or failed backend executions.
+- Updated Observability Center to refresh dashboard data without clearing the currently displayed dashboard.
 
 ### Notes
 
@@ -88,6 +90,7 @@ All notable changes to this project will be documented in this file.
 - Multi-Agent Copilot Console executions can now appear in Execution History through the persisted multi-agent execution telemetry read model.
 - RAG Console executions can now appear in Execution History through the persisted retrieval quality telemetry read model.
 - Data Analyst Console executions can now appear in Execution History through the persisted agent execution telemetry read model.
+- Observability Center can now behave as a live operational dashboard for persisted console telemetry signals.
 
 ---
 

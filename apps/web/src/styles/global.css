@@ -1451,3 +1451,63 @@ code {
     flex-direction: column;
   }
 }
+
+.dashboard-live-status-card {
+  align-items: center;
+  background: rgba(15, 23, 42, 0.76);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 1.25rem;
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.24);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1.25rem;
+}
+
+.dashboard-live-status-card h2 {
+  color: #f8fafc;
+  margin: 0.2rem 0 0.5rem;
+}
+
+.dashboard-live-status-card p {
+  color: #94a3b8;
+  margin: 0;
+}
+
+.dashboard-live-status-card strong {
+  color: #f8fafc;
+}
+
+.dashboard-live-status-meta {
+  background: rgba(2, 6, 23, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1rem;
+  min-width: 12rem;
+  padding: 1rem;
+  text-align: right;
+}
+
+.dashboard-live-status-meta span,
+.dashboard-live-status-meta small {
+  color: #94a3b8;
+  display: block;
+}
+
+.dashboard-live-status-meta strong {
+  color: #f8fafc;
+  display: block;
+  font-size: 1.4rem;
+  margin: 0.2rem 0;
+}
+
+@media (max-width: 720px) {
+  .dashboard-live-status-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-live-status-meta {
+    text-align: left;
+    width: 100%;
+  }
+}

@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getObservabilityDashboard } from "../api/observabilityDashboardApi";
 import type { ObservabilityDashboardResponse } from "../types/observability";
 
-type RequestState = "idle" | "loading" | "success" | "error";
+type RequestState = "idle" | "loading" | "refreshing" | "success" | "error";
+
+const defaultRefreshIntervalMs = 30000;
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -17,6 +19,31 @@ export function useObservabilityDashboard() {
     useState<ObservabilityDashboardResponse | null>(null);
   const [requestState, setRequestState] = useState<RequestState>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+  const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState(false);
+  const [refreshIntervalMs] = useState(defaultRefreshIntervalMs);
+
+  const loadDashboard = useCallback(async (mode: "initial" | "refresh") => {
+    setRequestState((currentState) => {
+      if (mode === "initial") {
+        return "loading";
+      }
+
+      return currentState === "loading" ? "loading" : "refreshing";
+    });
+    setErrorMessage(null);
+
+    try {
+      const response = await getObservabilityDashboard();
+
+      setDashboard(response);
+      setLastUpdatedAt(new Date().toISOString());
+      setRequestState("success");
+    } catch (error) {
+      setRequestState("error");
+      setErrorMessage(getErrorMessage(error));
+    }
+  }, []);
 
   useEffect(() => {
     let shouldIgnoreResult = false;
@@ -28,6 +55,7 @@ export function useObservabilityDashboard() {
         }
 
         setDashboard(response);
+        setLastUpdatedAt(new Date().toISOString());
         setRequestState("success");
       })
       .catch((error: unknown) => {
@@ -44,25 +72,36 @@ export function useObservabilityDashboard() {
     };
   }, []);
 
-  async function refreshDashboard() {
-    setRequestState("loading");
-    setErrorMessage(null);
-
-    try {
-      const response = await getObservabilityDashboard();
-
-      setDashboard(response);
-      setRequestState("success");
-    } catch (error) {
-      setRequestState("error");
-      setErrorMessage(getErrorMessage(error));
+  useEffect(() => {
+    if (!isAutoRefreshEnabled) {
+      return undefined;
     }
-  }
+
+    const intervalId = window.setInterval(() => {
+      void loadDashboard("refresh");
+    }, refreshIntervalMs);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [isAutoRefreshEnabled, loadDashboard, refreshIntervalMs]);
+
+  const refreshDashboard = useCallback(async () => {
+    await loadDashboard("refresh");
+  }, [loadDashboard]);
+
+  const toggleAutoRefresh = useCallback(() => {
+    setIsAutoRefreshEnabled((currentValue) => !currentValue);
+  }, []);
 
   return {
     dashboard,
     requestState,
     errorMessage,
+    lastUpdatedAt,
+    isAutoRefreshEnabled,
+    refreshIntervalMs,
     refreshDashboard,
+    toggleAutoRefresh,
   };
 }
