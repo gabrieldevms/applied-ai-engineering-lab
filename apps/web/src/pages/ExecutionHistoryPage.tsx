@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { JsonViewer } from "../components/ui/JsonViewer";
 import { MetricCard } from "../components/ui/MetricCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
@@ -27,6 +27,14 @@ const statusBadgeMap: Record<string, DashboardStatus> = {
   blocked: "critical",
   cancelled: "critical",
 };
+
+type JsonViewerValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonViewerValue[]
+  | { [key: string]: JsonViewerValue };
 
 function formatExecutionType(type: string): string {
   return (
@@ -96,74 +104,6 @@ function getAverageQuality(records: AIExecutionHistoryRecord[]): string {
   return `${Math.round(average * 100)}%`;
 }
 
-function renderRecordsTable(records: AIExecutionHistoryRecord[]) {
-  if (records.length === 0) {
-    return (
-      <article className="execution-history-empty">
-        <h2>Nenhuma execução encontrada</h2>
-        <p>
-          Registre eventos de observabilidade ou ajuste os filtros para
-          visualizar o histórico unificado de execuções.
-        </p>
-      </article>
-    );
-  }
-
-  return (
-    <div className="execution-history-table-wrapper">
-      <table className="execution-history-table">
-        <thead>
-          <tr>
-            <th>Quando</th>
-            <th>Tipo</th>
-            <th>Status</th>
-            <th>Componente</th>
-            <th>Operação</th>
-            <th>Qualidade</th>
-            <th>Duração</th>
-            <th>Resumo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {records.map((record) => (
-            <tr key={record.execution_id}>
-              <td>{formatDateTime(record.recorded_at)}</td>
-              <td>{formatExecutionType(record.execution_type)}</td>
-              <td>
-                <StatusBadge status={toBadgeStatus(record.status)} />
-                <span className="execution-history-status-text">
-                  {record.status}
-                </span>
-              </td>
-              <td>{record.component}</td>
-              <td>{record.operation}</td>
-              <td>{formatQualityScore(record.quality_score)}</td>
-              <td>{formatDuration(record.duration_ms)}</td>
-              <td>
-                <strong>{record.title}</strong>
-                <p>{record.summary}</p>
-                {record.run_id ? (
-                  <code className="execution-history-run-id">
-                    run_id: {record.run_id}
-                  </code>
-                ) : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-type JsonViewerValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonViewerValue[]
-  | { [key: string]: JsonViewerValue };
-
 function toJsonViewerValue(value: unknown): JsonViewerValue {
   if (
     value === null ||
@@ -190,16 +130,227 @@ function toJsonViewerValue(value: unknown): JsonViewerValue {
   return String(value);
 }
 
+function renderRecordsTable(
+  records: AIExecutionHistoryRecord[],
+  selectedExecutionId: string | null,
+  onSelectRecord: (record: AIExecutionHistoryRecord) => void,
+) {
+  if (records.length === 0) {
+    return (
+      <article className="execution-history-empty">
+        <h2>Nenhuma execução encontrada</h2>
+        <p>
+          Registre eventos de observabilidade ou ajuste os filtros para
+          visualizar o histórico unificado de execuções.
+        </p>
+      </article>
+    );
+  }
+
+  return (
+    <div className="execution-history-table-wrapper">
+      <table className="execution-history-table">
+        <thead>
+          <tr>
+            <th>Quando</th>
+            <th>Tipo</th>
+            <th>Status</th>
+            <th>Componente</th>
+            <th>Operação</th>
+            <th>Qualidade</th>
+            <th>Duração</th>
+            <th>Resumo</th>
+            <th>Detalhes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {records.map((record) => (
+            <tr
+              className={
+                record.execution_id === selectedExecutionId
+                  ? "execution-history-row is-selected"
+                  : "execution-history-row"
+              }
+              key={record.execution_id}
+            >
+              <td>{formatDateTime(record.recorded_at)}</td>
+              <td>{formatExecutionType(record.execution_type)}</td>
+              <td>
+                <StatusBadge status={toBadgeStatus(record.status)} />
+                <span className="execution-history-status-text">
+                  {record.status}
+                </span>
+              </td>
+              <td>{record.component}</td>
+              <td>{record.operation}</td>
+              <td>{formatQualityScore(record.quality_score)}</td>
+              <td>{formatDuration(record.duration_ms)}</td>
+              <td>
+                <strong>{record.title}</strong>
+                <p>{record.summary}</p>
+                {record.run_id ? (
+                  <code className="execution-history-run-id">
+                    run_id: {record.run_id}
+                  </code>
+                ) : null}
+              </td>
+              <td>
+                <button
+                  className="execution-history-detail-button"
+                  onClick={() => onSelectRecord(record)}
+                  type="button"
+                >
+                  Ver detalhes
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function renderSelectedRecordDetails(
+  selectedRecord: AIExecutionHistoryRecord | null,
+  onClearSelection: () => void,
+) {
+  if (!selectedRecord) {
+    return (
+      <section className="execution-history-details-empty">
+        <span className="eyebrow">Run details</span>
+        <h2>Nenhuma execução selecionada</h2>
+        <p>
+          Selecione uma linha da timeline para inspecionar metadata, IDs,
+          status, duração, qualidade e sinais técnicos da execução.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="execution-history-details-panel">
+      <div className="execution-history-details-header">
+        <div>
+          <span className="eyebrow">Run details</span>
+          <h2>{selectedRecord.title}</h2>
+          <p>{selectedRecord.summary}</p>
+        </div>
+
+        <div className="execution-history-details-actions">
+          <StatusBadge status={toBadgeStatus(selectedRecord.status)} />
+          <button
+            className="execution-history-detail-button"
+            onClick={onClearSelection}
+            type="button"
+          >
+            Limpar seleção
+          </button>
+        </div>
+      </div>
+
+      <section className="metrics-grid">
+        <MetricCard
+          description="Status operacional consolidado"
+          label="Status"
+          value={selectedRecord.status}
+        />
+        <MetricCard
+          description="Tipo de registro no histórico"
+          label="Tipo"
+          value={formatExecutionType(selectedRecord.execution_type)}
+        />
+        <MetricCard
+          description="Componente responsável pela execução"
+          label="Componente"
+          value={selectedRecord.component}
+        />
+        <MetricCard
+          description="Operação registrada na telemetria"
+          label="Operação"
+          value={selectedRecord.operation}
+        />
+      </section>
+
+      <section className="metrics-grid">
+        <MetricCard
+          description="Duração registrada para a execução"
+          label="Duração"
+          value={formatDuration(selectedRecord.duration_ms)}
+        />
+        <MetricCard
+          description="Quality score calculado pelo backend"
+          label="Qualidade"
+          value={formatQualityScore(selectedRecord.quality_score)}
+        />
+        <MetricCard
+          description="Timestamp da execução"
+          label="Registrado em"
+          value={formatDateTime(selectedRecord.recorded_at)}
+        />
+        <MetricCard
+          description="Identificador de correlação da execução"
+          label="Run ID"
+          value={selectedRecord.run_id ?? "N/A"}
+        />
+      </section>
+
+      <section className="execution-history-details-meta-grid">
+        <article>
+          <span>Execution ID</span>
+          <code>{selectedRecord.execution_id}</code>
+        </article>
+
+        <article>
+          <span>Source record ID</span>
+          <code>{selectedRecord.source_record_id}</code>
+        </article>
+
+        <article>
+          <span>Run ID</span>
+          <code>{selectedRecord.run_id ?? "N/A"}</code>
+        </article>
+
+        <article>
+          <span>Recorded at</span>
+          <code>{selectedRecord.recorded_at}</code>
+        </article>
+      </section>
+
+      <section className="content-grid">
+        <JsonViewer
+          title="Selected execution metadata"
+          value={toJsonViewerValue(selectedRecord.metadata)}
+        />
+
+        <JsonViewer
+          title="Selected execution record"
+          value={toJsonViewerValue(selectedRecord)}
+        />
+      </section>
+    </section>
+  );
+}
+
 export function ExecutionHistoryPage() {
-  const {
-    history,
-    filters,
-    requestState,
-    updateFilters,
-    refreshHistory,
-  } = useExecutionHistory();
+  const { history, filters, requestState, updateFilters, refreshHistory } =
+    useExecutionHistory();
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(
+    null,
+  );
 
   const records = useMemo(() => history?.records ?? [], [history]);
+
+  const selectedRecord = useMemo(() => {
+    if (!selectedExecutionId) {
+      return null;
+    }
+
+    return (
+      records.find((record) => record.execution_id === selectedExecutionId) ??
+      null
+    );
+  }, [records, selectedExecutionId]);
 
   const summaryCards = useMemo(
     () => [
@@ -231,6 +382,7 @@ export function ExecutionHistoryPage() {
     key: keyof ExecutionHistoryFilters,
     value: string,
   ) {
+    setSelectedExecutionId(null);
     updateFilters({
       ...filters,
       [key]: key === "limit" ? Number(value) : value,
@@ -245,8 +397,8 @@ export function ExecutionHistoryPage() {
           <h1>Histórico de execuções</h1>
           <p>
             Linha do tempo operacional que consolida telemetria, usage,
-            qualidade de recuperação, execução de agentes e execução
-            multiagente em uma única visão.
+            qualidade de recuperação, execução de agentes e execução multiagente
+            em uma única visão.
           </p>
         </div>
 
@@ -256,9 +408,7 @@ export function ExecutionHistoryPage() {
           onClick={() => void refreshHistory()}
           type="button"
         >
-          {requestState.isLoading
-            ? "Atualizando..."
-            : "Atualizar histórico"}
+          {requestState.isLoading ? "Atualizando..." : "Atualizar histórico"}
         </button>
       </header>
 
@@ -352,7 +502,7 @@ export function ExecutionHistoryPage() {
         </label>
       </section>
 
-      <section className="metric-grid">
+      <section className="metrics-grid">
         {summaryCards.map((card) => (
           <MetricCard
             description={card.description}
@@ -375,9 +525,15 @@ export function ExecutionHistoryPage() {
         {requestState.isLoading && !history ? (
           <p className="muted">Carregando histórico de execuções...</p>
         ) : (
-          renderRecordsTable(records)
+          renderRecordsTable(records, selectedExecutionId, (record) =>
+            setSelectedExecutionId(record.execution_id),
+          )
         )}
       </section>
+
+      {renderSelectedRecordDetails(selectedRecord, () =>
+        setSelectedExecutionId(null),
+      )}
 
       <JsonViewer
         title="Execution History Response"
