@@ -205,6 +205,22 @@ class ToolExecutionService:
                     "specialized_agent",
                     "",
                 ),
+                "tool_risk_level": tool_definition.security.risk_level,
+                "requires_human_approval": (
+                    tool_definition.security.requires_human_approval
+                ),
+                "requires_audit_log": tool_definition.security.requires_audit_log,
+                "allows_state_change": tool_definition.security.allows_state_change,
+                "allows_external_network": (
+                    tool_definition.security.allows_external_network
+                ),
+                "allows_sensitive_data": (
+                    tool_definition.security.allows_sensitive_data
+                ),
+                "requires_prompt_injection_assessment": (
+                    tool_definition.security.requires_prompt_injection_assessment
+                ),
+                "authorization_enforced": False,
             },
         )
 

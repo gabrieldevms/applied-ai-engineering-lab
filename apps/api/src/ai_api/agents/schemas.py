@@ -4,8 +4,33 @@ from ai_api.rag.schemas import SemanticSearchDocument
 from ai_api.data_analysis.schemas import DatabaseSchema, DatabaseTableData
 
 AgentRunStatus = Literal["completed", "failed"]
+
 AgentStepStatus = Literal["completed", "failed", "skipped"]
+
 ToolExecutionStatus = Literal["completed", "failed"]
+
+ToolRiskLevel = Literal["low", "medium", "high", "critical"]
+
+ToolCallerType = Literal[
+    "frontend_console",
+    "backend_service",
+    "qa_agent",
+    "data_analyst_agent",
+    "multi_agent_copilot",
+    "mcp_client",
+    "evaluation_runner",
+    "ci_pipeline",
+    "future_authenticated_user",
+    "future_admin_user",
+]
+
+ToolEnvironment = Literal[
+    "local",
+    "test",
+    "ci",
+    "staging",
+    "production",
+]
 
 class AgentToolCall(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -104,6 +129,25 @@ class AgentRunResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class ToolSecurityMetadata(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    risk_level: ToolRiskLevel = "low"
+    allowed_callers: list[ToolCallerType] = Field(
+        default_factory=lambda: ["backend_service"],
+    )
+    allowed_environments: list[ToolEnvironment] = Field(
+        default_factory=lambda: ["local", "test"],
+    )
+    requires_human_approval: bool = False
+    requires_audit_log: bool = False
+    allows_state_change: bool = False
+    allows_external_network: bool = False
+    allows_sensitive_data: bool = False
+    requires_prompt_injection_assessment: bool = False
+    authorization_notes: list[str] = Field(default_factory=list)
+
+
 class ToolDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -122,6 +166,10 @@ class ToolDefinition(BaseModel):
     output_schema: dict[str, Any] = Field(
         default_factory=dict,
         description="JSON-schema-like output contract.",
+    )
+    security: ToolSecurityMetadata = Field(
+        default_factory=ToolSecurityMetadata,
+        description="Security and authorization metadata for this tool.",
     )
     metadata: dict[str, Any] = Field(default_factory=dict)
 

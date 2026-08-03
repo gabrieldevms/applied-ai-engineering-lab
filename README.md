@@ -420,6 +420,8 @@ Current capabilities:
 - prompt injection protection baseline documentation;
 - deterministic prompt injection detection baseline;
 - prompt injection assessment endpoint.
+- tool authorization boundaries documentation;
+- tool risk classification metadata;
 
 ### AI Quality Command Center
 
@@ -1098,6 +1100,7 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
 - [Prompt Injection Protection Baseline](docs/security/prompt-injection-protection-baseline.md)
+- [Tool Authorization Boundaries](docs/security/tool-authorization-boundaries.md)
 - [Architecture Decision Records](docs/adr/)
 - [Study Notes](docs/study-notes/)
 

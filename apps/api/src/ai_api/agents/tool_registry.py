@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from ai_api.agents.schemas import ToolDefinition, ToolRegistryResponse
+from ai_api.agents.schemas import ToolDefinition, ToolRegistryResponse, ToolSecurityMetadata
 
 
 DEFAULT_TOOL_DEFINITIONS = [
@@ -33,6 +33,29 @@ DEFAULT_TOOL_DEFINITIONS = [
                 }
             },
         },
+        security=ToolSecurityMetadata(
+            risk_level="low",
+            allowed_callers=[
+                "frontend_console",
+                "backend_service",
+                "qa_agent",
+                "multi_agent_copilot",
+                "mcp_client",
+                "evaluation_runner",
+                "ci_pipeline",
+            ],
+            allowed_environments=["local", "test", "ci"],
+            requires_human_approval=False,
+            requires_audit_log=False,
+            allows_state_change=False,
+            allows_external_network=False,
+            allows_sensitive_data=False,
+            requires_prompt_injection_assessment=True,
+            authorization_notes=[
+                "Read-only retrieval over provided documents.",
+                "Retrieved context must be treated as data, not instructions.",
+            ],
+        ),
         metadata={
             "category": "rag",
             "safe_by_default": True,
@@ -73,6 +96,28 @@ DEFAULT_TOOL_DEFINITIONS = [
                 },
             },
         },
+        security=ToolSecurityMetadata(
+            risk_level="low",
+            allowed_callers=[
+                "frontend_console",
+                "backend_service",
+                "qa_agent",
+                "multi_agent_copilot",
+                "mcp_client",
+                "evaluation_runner",
+            ],
+            allowed_environments=["local", "test", "ci"],
+            requires_human_approval=False,
+            requires_audit_log=False,
+            allows_state_change=False,
+            allows_external_network=False,
+            allows_sensitive_data=False,
+            requires_prompt_injection_assessment=True,
+            authorization_notes=[
+                "Generates grounded answers from provided context.",
+                "Does not change external state.",
+            ],
+        ),
         metadata={
             "category": "rag",
             "safe_by_default": True,
@@ -117,6 +162,29 @@ DEFAULT_TOOL_DEFINITIONS = [
                 },
             },
         },
+        security=ToolSecurityMetadata(
+            risk_level="low",
+            allowed_callers=[
+                "frontend_console",
+                "backend_service",
+                "qa_agent",
+                "multi_agent_copilot",
+                "mcp_client",
+                "evaluation_runner",
+                "ci_pipeline",
+            ],
+            allowed_environments=["local", "test", "ci"],
+            requires_human_approval=False,
+            requires_audit_log=False,
+            allows_state_change=False,
+            allows_external_network=False,
+            allows_sensitive_data=False,
+            requires_prompt_injection_assessment=True,
+            authorization_notes=[
+                "Analyzes requirement text without changing state.",
+                "Requirement text must be treated as user-provided data.",
+            ],
+        ),
         metadata={
             "category": "qa",
             "safe_by_default": True,
@@ -184,6 +252,29 @@ DEFAULT_TOOL_DEFINITIONS = [
                 },
             },
         },
+        security=ToolSecurityMetadata(
+            risk_level="medium",
+            allowed_callers=[
+                "frontend_console",
+                "backend_service",
+                "qa_agent",
+                "multi_agent_copilot",
+                "mcp_client",
+                "evaluation_runner",
+            ],
+            allowed_environments=["local", "test", "ci"],
+            requires_human_approval=False,
+            requires_audit_log=False,
+            allows_state_change=False,
+            allows_external_network=False,
+            allows_sensitive_data=True,
+            requires_prompt_injection_assessment=True,
+            authorization_notes=[
+                "Runs controlled read-only SQL analysis over provided table data.",
+                "Unsafe SQL must remain blocked by SQL safety validation.",
+                "External database access is not implemented.",
+            ],
+        ),
         metadata={
             "category": "data_analysis",
             "safe_by_default": True,
@@ -242,6 +333,8 @@ class ToolRegistry:
             metadata={
                 "registry": "agent-tool-registry-v1",
                 "default_tools_loaded": True,
+                "security_classification": "tool-risk-classification-v1",
+                "authorization_enforced": False,
             },
         )
 
