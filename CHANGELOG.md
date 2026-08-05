@@ -142,6 +142,8 @@ All notable changes to this project will be documented in this file.
 
 #### Documentation and portfolio
 
+- Updated ROADMAP to remove personal GitHub and LinkedIn launch communication tasks from the repository documentation scope.
+- Clarified that portfolio-ready public documentation and local launch documentation are completed for the M8 local portfolio launch.
 - Updated README into a portfolio-oriented launch landing page.
 - Moved detailed capability inventory from the README into a dedicated technical reference document.
 - Updated README security and governance status to reflect the current implemented controls.
@@ -152,6 +154,8 @@ All notable changes to this project will be documented in this file.
 
 ### Notes
 
+- Personal launch communication materials, such as LinkedIn posts, GitHub profile snippets and private pitch notes, are intentionally kept outside the repository.
+- Public project documentation remains focused on helping visitors understand, run, study and demonstrate the project from their own experience.
 - M8 remains in progress and is now in final launch preparation.
 - The local AI Quality Command Center, persistent local observability foundation, execution history, run details and security/governance baseline are implemented for portfolio demonstration.
 - The README is now optimized as a GitHub landing page, while the detailed technical inventory is preserved in `docs/reference/current-capabilities-reference.md`.
