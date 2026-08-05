@@ -428,6 +428,7 @@ Current capabilities:
 - prompt injection telemetry integration;
 - audit log service foundation;
 - blocked tool-call audit event recording;
+- prompt injection audit event recording;
 
 ### AI Quality Command Center
 

@@ -76,6 +76,8 @@ All notable changes to this project will be documented in this file.
 - Added audit log service and API tests.
 - Added audit event recording for blocked tool-call authorization decisions.
 - Added tests covering blocked tool-call audit events.
+- Added audit event recording for high-risk prompt injection assessments.
+- Added API tests covering prompt injection audit events.
 
 ### Changed
 
@@ -108,6 +110,7 @@ All notable changes to this project will be documented in this file.
 - Tool execution now records sanitized blocked tool-call telemetry before raising authorization errors.
 - Prompt injection assessment endpoint now records sanitized telemetry for relevant security assessments without storing the original input text.
 - Tool execution now records both blocked tool-call telemetry and audit log events when authorization blocks execution.
+- Prompt injection assessment now records both telemetry and audit log events for high-risk/blocking assessments.
 
 ### Notes
 
