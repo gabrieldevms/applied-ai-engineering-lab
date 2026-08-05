@@ -4,9 +4,9 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-**Current module:** M8 — Cloud, Security and Portfolio in progress  
-**Latest completed milestone:** Final M8 roadmap synchronization and portfolio-ready public documentation  
-**Next focus:** Local portfolio launch validation and post-launch implementation planning   
+- **Current module:** M8 — Cloud, Security and Portfolio in progress
+- **Latest completed milestone:** Final M8 roadmap synchronization and portfolio-ready public documentation
+- **Next focus:** Local portfolio launch validation and post-launch implementation planning
 
 The project is currently in the final preparation stage for the **M8 local portfolio launch**.
 
@@ -23,7 +23,7 @@ Security and governance baseline
   ↓
 Portfolio README, demo script and technical case study
   ↓
-GitHub and LinkedIn launch presentation
+Portfolio-ready public documentation
 ```
 
 | Module                             | Status      |

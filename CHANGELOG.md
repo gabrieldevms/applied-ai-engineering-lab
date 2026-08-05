@@ -142,6 +142,9 @@ All notable changes to this project will be documented in this file.
 
 #### Documentation and portfolio
 
+- Updated README, ROADMAP and current capabilities reference launch status for the final M8 local portfolio launch documentation scope.
+- Removed personal GitHub and LinkedIn launch communication tasks from the repository documentation scope.
+- Clarified that portfolio-ready public documentation and local launch documentation are completed for the M8 local portfolio launch.
 - Updated ROADMAP to remove personal GitHub and LinkedIn launch communication tasks from the repository documentation scope.
 - Clarified that portfolio-ready public documentation and local launch documentation are completed for the M8 local portfolio launch.
 - Updated README into a portfolio-oriented launch landing page.

@@ -12,9 +12,9 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 
 ## Project Status
 
-**Current module:** M8 - Cloud, Security and Portfolio in progress  
-**Latest completed milestone:** Security audit integration for blocked tool calls and prompt injection events  
-**Next focus:** Final portfolio documentation, launch demo script, technical case study and M8 roadmap synchronization  
+- **Current module:** M8 — Cloud, Security and Portfolio in progress
+- **Latest completed milestone:** Final M8 launch documentation status
+- **Next focus:** Local portfolio launch validation and post-launch implementation planning
 
 The project currently includes:
 
