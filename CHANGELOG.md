@@ -6,12 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Added current capabilities reference documentation preserving the detailed technical inventory previously maintained in the README.
-- Added AI Quality Command Center technical case study for portfolio presentation.
-- Added launch demo script for presenting the AI Quality Command Center as a local-first AI Quality Engineering platform.
-- Added security and governance baseline documentation.
-- Added updated security/governance status documentation for provider configuration, prompt injection, tool authorization, sensitive data handling and audit logs.
-- Added post-launch implementation packs to the roadmap for cloud deployment, production observability, persistent agent state, enterprise security, MCP production hosting, data integrations and multi-provider AI evaluation.
+#### Product experience
+
 - Started M8 product experience work.
 - Rebuilt the frontend from scratch using Vite, React and TypeScript.
 - Added the AI Quality Command Center foundation.
@@ -27,6 +23,9 @@ All notable changes to this project will be documented in this file.
 - Added demo usage record action for local LLMOps demonstration.
 - Added Central de Riscos for risk and recommendation panels.
 - Added consolidated section-level risk, recommendation and status views using `GET /observability/dashboard`.
+
+#### Persistent storage and observability
+
 - Added Persistent Storage Foundation with reusable local JSONL storage primitives.
 - Added storage configuration settings for `STORAGE_BACKEND` and `STORAGE_BASE_DIR`.
 - Added generic JSONL store support for append, list, recent listing, field lookup, count, clear and metadata operations.
@@ -40,11 +39,6 @@ All notable changes to this project will be documented in this file.
 - Added `AGENT_EXECUTION_RECORDS_PATH` setting for configurable agent execution persistence.
 - Added persistent local JSONL storage support for multi-agent execution telemetry records.
 - Added `MULTI_AGENT_EXECUTION_RECORDS_PATH` setting for configurable multi-agent execution persistence.
-- Added Execution History backend read model for consolidating persisted observability records.
-- Added `GET /observability/execution-history` to list unified AI execution history records across evaluation, usage, retrieval, agent and multi-agent telemetry.
-- Added Execution History UI to the AI Quality Command Center.
-- Added frontend API client, hook and types for `GET /observability/execution-history`.
-- Added filters for execution type, status, component, run ID and limit in the Execution History page.
 - Added QA Agent Console telemetry integration with agent execution observability.
 - Added frontend API client and types for `POST /observability/agent-execution/records`.
 - Added Multi-Agent Copilot Console telemetry integration with multi-agent execution observability.
@@ -52,12 +46,29 @@ All notable changes to this project will be documented in this file.
 - Added RAG Console telemetry integration with retrieval quality observability.
 - Added frontend API client and types for `POST /observability/retrieval-quality/records`.
 - Added Data Analyst Console telemetry integration with agent execution observability.
-- Added live Observability Dashboard behavior with manual refresh, last updated timestamp and auto-refresh toggle.
+
+#### Execution history and dashboard behavior
+
+- Added Execution History backend read model for consolidating persisted observability records.
+- Added `GET /observability/execution-history` to list unified AI execution history records across evaluation, usage, retrieval, agent and multi-agent telemetry.
+- Added Execution History UI to the AI Quality Command Center.
+- Added frontend API client, hook and types for `GET /observability/execution-history`.
+- Added filters for execution type, status, component, run ID and limit in the Execution History page.
 - Added Execution History run details panel with selected execution drill-down.
+- Added live Observability Dashboard behavior with manual refresh, last updated timestamp and auto-refresh toggle.
+
+#### Security and governance
+
 - Added safe LLM provider configuration fields to provider health responses.
 - Added deterministic prompt injection detection baseline.
 - Added `POST /security/prompt-injection/assess` endpoint.
 - Added prompt injection detection and API tests.
+- Added prompt injection telemetry service.
+- Added safe telemetry recording for medium and high prompt injection assessments.
+- Added `GET /security/prompt-injection/records` endpoint.
+- Added prompt injection telemetry tests.
+- Added audit event recording for high-risk prompt injection assessments.
+- Added API tests covering prompt injection audit events.
 - Added tool authorization boundaries documentation covering tool risk levels, caller types, environment boundaries and future authorization controls.
 - Added tool risk classification metadata to registered agent tools.
 - Added tool security metadata to `/agents/tools` responses.
@@ -65,38 +76,43 @@ All notable changes to this project will be documented in this file.
 - Added tool authorization service for registered agent tools.
 - Added caller and environment checks during tool execution.
 - Added tests for allowed and blocked tool execution authorization decisions.
-- Added sensitive data handling policy covering prompts, RAG documents, table data, telemetry, logs, Execution History, MCP inputs and provider usage.
-- Added audit log schema documentation covering security-relevant events, tool authorization, prompt injection, human approval, sensitive data, provider configuration and MCP audit events.
 - Added blocked tool-call telemetry service.
 - Added safe telemetry recording when tool authorization blocks execution.
 - Added `GET /security/blocked-tool-calls` endpoint.
 - Added blocked tool-call telemetry tests.
-- Added prompt injection telemetry service.
-- Added safe telemetry recording for medium and high prompt injection assessments.
-- Added `GET /security/prompt-injection/records` endpoint.
-- Added prompt injection telemetry tests.
+- Added audit event recording for blocked tool-call authorization decisions.
+- Added tests covering blocked tool-call audit events.
+- Added sensitive data handling policy covering prompts, RAG documents, table data, telemetry, logs, Execution History, MCP inputs and provider usage.
+- Added audit log schema documentation covering security-relevant events, tool authorization, prompt injection, human approval, sensitive data, provider configuration and MCP audit events.
 - Added security audit log service foundation.
 - Added audit event schemas for authorization, prompt injection, human approval, sensitive data, provider configuration and MCP events.
 - Added in-memory and JSONL audit event stores.
 - Added `GET /security/audit/events` endpoint.
 - Added audit log service and API tests.
-- Added audit event recording for blocked tool-call authorization decisions.
-- Added tests covering blocked tool-call audit events.
-- Added audit event recording for high-risk prompt injection assessments.
-- Added API tests covering prompt injection audit events.
+- Added security and governance baseline documentation.
+- Added updated security/governance status documentation for provider configuration, prompt injection, tool authorization, sensitive data handling and audit logs.
+
+#### Portfolio documentation
+
+- Added launch demo script for presenting the AI Quality Command Center as a local-first AI Quality Engineering platform.
+- Added AI Quality Command Center technical case study for portfolio presentation.
+- Added current capabilities reference documentation preserving the detailed technical inventory previously maintained in the README.
+- Added post-launch implementation packs to the roadmap for cloud deployment, production observability, persistent agent state, enterprise security, MCP production hosting, data integrations and multi-provider AI evaluation.
 
 ### Changed
 
-- Updated README into a portfolio-oriented launch landing page.
-- Moved detailed capability inventory from the README into a dedicated technical reference document.
-- Updated README security and governance status to reflect the current implemented controls.
-- Updated ROADMAP M8 security and governance checklist to reflect implemented prompt injection, tool authorization, telemetry and audit log capabilities.
-- Updated M8 next focus from implementation expansion to launch documentation, case study and portfolio presentation.
+#### Frontend and product experience
+
 - Replaced the old frontend prototype with a clean product-oriented frontend foundation.
 - Organized frontend navigation around product areas and AI engineering workflows.
 - Introduced reusable frontend structures for API clients, typed responses, JSON viewers, metric cards and console pages.
 - Completed the first local AI Quality Command Center frontend/product experience.
 - Updated the frontend navigation to include provider settings, Usage & Cost and Central de Riscos.
+- Updated Observability Center to refresh dashboard data without clearing the currently displayed dashboard.
+- Updated Execution History timeline to support selecting records and inspecting execution metadata.
+
+#### Persistence and observability
+
 - Updated AI usage tracking to support persistent storage through the storage foundation.
 - Updated Usage & Cost backend data flow to survive API restarts when `STORAGE_BACKEND=local_jsonl`.
 - Updated evaluation telemetry to support persistent storage through the storage foundation.
@@ -111,39 +127,42 @@ All notable changes to this project will be documented in this file.
 - Updated Multi-Agent Copilot Console to automatically register multi-agent execution telemetry after successful or failed backend executions.
 - Updated RAG Console to automatically register retrieval quality telemetry after retrieve and answer executions.
 - Updated Data Analyst Console to automatically register agent execution telemetry after successful, blocked or failed backend executions.
-- Updated Observability Center to refresh dashboard data without clearing the currently displayed dashboard.
-- Updated Execution History timeline to support selecting records and inspecting execution metadata.
+
+#### Security and governance
+
 - Hardened provider health responses to avoid exposing sensitive environment variable names, API key values or internal provider URLs.
 - Updated the Provider Settings UI to display only sanitized provider metadata and logical configuration fields.
 - Tool execution metadata now includes tool risk classification fields.
 - Tool execution now enforces authorization checks before running handlers.
 - Tool Registry metadata now reports authorization enforcement as enabled.
 - Tool execution now records sanitized blocked tool-call telemetry before raising authorization errors.
-- Prompt injection assessment endpoint now records sanitized telemetry for relevant security assessments without storing the original input text.
 - Tool execution now records both blocked tool-call telemetry and audit log events when authorization blocks execution.
+- Prompt injection assessment endpoint now records sanitized telemetry for relevant security assessments without storing the original input text.
 - Prompt injection assessment now records both telemetry and audit log events for high-risk/blocking assessments.
+
+#### Documentation and portfolio
+
+- Updated README into a portfolio-oriented launch landing page.
+- Moved detailed capability inventory from the README into a dedicated technical reference document.
+- Updated README security and governance status to reflect the current implemented controls.
+- Updated ROADMAP M8 security and governance checklist to reflect implemented prompt injection, tool authorization, telemetry and audit log capabilities.
+- Updated M8 next focus from implementation expansion to launch documentation, case study and portfolio presentation.
+- Updated ROADMAP to clarify the M8 local portfolio launch scope.
+- Moved production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting into post-launch implementation packs.
 
 ### Notes
 
-- M8 is still in progress.
-- The first AI Quality Command Center frontend/product experience is completed for local demonstrations and portfolio presentation.
+- M8 remains in progress and is now in final launch preparation.
+- The local AI Quality Command Center, persistent local observability foundation, execution history, run details and security/governance baseline are implemented for portfolio demonstration.
+- The README is now optimized as a GitHub landing page, while the detailed technical inventory is preserved in `docs/reference/current-capabilities-reference.md`.
 - Console execution results are currently kept in local React state.
-- M8 remains in progress, but the local AI Quality Command Center, persistent local observability foundation, execution history and security/governance baseline are now implemented for portfolio demonstration.
+- Execution History works as a backend read model over persisted observability telemetry. It does not create a separate execution-history store yet.
+- QA Agent Console executions can appear in Execution History through persisted agent execution telemetry.
+- Multi-Agent Copilot Console executions can appear in Execution History through persisted multi-agent execution telemetry.
+- RAG Console executions can appear in Execution History through persisted retrieval quality telemetry.
+- Data Analyst Console executions can appear in Execution History through persisted agent execution telemetry.
+- Observability Center can behave as a live operational dashboard for persisted console telemetry signals.
 - Production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting remain post-launch work.
-- The next M8 focus is launch documentation, final case study, roadmap synchronization and portfolio presentation.
-- Usage tracking is the first observability service migrated from in-memory-only storage to the persistent storage foundation.
-- Evaluation telemetry is now the second observability capability migrated to the persistent storage foundation, after usage tracking.
-- Retrieval quality telemetry is now the third observability capability migrated to the persistent storage foundation.
-- Agent execution telemetry is now the fourth observability capability migrated to the persistent storage foundation.
-- Multi-agent execution telemetry completes the first persistent storage pass for the core observability telemetry services.
-- Execution History currently works as a backend read model over persisted observability telemetry. It does not create a separate execution-history store yet.
-- Execution History UI currently consumes the backend read model and does not persist frontend console state yet.
-- QA Agent Console executions can now appear in Execution History through the persisted agent execution telemetry read model.
-- Multi-Agent Copilot Console executions can now appear in Execution History through the persisted multi-agent execution telemetry read model.
-- RAG Console executions can now appear in Execution History through the persisted retrieval quality telemetry read model.
-- Data Analyst Console executions can now appear in Execution History through the persisted agent execution telemetry read model.
-- Observability Center can now behave as a live operational dashboard for persisted console telemetry signals.
-- Execution History now supports operational drill-down for individual telemetry records.
 
 ---
 
