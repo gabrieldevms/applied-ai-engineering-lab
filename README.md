@@ -23,15 +23,13 @@ The result is a local AI Quality Engineering platform built around explicit arch
 
 ## Current Status
 
-- **Current module:** M8 — Cloud, Security and Portfolio in progress
-- **Latest completed milestone:** Final M8 launch documentation status
+- **Current module:** Cloud, Security and Portfolio in progress
+- **Latest completed milestone:** Final launch documentation status
 - **Next focus:** Local portfolio launch validation and post-launch implementation planning
 
 The current version is suitable for:
 
 - local demonstrations;
-- portfolio presentation;
-- technical interviews;
 - architecture discussions;
 - AI Engineering and QA Engineering learning.
 
