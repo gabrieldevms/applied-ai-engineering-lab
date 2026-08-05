@@ -4,7 +4,16 @@ import re
 from collections.abc import Mapping
 from typing import Any, Protocol
 from ai_api.agents.exceptions import ToolExecutionError
-from ai_api.agents.schemas import ToolExecutionResponse
+from ai_api.agents.schemas import (
+    ToolAuthorizationDecision,
+    ToolDefinition,
+    ToolExecutionResponse,
+)
+from ai_api.config import get_settings
+from ai_api.security import (
+    BlockedToolCallTelemetryRequest,
+    BlockedToolCallTelemetryService,
+)
 from ai_api.agents.tool_registry import ToolRegistry
 from ai_api.agents.tool_authorization import ToolAuthorizationService
 from ai_api.data_analysis import (
@@ -138,11 +147,20 @@ class ToolExecutionService:
         registry: ToolRegistry | None = None,
         handlers: Mapping[str, ToolHandler] | None = None,
         authorization_service: ToolAuthorizationService | None = None,
+        blocked_tool_call_telemetry_service: (
+            BlockedToolCallTelemetryService | None
+        ) = None,
     ) -> None:
         self.registry = registry or ToolRegistry()
 
         self.authorization_service = (
             authorization_service or ToolAuthorizationService()
+        )
+
+        self.blocked_tool_call_telemetry_service = (
+            blocked_tool_call_telemetry_service
+            if blocked_tool_call_telemetry_service is not None
+            else BlockedToolCallTelemetryService.from_settings(get_settings())
         )
 
         default_handlers = {
@@ -188,11 +206,16 @@ class ToolExecutionService:
         )
 
         if authorization_decision.status == "blocked":
+            self._record_blocked_tool_call_telemetry(
+                tool_definition=tool_definition,
+                authorization_decision=authorization_decision,
+                metadata=metadata,
+            )
+
             raise ToolExecutionError(
                 "Tool execution blocked by authorization policy: "
                 + "; ".join(authorization_decision.violations)
             )
-
         execution_arguments = dict(arguments or {})
 
         try:
@@ -248,6 +271,74 @@ class ToolExecutionService:
             },
         )
 
+    def _record_blocked_tool_call_telemetry(
+        self,
+        tool_definition: ToolDefinition,
+        authorization_decision: ToolAuthorizationDecision,
+        metadata: dict[str, Any] | None,
+    ) -> None:
+        execution_metadata = metadata or {}
+
+        try:
+            self.blocked_tool_call_telemetry_service.record(
+                BlockedToolCallTelemetryRequest(
+                    tool_name=tool_definition.name,
+                    caller_type=authorization_decision.caller_type,
+                    environment=authorization_decision.environment,
+                    risk_level=authorization_decision.risk_level,
+                    authorization_policy=authorization_decision.metadata[
+                        "authorization_policy"
+                    ],
+                    reason=authorization_decision.reason,
+                    violations=authorization_decision.violations,
+                    prompt_injection_risk_level=str(
+                        execution_metadata.get(
+                            "prompt_injection_risk_level",
+                            "none",
+                        )
+                    ).strip().lower()
+                    or "none",
+                    run_id=_optional_string(execution_metadata.get("run_id")),
+                    trace_id=_optional_string(execution_metadata.get("trace_id")),
+                    request_id=_optional_string(
+                        execution_metadata.get("request_id")
+                    ),
+                    metadata={
+                        "source": "tool_execution_service",
+                        "telemetry_bridge": "blocked_tool_call_telemetry",
+                        "authorization_enforced": True,
+                        "tool_category": tool_definition.metadata.get(
+                            "category",
+                            "",
+                        ),
+                        "requires_llm": tool_definition.metadata.get(
+                            "requires_llm",
+                            False,
+                        ),
+                        "requires_human_approval": (
+                            tool_definition.security.requires_human_approval
+                        ),
+                        "requires_audit_log": (
+                            tool_definition.security.requires_audit_log
+                        ),
+                        "allows_state_change": (
+                            tool_definition.security.allows_state_change
+                        ),
+                        "allows_external_network": (
+                            tool_definition.security.allows_external_network
+                        ),
+                        "allows_sensitive_data": (
+                            tool_definition.security.allows_sensitive_data
+                        ),
+                        "requires_prompt_injection_assessment": (
+                            tool_definition.security.requires_prompt_injection_assessment
+                        ),
+                    },
+                )
+            )
+        except Exception:
+            return
+
     def _build_execution_id(
         self,
         tool_name: str,
@@ -279,3 +370,15 @@ class ToolExecutionService:
             return False
 
         return cleaned_tool_name in self.handlers
+    
+
+def _optional_string(value: Any) -> str | None:
+    if value is None:
+        return None
+
+    cleaned_value = str(value).strip()
+
+    if not cleaned_value:
+        return None
+
+    return cleaned_value

@@ -61,6 +61,10 @@ All notable changes to this project will be documented in this file.
 - Added tests for allowed and blocked tool execution authorization decisions.
 - Added sensitive data handling policy covering prompts, RAG documents, table data, telemetry, logs, Execution History, MCP inputs and provider usage.
 - Added audit log schema documentation covering security-relevant events, tool authorization, prompt injection, human approval, sensitive data, provider configuration and MCP audit events.
+- Added blocked tool-call telemetry service.
+- Added safe telemetry recording when tool authorization blocks execution.
+- Added `GET /security/blocked-tool-calls` endpoint.
+- Added blocked tool-call telemetry tests.
 
 ### Changed
 
@@ -90,6 +94,7 @@ All notable changes to this project will be documented in this file.
 - Tool execution metadata now includes tool risk classification fields.
 - Tool execution now enforces authorization checks before running handlers.
 - Tool Registry metadata now reports authorization enforcement as enabled.
+- Tool execution now records sanitized blocked tool-call telemetry before raising authorization errors.
 
 ### Notes
 

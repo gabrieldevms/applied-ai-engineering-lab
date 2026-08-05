@@ -2,7 +2,7 @@ import logging
 import time
 from collections.abc import Awaitable, Callable
 from typing import Annotated, Any
-from fastapi import FastAPI, Request, UploadFile, Depends, File, Form
+from fastapi import Depends, FastAPI, File, Query, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
@@ -257,6 +257,8 @@ from ai_api.security import (
     PromptInjectionAssessmentRequest,
     PromptInjectionAssessmentResponse,
     PromptInjectionDetectionService,
+    BlockedToolCallTelemetryRecordsResponse,
+    BlockedToolCallTelemetryService,
 )
 
 logging.basicConfig(
@@ -1710,4 +1712,23 @@ def get_ai_execution_history(
         component=component,
         run_id=run_id,
         limit=limit,
+    )
+
+
+@app.get("/security/blocked-tool-calls", response_model=BlockedToolCallTelemetryRecordsResponse,)
+def list_blocked_tool_call_telemetry(
+    limit: int = Query(default=100, ge=1, le=1000),
+    tool_name: str | None = None,
+    caller_type: str | None = None,
+    environment: str | None = None,
+    risk_level: str | None = None,
+) -> BlockedToolCallTelemetryRecordsResponse:
+    return BlockedToolCallTelemetryService.from_settings(
+        get_settings()
+    ).list_records(
+        limit=limit,
+        tool_name=tool_name,
+        caller_type=caller_type,
+        environment=environment,
+        risk_level=risk_level,
     )
