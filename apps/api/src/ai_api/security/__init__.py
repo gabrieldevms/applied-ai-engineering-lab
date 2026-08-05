@@ -5,6 +5,12 @@ from ai_api.security.schemas import (
     PromptInjectionRecommendedAction,
     PromptInjectionRiskLevel,
 )
+from ai_api.security.blocked_tool_call_telemetry import (
+    BlockedToolCallTelemetryRecord,
+    BlockedToolCallTelemetryRecordsResponse,
+    BlockedToolCallTelemetryRequest,
+    BlockedToolCallTelemetryService,
+)
 
 __all__ = [
     "PromptInjectionAssessmentRequest",
@@ -12,4 +18,8 @@ __all__ = [
     "PromptInjectionDetectionService",
     "PromptInjectionRecommendedAction",
     "PromptInjectionRiskLevel",
+    "BlockedToolCallTelemetryRecord",
+    "BlockedToolCallTelemetryRecordsResponse",
+    "BlockedToolCallTelemetryRequest",
+    "BlockedToolCallTelemetryService",
 ]

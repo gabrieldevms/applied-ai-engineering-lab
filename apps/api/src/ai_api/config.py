@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     storage_backend: StorageBackendName = Field(default="local_jsonl")
     storage_base_dir: str = Field(default=".data")
 
+    blocked_tool_call_records_path: str = "security/blocked-tool-call-records.jsonl"
     agent_execution_log_path: str = ".data/agent-execution-logs.jsonl"
     ai_usage_records_path: str = "observability/usage-records.jsonl"
     evaluation_telemetry_events_path: str = (
