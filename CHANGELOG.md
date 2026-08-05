@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Added security and governance baseline documentation.
+- Added updated security/governance status documentation for provider configuration, prompt injection, tool authorization, sensitive data handling and audit logs.
+- Added post-launch implementation packs to the roadmap for cloud deployment, production observability, persistent agent state, enterprise security, MCP production hosting, data integrations and multi-provider AI evaluation.
 - Started M8 product experience work.
 - Rebuilt the frontend from scratch using Vite, React and TypeScript.
 - Added the AI Quality Command Center foundation.
@@ -81,6 +84,9 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Updated README security and governance status to reflect the current implemented controls.
+- Updated ROADMAP M8 security and governance checklist to reflect implemented prompt injection, tool authorization, telemetry and audit log capabilities.
+- Updated M8 next focus from implementation expansion to launch documentation, case study and portfolio presentation.
 - Replaced the old frontend prototype with a clean product-oriented frontend foundation.
 - Organized frontend navigation around product areas and AI engineering workflows.
 - Introduced reusable frontend structures for API clients, typed responses, JSON viewers, metric cards and console pages.
@@ -117,9 +123,9 @@ All notable changes to this project will be documented in this file.
 - M8 is still in progress.
 - The first AI Quality Command Center frontend/product experience is completed for local demonstrations and portfolio presentation.
 - Console execution results are currently kept in local React state.
-- Most observability records are still stored in backend memory.
-- Persistent execution history, live dashboard updates, production observability integration, security/governance, cloud readiness and portfolio documentation remain future M8 work.
-- Persistent Storage Foundation introduces reusable storage primitives, but existing observability services are not migrated to persistent storage yet.
+- M8 remains in progress, but the local AI Quality Command Center, persistent local observability foundation, execution history and security/governance baseline are now implemented for portfolio demonstration.
+- Production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting remain post-launch work.
+- The next M8 focus is launch documentation, final case study, roadmap synchronization and portfolio presentation.
 - Usage tracking is the first observability service migrated from in-memory-only storage to the persistent storage foundation.
 - Evaluation telemetry is now the second observability capability migrated to the persistent storage foundation, after usage tracking.
 - Retrieval quality telemetry is now the third observability capability migrated to the persistent storage foundation.

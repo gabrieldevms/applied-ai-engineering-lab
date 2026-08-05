@@ -7,8 +7,8 @@ The project starts with a structured AI API and incrementally evolves toward RAG
 ## Project Status
 
 **Current module:** M8 — Cloud, Security and Portfolio in progress  
-**Latest completed milestone:** Execution History run details and live Observability Dashboard behavior  
-**Next focus:** Portfolio documentation, security and governance baseline, and production deployment direction  
+**Latest completed milestone:** Security audit integration for blocked tool calls and prompt injection events  
+**Next focus:** Final portfolio documentation, launch demo script, technical case study and M8 roadmap synchronization  
 
 The project currently includes:
 
@@ -61,6 +61,18 @@ The project currently includes:
 - RAG Console telemetry integration
 - Data Analyst Console telemetry integration
 - Live Observability Dashboard behavior
+- Safe provider configuration strategy
+- Hardened provider settings exposure
+- Prompt injection detection baseline
+- Prompt injection telemetry
+- Tool risk classification
+- Tool authorization enforcement
+- Blocked tool-call telemetry
+- Audit log service foundation
+- Blocked tool-call audit event recording
+- Prompt injection audit event recording
+- Sensitive data handling policy
+- Security and governance baseline
 
 For detailed reviews, see:
 
@@ -410,25 +422,42 @@ The local AI Quality Command Center consumes these signals through the Observabi
 
 ### Security and Governance
 
-The project includes an initial security and governance foundation.
+The project includes a security and governance foundation for local AI engineering workflows.
 
 Current capabilities:
 
 - provider configuration strategy;
-- security and governance baseline;
 - hardened provider settings exposure;
+- security and governance baseline documentation;
 - prompt injection protection baseline documentation;
 - deterministic prompt injection detection baseline;
-- prompt injection assessment endpoint.
+- prompt injection assessment endpoint;
+- prompt injection telemetry integration;
+- prompt injection audit event recording;
 - tool authorization boundaries documentation;
 - tool risk classification metadata;
 - tool authorization checks enforced during tool execution;
-- sensitive data handling policy;
 - blocked tool-call telemetry;
-- prompt injection telemetry integration;
-- audit log service foundation;
 - blocked tool-call audit event recording;
-- prompt injection audit event recording;
+- sensitive data handling policy;
+- audit log schema documentation;
+- audit log service foundation.
+
+Current security endpoints:
+
+- `POST /security/prompt-injection/assess`
+- `GET /security/prompt-injection/records`
+- `GET /security/blocked-tool-calls`
+- `GET /security/audit/events`
+
+Current limitations:
+
+- authentication and access control are not implemented yet;
+- multi-user isolation is not implemented yet;
+- secrets management is not production-grade yet;
+- audit logs are persisted locally through JSONL when local persistence is enabled;
+- audit log UI is not implemented yet;
+- production monitoring and external security integrations are not implemented yet.
 
 ### AI Quality Command Center
 
@@ -643,12 +672,12 @@ http://127.0.0.1:8000/docs
 
 ### Security
 
-| Method | Endpoint                                | Purpose                                  |
-| ------ | --------------------------------------- | ---------------------------------------- |
-| `POST` | `/security/prompt-injection/assess`     | Assess prompt injection risk for a text  |
-| `GET`  | `/security/blocked-tool-calls` | List blocked tool-call telemetry records |
-| `GET`  | `/security/prompt-injection/records` | List prompt injection telemetry records |
-| `GET`  | `/security/audit/events` | List security audit log events |
+| Method | Endpoint | Purpose |
+| ------ | -------- | ------- |
+| `POST` | `/security/prompt-injection/assess` | Assess prompt injection risk for a text |
+| `GET` | `/security/prompt-injection/records` | List prompt injection telemetry records |
+| `GET` | `/security/blocked-tool-calls` | List blocked tool-call telemetry records |
+| `GET` | `/security/audit/events` | List security audit log events |
 
 ### Observability
 
@@ -1028,11 +1057,12 @@ Known limitations:
 - automatic multi-agent conflict resolution is not implemented yet;
 - production MCP hosting is not defined yet;
 - authentication, authorization and multi-user isolation are not implemented yet;
-- prompt injection protection requires a dedicated baseline;
-- tool authorization boundaries need to be formalized;
 - OpenTelemetry, Grafana and external monitoring integrations are not implemented yet;
 - the project does not yet provide a deployed frontend;
 - frontend console execution results are currently kept in local React page state.
+- prompt injection detection is currently a deterministic baseline and not a complete adversarial protection system;
+- tool authorization is enforced for registered tools, but production authentication, access control and multi-user isolation are not implemented yet;
+- audit logs are available through backend services and endpoints, but audit log UI, retention policy and production-grade audit storage are not implemented yet;
 
 These limitations define the boundary between the implemented local AI engineering product and the upcoming cloud, security, governance and production hardening capabilities.
 
@@ -1066,18 +1096,31 @@ Completed M8 capabilities:
 - persistent local multi-agent execution telemetry;
 - console telemetry integration;
 - live Observability Dashboard behavior.
+- safe provider configuration strategy;
+- hardened provider settings exposure;
+- security and governance baseline;
+- prompt injection detection baseline;
+- prompt injection telemetry integration;
+- prompt injection audit event recording;
+- tool authorization boundaries documentation;
+- tool risk classification;
+- tool authorization enforcement;
+- blocked tool-call telemetry;
+- blocked tool-call audit event recording;
+- sensitive data handling policy;
+- audit log schema documentation;
+- audit log service foundation.
 
 Next M8 focus areas:
 
-- portfolio-oriented README;
+- final M8 roadmap synchronization;
+- launch demo script;
 - final technical case study;
-- complete API usage examples;
-- safe provider configuration strategy;
-- security and governance baseline;
-- persistent vector storage;
-- persistent agent state;
-- cloud/deployment direction;
-- production monitoring direction.
+- final portfolio README polish;
+- GitHub project presentation;
+- LinkedIn project presentation.
+
+Post-launch implementation packs will cover cloud deployment, production observability, persistent agent state, enterprise security, production MCP hosting, data integrations and multi-provider AI evaluation.
 
 ## Engineering Approach
 
@@ -1109,6 +1152,7 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Architecture](docs/architecture/initial-architecture.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
+- [Security and Governance Baseline](docs/security/security-and-governance-baseline.md)
 - [Prompt Injection Protection Baseline](docs/security/prompt-injection-protection-baseline.md)
 - [Sensitive Data Handling Policy](docs/security/sensitive-data-handling-policy.md)
 - [Audit Log Schema](docs/security/audit-log-schema.md)
