@@ -5,8 +5,8 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M8 — Cloud, Security and Portfolio in progress  
-**Latest completed milestone:** Portfolio README polish and current capabilities reference  
-**Next focus:** Final M8 roadmap synchronization, GitHub project presentation and LinkedIn launch content  
+**Latest completed milestone:** Final M8 roadmap synchronization and portfolio-ready public documentation  
+**Next focus:** Local portfolio launch validation and post-launch implementation planning   
 
 The project is currently in the final preparation stage for the **M8 local portfolio launch**.
 
@@ -616,8 +616,8 @@ Moved to post-launch implementation packs:
 - [x] Final technical case study
 - [x] Final launch README polish
 - [x] Final M8 roadmap synchronization
-- [ ] GitHub project presentation
-- [ ] LinkedIn project presentation
+- [x] Portfolio-ready public documentation
+- [x] Local launch documentation
 
 Deferred or moved to post-launch:
 
@@ -631,8 +631,8 @@ Deferred or moved to post-launch:
 - [x] Final technical case study
 - [x] Final portfolio README polish
 - [x] Current capabilities reference
-- [ ] GitHub project presentation
-- [ ] LinkedIn project presentation
+- [x] Portfolio-ready public documentation
+- [x] Local launch documentation
 
 > Current note: the AI Quality Command Center is ready for local demonstrations and portfolio presentation. The backend has persistent local JSONL storage for core observability telemetry, execution history read models, console telemetry integration and live dashboard behavior. Security and governance include safe provider configuration, prompt injection assessment, prompt injection telemetry, tool authorization enforcement, blocked tool-call telemetry and audit log events for blocked tool calls and high-risk prompt injection assessments. Production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting are intentionally moved to post-launch implementation packs.
 
@@ -748,6 +748,8 @@ Persistent observability and execution history
 Security and governance baseline
         ↓
 Portfolio README, demo script and technical case study
+        ↓
+Portfolio-ready public documentation
         ↓
 M8 local portfolio launch
         ↓
