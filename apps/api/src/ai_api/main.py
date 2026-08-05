@@ -264,6 +264,12 @@ from ai_api.security import (
     PromptInjectionTelemetryService,
     AuditLogEventsResponse,
     AuditLogService,
+    AuditActor,
+    AuditCaller,
+    AuditLogEventRequest,
+    AuditPolicy,
+    AuditRisk,
+    AuditTarget,
 )
 
 logging.basicConfig(
@@ -1470,7 +1476,8 @@ def run_ci_evaluation_pipeline(
     )
 
 
-@app.post("/security/prompt-injection/assess", response_model=PromptInjectionAssessmentResponse,)
+@app.post("/security/prompt-injection/assess", response_model=PromptInjectionAssessmentResponse,
+)
 def assess_prompt_injection(
     request: PromptInjectionAssessmentRequest,
 ) -> PromptInjectionAssessmentResponse:
@@ -1495,6 +1502,8 @@ def assess_prompt_injection(
             },
         )
     )
+
+    _record_prompt_injection_audit_event_if_relevant(assessment)
 
     return assessment
 
@@ -1810,3 +1819,88 @@ def list_audit_log_events(
         target_id=target_id,
         run_id=run_id,
     )
+
+
+def _record_prompt_injection_audit_event_if_relevant(
+    assessment: PromptInjectionAssessmentResponse,
+) -> None:
+    if not _should_record_prompt_injection_audit_event(assessment):
+        return
+
+    target_id = _prompt_injection_target_id(assessment.workflow)
+
+    try:
+        AuditLogService.from_settings(get_settings()).record(
+            AuditLogEventRequest(
+                event_type="prompt_injection_blocked",
+                severity="critical",
+                status="blocked",
+                component="prompt_injection_detection_service",
+                operation="assess_prompt_injection",
+                environment="local",
+                actor=AuditActor(
+                    actor_type="backend_service",
+                    actor_id="prompt-injection-detection-service",
+                ),
+                caller=AuditCaller(
+                    caller_type="frontend_console",
+                ),
+                target=AuditTarget(
+                    target_type="workflow",
+                    target_id=target_id,
+                    target_name=target_id,
+                ),
+                policy=AuditPolicy(
+                    policy_name="prompt-injection-policy-v1",
+                    policy_version="v1",
+                    decision="blocked",
+                    reason="High-risk prompt injection assessment requires blocking.",
+                    violations=assessment.detected_patterns,
+                ),
+                risk=AuditRisk(
+                    risk_level=assessment.risk_level,
+                    risk_reasons=assessment.risk_reasons,
+                    prompt_injection_risk_level=assessment.risk_level,
+                    sensitive_data_detected=False,
+                ),
+                metadata={
+                    "source": "prompt_injection_assessment_endpoint",
+                    "audit_bridge": "prompt_injection_assessment",
+                    "input_source": assessment.input_source,
+                    "workflow": assessment.workflow,
+                    "recommended_action": assessment.recommended_action,
+                    "is_blocking_required": assessment.is_blocking_required,
+                    "detected_patterns": assessment.detected_patterns,
+                    "inspected_character_count": (
+                        assessment.inspected_character_count
+                    ),
+                    "raw_input_stored": False,
+                    "input_text_echoed": False,
+                    "sensitive_payload_stored": False,
+                },
+            )
+        )
+    except Exception:
+        return
+
+
+def _should_record_prompt_injection_audit_event(
+    assessment: PromptInjectionAssessmentResponse,
+) -> bool:
+    return (
+        assessment.risk_level == "high"
+        or assessment.recommended_action == "block"
+        or assessment.is_blocking_required
+    )
+
+
+def _prompt_injection_target_id(workflow: str | None) -> str:
+    if workflow is None:
+        return "prompt-injection-assessment"
+
+    cleaned_workflow = workflow.strip()
+
+    if not cleaned_workflow:
+        return "prompt-injection-assessment"
+
+    return cleaned_workflow
