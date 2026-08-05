@@ -65,6 +65,15 @@ All notable changes to this project will be documented in this file.
 - Added safe telemetry recording when tool authorization blocks execution.
 - Added `GET /security/blocked-tool-calls` endpoint.
 - Added blocked tool-call telemetry tests.
+- Added prompt injection telemetry service.
+- Added safe telemetry recording for medium and high prompt injection assessments.
+- Added `GET /security/prompt-injection/records` endpoint.
+- Added prompt injection telemetry tests.
+- Added security audit log service foundation.
+- Added audit event schemas for authorization, prompt injection, human approval, sensitive data, provider configuration and MCP events.
+- Added in-memory and JSONL audit event stores.
+- Added `GET /security/audit/events` endpoint.
+- Added audit log service and API tests.
 
 ### Changed
 
@@ -95,6 +104,7 @@ All notable changes to this project will be documented in this file.
 - Tool execution now enforces authorization checks before running handlers.
 - Tool Registry metadata now reports authorization enforcement as enabled.
 - Tool execution now records sanitized blocked tool-call telemetry before raising authorization errors.
+- Prompt injection assessment endpoint now records sanitized telemetry for relevant security assessments without storing the original input text.
 
 ### Notes
 
