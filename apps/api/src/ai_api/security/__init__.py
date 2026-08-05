@@ -17,6 +17,19 @@ from ai_api.security.prompt_injection_telemetry import (
     PromptInjectionTelemetryRequest,
     PromptInjectionTelemetryService,
 )
+from ai_api.security.audit_logs import (
+    AuditActor,
+    AuditCaller,
+    AuditLogEvent,
+    AuditLogEventRequest,
+    AuditLogEventsResponse,
+    AuditLogService,
+    AuditPolicy,
+    AuditRedaction,
+    AuditRisk,
+    AuditRunContext,
+    AuditTarget,
+)
 
 __all__ = [
     "PromptInjectionAssessmentRequest",
@@ -32,4 +45,15 @@ __all__ = [
     "PromptInjectionTelemetryRecordsResponse",
     "PromptInjectionTelemetryRequest",
     "PromptInjectionTelemetryService",
+    "AuditActor",
+    "AuditCaller",
+    "AuditLogEvent",
+    "AuditLogEventRequest",
+    "AuditLogEventsResponse",
+    "AuditLogService",
+    "AuditPolicy",
+    "AuditRedaction",
+    "AuditRisk",
+    "AuditRunContext",
+    "AuditTarget",
 ]

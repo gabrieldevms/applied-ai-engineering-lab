@@ -262,6 +262,8 @@ from ai_api.security import (
     PromptInjectionTelemetryRecordsResponse,
     PromptInjectionTelemetryRequest,
     PromptInjectionTelemetryService,
+    AuditLogEventsResponse,
+    AuditLogService,
 )
 
 logging.basicConfig(
@@ -1778,4 +1780,33 @@ def list_blocked_tool_call_telemetry(
         caller_type=caller_type,
         environment=environment,
         risk_level=risk_level,
+    )
+
+
+@app.get("/security/audit/events",response_model=AuditLogEventsResponse,)
+def list_audit_log_events(
+    limit: int = Query(default=100, ge=1, le=1000),
+    event_type: str | None = None,
+    severity: str | None = None,
+    status: str | None = None,
+    component: str | None = None,
+    operation: str | None = None,
+    environment: str | None = None,
+    target_type: str | None = None,
+    target_id: str | None = None,
+    run_id: str | None = None,
+) -> AuditLogEventsResponse:
+    return AuditLogService.from_settings(
+        get_settings()
+    ).list_events(
+        limit=limit,
+        event_type=event_type,
+        severity=severity,
+        status=status,
+        component=component,
+        operation=operation,
+        environment=environment,
+        target_type=target_type,
+        target_id=target_id,
+        run_id=run_id,
     )
