@@ -591,14 +591,14 @@ M8 transforms the backend platform foundation into a more demonstrable and portf
 - [x] Security and governance baseline
 - [ ] GitHub project presentation
 - [ ] LinkedIn project presentation
-- [ ] Final technical case study
+- [x] Final technical case study
 - [ ] Final launch README polish
 
 ### Final M8 launch focus
 
 - [ ] Final M8 roadmap synchronization
 - [x] Launch demo script
-- [ ] Final technical case study
+- [x] Final technical case study
 - [ ] Final portfolio README polish
 - [ ] GitHub project presentation
 - [ ] LinkedIn project presentation

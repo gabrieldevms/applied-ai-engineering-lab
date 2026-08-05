@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Added AI Quality Command Center technical case study for portfolio presentation.
 - Added launch demo script for presenting the AI Quality Command Center as a local-first AI Quality Engineering platform.
 - Added security and governance baseline documentation.
 - Added updated security/governance status documentation for provider configuration, prompt injection, tool authorization, sensitive data handling and audit logs.
