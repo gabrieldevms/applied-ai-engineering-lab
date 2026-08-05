@@ -427,6 +427,7 @@ Current capabilities:
 - blocked tool-call telemetry;
 - prompt injection telemetry integration;
 - audit log service foundation;
+- blocked tool-call audit event recording;
 
 ### AI Quality Command Center
 
