@@ -5,10 +5,12 @@ This roadmap tracks the incremental development of a production-oriented Applied
 ## Current Status
 
 **Current module:** M8 — Cloud, Security and Portfolio in progress  
-**Latest completed milestone:** Security audit integration for blocked tool calls and prompt injection events  
-**Next focus:** Security/governance documentation synchronization, launch demo script, final technical case study and portfolio presentation  
+**Latest completed milestone:** Portfolio README polish and current capabilities reference  
+**Next focus:** Final M8 roadmap synchronization, GitHub project presentation and LinkedIn launch content  
 
-The short-term implementation order is:
+The project is currently in the final preparation stage for the **M8 local portfolio launch**.
+
+The short-term launch order is:
 
 ```text
 M7 — Evaluation and LLMOps
@@ -17,9 +19,11 @@ M8 — AI Quality Command Center product experience
   ↓
 Persistent observability and execution history
   ↓
-Security, governance and portfolio documentation
+Security and governance baseline
   ↓
-Cloud and production deployment direction
+Portfolio README, demo script and technical case study
+  ↓
+GitHub and LinkedIn launch presentation
 ```
 
 | Module                             | Status      |
@@ -481,32 +485,61 @@ Current limitations:
 
 ## M8 — Cloud, Security and Portfolio
 
-**Status:** In Progress
+**Status:** In Progress — final launch preparation
 
 **Goal:** Prepare the project for production-like deployment, governance, frontend experience and professional presentation.
 
 M8 transforms the backend platform foundation into a more demonstrable and portfolio-ready AI engineering product through the AI Quality Command Center, persistent local observability, execution history, security and governance controls, and portfolio documentation.
 
+The current M8 scope is focused on a **local portfolio launch**, not a full production SaaS deployment.
+
+### Local portfolio launch scope
+
+The M8 local portfolio launch includes:
+
+- local AI Quality Command Center product experience;
+- persistent local JSONL observability foundation;
+- Execution History backend and frontend experience;
+- run details drill-down;
+- console telemetry integration;
+- live Observability Dashboard behavior;
+- safe provider configuration strategy;
+- prompt injection detection baseline;
+- tool authorization enforcement;
+- blocked tool-call telemetry;
+- audit log service foundation;
+- prompt injection and blocked tool-call audit events;
+- security and governance documentation;
+- portfolio README;
+- current capabilities reference;
+- launch demo script;
+- technical case study.
+
 ### Cloud and operations
 
-- [ ] Cloud deployment
+Implemented in M8:
+
 - [x] Environment-based local storage configuration
-- [ ] Environment-specific deployment configuration
-- [ ] Persistent vector storage
 - [x] Persistent evaluation telemetry storage
-- [ ] Persistent evaluation result and artifact storage
 - [x] Persistent observability storage foundation
 - [x] Persistent usage tracking storage
 - [x] Persistent retrieval quality telemetry storage
 - [x] Persistent agent execution telemetry storage
 - [x] Persistent multi-agent execution telemetry storage
+
+Moved to post-launch implementation packs:
+
+- [ ] Cloud deployment
+- [ ] Environment-specific deployment configuration
+- [ ] Persistent vector storage
+- [ ] Persistent evaluation result and artifact storage
 - [ ] Persistent agent state
 - [ ] Deployment pipeline
 - [ ] Production health checks
 - [ ] Production MCP hosting direction
 - [ ] Production monitoring direction
 
-#### Completed implementation focus
+### Observability and execution history
 
 - [x] Persistent Storage Foundation
 - [x] Usage Tracking persistence
@@ -520,18 +553,9 @@ M8 transforms the backend platform foundation into a more demonstrable and portf
 - [x] Console Telemetry Integration
 - [x] Live Observability Dashboard behavior
 
-#### Remaining cloud and operations work
-
-- [ ] Cloud deployment
-- [ ] Deployment pipeline
-- [ ] Production health checks
-- [ ] Persistent vector storage
-- [ ] Persistent agent state
-- [ ] Persistent evaluation result and artifact storage
-- [ ] Production MCP hosting direction
-- [ ] Production monitoring direction
-
 ### Security and governance
+
+Implemented in M8:
 
 - [x] Safe provider configuration strategy
 - [x] Hardened provider settings exposure
@@ -548,6 +572,9 @@ M8 transforms the backend platform foundation into a more demonstrable and portf
 - [x] Audit log service
 - [x] Blocked tool-call telemetry
 - [x] Blocked tool-call audit event recording
+
+Moved to post-launch implementation packs:
+
 - [ ] Secrets management
 - [ ] Authentication and access control
 - [ ] Multi-user isolation
@@ -578,30 +605,36 @@ M8 transforms the backend platform foundation into a more demonstrable and portf
 - [x] Data Analyst Console telemetry integration
 - [x] Live Observability Dashboard behavior
 
-> Current note: the first AI Quality Command Center frontend/product experience is completed for local demonstrations. The backend has persistent local JSONL storage for core observability telemetry, execution history read models, console telemetry integration and live dashboard behavior. Security and governance now include safe provider configuration, prompt injection assessment, prompt injection telemetry, tool authorization enforcement, blocked tool-call telemetry and audit log events for blocked tool calls and high-risk prompt injection assessments. Production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting remain post-launch work.
-
 ### Documentation and portfolio
 
 - [x] Updated architecture documentation
-- [ ] Architecture diagrams
-- [ ] Complete API usage examples
 - [x] Portfolio-oriented README foundation
 - [x] Demonstration scenarios
 - [x] Launch demo script
+- [x] Current capabilities reference
 - [x] Security and governance baseline
-- [ ] GitHub project presentation
-- [ ] LinkedIn project presentation
 - [x] Final technical case study
 - [x] Final launch README polish
+- [x] Final M8 roadmap synchronization
+- [ ] GitHub project presentation
+- [ ] LinkedIn project presentation
+
+Deferred or moved to post-launch:
+
+- [ ] Architecture diagrams
+- [ ] Complete API usage examples
 
 ### Final M8 launch focus
 
-- [ ] Final M8 roadmap synchronization
+- [x] Final M8 roadmap synchronization
 - [x] Launch demo script
 - [x] Final technical case study
 - [x] Final portfolio README polish
+- [x] Current capabilities reference
 - [ ] GitHub project presentation
 - [ ] LinkedIn project presentation
+
+> Current note: the AI Quality Command Center is ready for local demonstrations and portfolio presentation. The backend has persistent local JSONL storage for core observability telemetry, execution history read models, console telemetry integration and live dashboard behavior. Security and governance include safe provider configuration, prompt injection assessment, prompt injection telemetry, tool authorization enforcement, blocked tool-call telemetry and audit log events for blocked tool calls and high-risk prompt injection assessments. Production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting are intentionally moved to post-launch implementation packs.
 
 ---
 
@@ -712,9 +745,13 @@ AI Quality Command Center
         ↓
 Persistent observability and execution history
         ↓
-Security, governance and portfolio documentation
+Security and governance baseline
         ↓
-Cloud and production deployment direction
+Portfolio README, demo script and technical case study
+        ↓
+M8 local portfolio launch
+        ↓
+Post-launch implementation packs
 ```
 
 Each module builds on the contracts, tests and architectural decisions introduced by the previous modules.
