@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Added launch demo script for presenting the AI Quality Command Center as a local-first AI Quality Engineering platform.
 - Added security and governance baseline documentation.
 - Added updated security/governance status documentation for provider configuration, prompt injection, tool authorization, sensitive data handling and audit logs.
 - Added post-launch implementation packs to the roadmap for cloud deployment, production observability, persistent agent state, enterprise security, MCP production hosting, data integrations and multi-provider AI evaluation.
