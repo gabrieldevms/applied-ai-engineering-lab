@@ -82,27 +82,27 @@ The project currently includes:
 
 For detailed reviews, see:
 
-- [M4 ÔÇö AI Agents Module Review](docs/study-notes/04-ai-agents-module-review.md)
-- [File Ingestion Expansion Review](docs/study-notes/05-file-ingestion-expansion-review.md)
-- [M5 ÔÇö MCP QA Server Review](docs/study-notes/06-mcp-qa-server-review.md)
-- [M6 ÔÇö Multi-Agent QA Copilot Review](docs/study-notes/07-multi-agent-qa-copilot-review.md)
-- [M7 ÔÇö Evaluation and LLMOps Review](docs/study-notes/08-evaluation-and-llmops-review.md)
+- [M4 — AI Agents Module Review](../study-notes/04-ai-agents-module-review.md)
+- [File Ingestion Expansion Review](../study-notes/05-file-ingestion-expansion-review.md)
+- [M5 — MCP QA Server Review](../study-notes/06-mcp-qa-server-review.md)
+- [M6 — Multi-Agent QA Copilot Review](../study-notes/07-multi-agent-qa-copilot-review.md)
+- [M7 — Evaluation and LLMOps Review](../study-notes/08-evaluation-and-llmops-review.md)
 
 | Module                             | Status      | Scope                                                                                  |
 | ---------------------------------- | ----------- | -------------------------------------------------------------------------------------- |
-| M0 ÔÇö Foundation                    | Ô£à Completed | Repository, workflow, documentation and architecture foundation                        |
-| M1 ÔÇö AI API Base                   | Ô£à Completed | FastAPI, schemas, tests, Docker, CI, logging and error handling                        |
-| M2 ÔÇö LLM Engineering               | Ô£à Completed | Providers, prompts, structured outputs, retries, fallback and requirement analysis     |
-| M3 ÔÇö RAG Knowledge Assistant       | Ô£à Completed | Ingestion, chunking, embeddings, retrieval, answers, citations and evaluation          |
-| M4 ÔÇö AI Agents                     | Ô£à Completed | Runtime, tools, execution, planning, QA Agent and safety controls                      |
-| Pre-M5 ÔÇö File Ingestion Expansion  | Ô£à Completed | Multi-format text extraction and structured table extraction                           |
-| Pre-M5 ÔÇö Data Analyst Agent        | Ô£à Completed | SQL generation, read-only validation, controlled execution and evaluation              |
-| M5 ÔÇö MCP QA Server                 | Ô£à Completed | MCP tools focused on QA and software engineering                                       |
-| M6 ÔÇö Multi-Agent QA Copilot        | Ô£à Completed | Specialized QA agents, orchestration, MCP exposure and deterministic evaluation        |
-| M7 ÔÇö Evaluation and LLMOps         | Ô£à Completed | Evaluation suites, CI evaluation pipeline, telemetry, usage tracking and observability |
-| M8 ÔÇö Cloud, Security and Portfolio | ­ƒÜº In Progress | Deployment, security, governance, frontend experience and portfolio presentation       |
+| M0 — Foundation                    | ✅ Completed | Repository, workflow, documentation and architecture foundation                        |
+| M1 — AI API Base                   | ✅ Completed | FastAPI, schemas, tests, Docker, CI, logging and error handling                        |
+| M2 — LLM Engineering               | ✅ Completed | Providers, prompts, structured outputs, retries, fallback and requirement analysis     |
+| M3 — RAG Knowledge Assistant       | ✅ Completed | Ingestion, chunking, embeddings, retrieval, answers, citations and evaluation          |
+| M4 — AI Agents                     | ✅ Completed | Runtime, tools, execution, planning, QA Agent and safety controls                      |
+| Pre-M5 — File Ingestion Expansion  | ✅ Completed | Multi-format text extraction and structured table extraction                           |
+| Pre-M5 — Data Analyst Agent        | ✅ Completed | SQL generation, read-only validation, controlled execution and evaluation              |
+| M5 — MCP QA Server                 | ✅ Completed | MCP tools focused on QA and software engineering                                       |
+| M6 — Multi-Agent QA Copilot        | ✅ Completed | Specialized QA agents, orchestration, MCP exposure and deterministic evaluation        |
+| M7 — Evaluation and LLMOps         | ✅ Completed | Evaluation suites, CI evaluation pipeline, telemetry, usage tracking and observability |
+| M8 — Cloud, Security and Portfolio | ­🚧 In Progress | Deployment, security, governance, frontend experience and portfolio presentation       |
 
-See the complete [project roadmap](ROADMAP.md).
+See the complete [project roadmap](../../ROADMAP.md).
 
 ## Why This Project Exists
 
@@ -235,10 +235,10 @@ The Tool Registry currently describes:
 
 | Tool                      | Registered | Executable | Purpose                                           |
 | ------------------------- | ---------: | ---------: | ------------------------------------------------- |
-| `rag.retrieve`            |          Ô£à |          Ô£à | Retrieve relevant document chunks                 |
-| `requirements.analyze`    |          Ô£à |          Ô£à | Analyze software requirements                     |
-| `rag.answer`              |          Ô£à |          Ô£à | Generate a grounded answer from retrieved context |
-| `data_analysis.agent.run` |          Ô£à |          Ô£à | Run the Data Analyst Agent as a specialized tool  |
+| `rag.retrieve`            |          ✅ |          ✅ | Retrieve relevant document chunks                 |
+| `requirements.analyze`    |          ✅ |          ✅ | Analyze software requirements                     |
+| `rag.answer`              |          ✅ |          ✅ | Generate a grounded answer from retrieved context |
+| `data_analysis.agent.run` |          ✅ |          ✅ | Run the Data Analyst Agent as a specialized tool  |
 
 Tool execution is centralized in the `ToolExecutionService`. The service validates the requested tool against the registry and only allows tools with explicit execution handlers.
 
@@ -490,10 +490,10 @@ The current Command Center includes:
 
 The main frontend consoles now register telemetry automatically:
 
-- QA Agent Console ÔåÆ agent execution telemetry;
-- Multi-Agent QA Copilot Console ÔåÆ multi-agent execution telemetry;
-- RAG Console ÔåÆ retrieval quality telemetry;
-- Data Analyst Console ÔåÆ agent execution telemetry.
+- QA Agent Console → agent execution telemetry;
+- Multi-Agent QA Copilot Console → multi-agent execution telemetry;
+- RAG Console → retrieval quality telemetry;
+- Data Analyst Console → agent execution telemetry.
 
 The current frontend is suitable for local demonstrations and portfolio presentation.
 
@@ -506,7 +506,7 @@ Current limitations:
 - production database storage is not implemented yet;
 - deployed frontend hosting is not implemented yet.
 
-The next M8 focus areas are portfolio documentation, security and governance baseline, safe provider configuration strategy and production deployment direction.
+The next operational step is local portfolio launch validation. Production cloud deployment, persistent vector storage, persistent agent state, production monitoring, production MCP hosting, authentication and multi-user isolation are tracked as post-launch implementation packs.
 
 ## Architecture
 
@@ -741,58 +741,58 @@ Future modules may introduce:
 - deployed frontend experience;
 - production-ready monitoring and governance.
 
-Planned technologies are tracked in the [roadmap](ROADMAP.md) and should not be interpreted as current dependencies.
+Planned technologies are tracked in the [roadmap](../../ROADMAP.md) and should not be interpreted as current dependencies.
 
 ## Repository Structure
 
 ```text
 applied-ai-engineering-lab/
-Ôö£ÔöÇÔöÇ .github/
-Ôöé   ÔööÔöÇÔöÇ workflows/
-Ôöé       Ôö£ÔöÇÔöÇ ai-evaluation-pipeline.yml
-Ôöé       ÔööÔöÇÔöÇ ci.yml
-Ôö£ÔöÇÔöÇ apps/
-Ôöé   Ôö£ÔöÇÔöÇ api/
-Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Dockerfile
-Ôöé   Ôöé   ÔööÔöÇÔöÇ src/
-Ôöé   Ôöé       ÔööÔöÇÔöÇ ai_api/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ agents/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ data_analysis/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ evals/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ llm/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ mcp_server/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ multi_agent/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ rag/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ requirements/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ storage/
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ config.py
-Ôöé   Ôöé           Ôö£ÔöÇÔöÇ main.py
-Ôöé   Ôöé           ÔööÔöÇÔöÇ schemas.py
-Ôöé   ÔööÔöÇÔöÇ web/
-Ôöé       ÔööÔöÇÔöÇ src/
-Ôöé           Ôö£ÔöÇÔöÇ api/
-Ôöé           Ôö£ÔöÇÔöÇ components/
-Ôöé           Ôö£ÔöÇÔöÇ hooks/
-Ôöé           Ôö£ÔöÇÔöÇ pages/
-Ôöé           Ôö£ÔöÇÔöÇ styles/
-Ôöé           ÔööÔöÇÔöÇ types/
-Ôö£ÔöÇÔöÇ docs/
-Ôöé   Ôö£ÔöÇÔöÇ adr/
-Ôöé   Ôö£ÔöÇÔöÇ architecture/
-Ôöé   Ôö£ÔöÇÔöÇ demos/
-Ôöé   Ôö£ÔöÇÔöÇ diagrams/
-Ôöé   ÔööÔöÇÔöÇ study-notes/
-Ôö£ÔöÇÔöÇ scripts/
-Ôö£ÔöÇÔöÇ tests/
-Ôöé   Ôö£ÔöÇÔöÇ integration/
-Ôöé   ÔööÔöÇÔöÇ unit/
-Ôö£ÔöÇÔöÇ .env.example
-Ôö£ÔöÇÔöÇ CHANGELOG.md
-Ôö£ÔöÇÔöÇ CONTRIBUTING.md
-Ôö£ÔöÇÔöÇ ROADMAP.md
-Ôö£ÔöÇÔöÇ docker-compose.yml
-Ôö£ÔöÇÔöÇ pyproject.toml
-ÔööÔöÇÔöÇ uv.lock
+├── .github/
+│   └── workflows/
+│       ├── ai-evaluation-pipeline.yml
+│       └── ci.yml
+├── apps/
+│   ├── api/
+│   │   ├── Dockerfile
+│   │   └── src/
+│   │       └── ai_api/
+│   │           ├── agents/
+│   │           ├── data_analysis/
+│   │           ├── evals/
+│   │           ├── llm/
+│   │           ├── mcp_server/
+│   │           ├── multi_agent/
+│   │           ├── rag/
+│   │           ├── requirements/
+│   │           ├── storage/
+│   │           ├── config.py
+│   │           ├── main.py
+│   │           └── schemas.py
+│   └── web/
+│       └── src/
+│           ├── api/
+│           ├── components/
+│           ├── hooks/
+│           ├── pages/
+│           ├── styles/
+│           └── types/
+├── docs/
+│   ├── adr/
+│   ├── architecture/
+│   ├── demos/
+│   ├── diagrams/
+│   └── study-notes/
+├── scripts/
+├── tests/
+│   ├── integration/
+│   └── unit/
+├── .env.example
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── ROADMAP.md
+├── docker-compose.yml
+├── pyproject.toml
+└── uv.lock
 ```
 
 ## Getting Started
@@ -1070,9 +1070,9 @@ Known limitations:
 - tool authorization is enforced for registered tools, but production authentication, access control and multi-user isolation are not implemented yet;
 - audit logs are available through backend services and endpoints, but audit log UI, retention policy and production-grade audit storage are not implemented yet;
 
-These limitations define the boundary between the implemented local AI engineering product and the upcoming cloud, security, governance and production hardening capabilities.
+These limitations define the boundary between the implemented local AI engineering product and future post-launch production hardening capabilities.
 
-## Current Milestone: M8 ÔÇö Cloud, Security and Portfolio
+## Current Milestone: M8 — Cloud, Security and Portfolio
 
 M8 is turning the project into a more demonstrable, secure and portfolio-ready AI engineering platform.
 
@@ -1117,14 +1117,15 @@ Completed M8 capabilities:
 - audit log schema documentation;
 - audit log service foundation.
 
-Next M8 focus areas:
+Current M8 local launch status:
 
-- final M8 roadmap synchronization;
-- launch demo script;
-- final technical case study;
-- final portfolio README polish;
-- GitHub project presentation;
-- LinkedIn project presentation.
+- final M8 roadmap synchronization completed;
+- launch demo script completed;
+- final technical case study completed;
+- portfolio README polish completed;
+- current capabilities reference completed;
+- local portfolio launch validation is the next operational step;
+- post-launch implementation packs will guide future work.
 
 Post-launch implementation packs will cover cloud deployment, production observability, persistent agent state, enterprise security, production MCP hosting, data integrations and multi-provider AI evaluation.
 
@@ -1134,17 +1135,17 @@ Each capability follows the same development cycle:
 
 ```text
 Understand the problem
-        Ôåô
+        ↓
 Define contracts and schemas
-        Ôåô
+        ↓
 Implement a small vertical slice
-        Ôåô
+        ↓
 Add deterministic tests
-        Ôåô
+        ↓
 Expose the capability through the API
-        Ôåô
+        ↓
 Document architectural decisions
-        Ôåô
+        ↓
 Integrate it into larger workflows
 ```
 
@@ -1152,21 +1153,21 @@ The repository favors explicit abstractions and controlled execution over hidden
 
 ## Documentation
 
-- [Roadmap](ROADMAP.md)
-- [Changelog](CHANGELOG.md)
-- [Contributing Guide](CONTRIBUTING.md)
-- [Architecture](docs/architecture/initial-architecture.md)
-- [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
-- [Launch Demo Script](docs/demos/launch-demo-script.md)
-- [AI Quality Command Center Case Study](docs/case-study/ai-quality-command-center-case-study.md)
-- [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
-- [Security and Governance Baseline](docs/security/security-and-governance-baseline.md)
-- [Prompt Injection Protection Baseline](docs/security/prompt-injection-protection-baseline.md)
-- [Sensitive Data Handling Policy](docs/security/sensitive-data-handling-policy.md)
-- [Audit Log Schema](docs/security/audit-log-schema.md)
-- [Tool Authorization Boundaries](docs/security/tool-authorization-boundaries.md)
-- [Architecture Decision Records](docs/adr/)
-- [Study Notes](docs/study-notes/)
+- [Roadmap](../../ROADMAP.md)
+- [Changelog](../../CHANGELOG.md)
+- [Contributing Guide](../../CONTRIBUTING.md)
+- [Architecture](../architecture/initial-architecture.md)
+- [Demonstration Scenarios](../demos/demonstration-scenarios.md)
+- [Launch Demo Script](../demos/launch-demo-script.md)
+- [AI Quality Command Center Case Study](../case-study/ai-quality-command-center-case-study.md)
+- [Provider Configuration Strategy](../security/provider-configuration-strategy.md)
+- [Security and Governance Baseline](../security/security-and-governance-baseline.md)
+- [Prompt Injection Protection Baseline](../security/prompt-injection-protection-baseline.md)
+- [Sensitive Data Handling Policy](../security/sensitive-data-handling-policy.md)
+- [Audit Log Schema](../security/audit-log-schema.md)
+- [Tool Authorization Boundaries](../security/tool-authorization-boundaries.md)
+- [Architecture Decision Records](../adr/)
+- [Study Notes](../study-notes/)
 
 ## Learning Goals
 
