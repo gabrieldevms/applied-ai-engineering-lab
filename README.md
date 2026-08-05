@@ -1151,6 +1151,7 @@ The repository favors explicit abstractions and controlled execution over hidden
 - [Contributing Guide](CONTRIBUTING.md)
 - [Architecture](docs/architecture/initial-architecture.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
+- [Launch Demo Script](docs/demos/launch-demo-script.md)
 - [Provider Configuration Strategy](docs/security/provider-configuration-strategy.md)
 - [Security and Governance Baseline](docs/security/security-and-governance-baseline.md)
 - [Prompt Injection Protection Baseline](docs/security/prompt-injection-protection-baseline.md)
