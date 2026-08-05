@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Added current capabilities reference documentation preserving the detailed technical inventory previously maintained in the README.
 - Added AI Quality Command Center technical case study for portfolio presentation.
 - Added launch demo script for presenting the AI Quality Command Center as a local-first AI Quality Engineering platform.
 - Added security and governance baseline documentation.
@@ -86,6 +87,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Updated README into a portfolio-oriented launch landing page.
+- Moved detailed capability inventory from the README into a dedicated technical reference document.
 - Updated README security and governance status to reflect the current implemented controls.
 - Updated ROADMAP M8 security and governance checklist to reflect implemented prompt injection, tool authorization, telemetry and audit log capabilities.
 - Updated M8 next focus from implementation expansion to launch documentation, case study and portfolio presentation.

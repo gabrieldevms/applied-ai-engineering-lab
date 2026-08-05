@@ -592,14 +592,14 @@ M8 transforms the backend platform foundation into a more demonstrable and portf
 - [ ] GitHub project presentation
 - [ ] LinkedIn project presentation
 - [x] Final technical case study
-- [ ] Final launch README polish
+- [x] Final launch README polish
 
 ### Final M8 launch focus
 
 - [ ] Final M8 roadmap synchronization
 - [x] Launch demo script
 - [x] Final technical case study
-- [ ] Final portfolio README polish
+- [x] Final portfolio README polish
 - [ ] GitHub project presentation
 - [ ] LinkedIn project presentation
 
