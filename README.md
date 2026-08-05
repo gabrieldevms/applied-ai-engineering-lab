@@ -425,6 +425,7 @@ Current capabilities:
 - tool authorization checks enforced during tool execution;
 - sensitive data handling policy;
 - blocked tool-call telemetry;
+- prompt injection telemetry integration;
 
 ### AI Quality Command Center
 
@@ -643,6 +644,7 @@ http://127.0.0.1:8000/docs
 | ------ | --------------------------------------- | ---------------------------------------- |
 | `POST` | `/security/prompt-injection/assess`     | Assess prompt injection risk for a text  |
 | `GET`  | `/security/blocked-tool-calls` | List blocked tool-call telemetry records |
+| `GET`  | `/security/prompt-injection/records` | List prompt injection telemetry records |
 
 ### Observability
 

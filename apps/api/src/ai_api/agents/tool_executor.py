@@ -10,7 +10,7 @@ from ai_api.agents.schemas import (
     ToolExecutionResponse,
 )
 from ai_api.config import get_settings
-from ai_api.security import (
+from ai_api.security.blocked_tool_call_telemetry import (
     BlockedToolCallTelemetryRequest,
     BlockedToolCallTelemetryService,
 )

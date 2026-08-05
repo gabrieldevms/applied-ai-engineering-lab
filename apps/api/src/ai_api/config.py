@@ -1,6 +1,5 @@
 from functools import lru_cache
 from typing import Literal
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -50,6 +49,8 @@ class Settings(BaseSettings):
     multi_agent_execution_records_path: str = (
         "observability/multi-agent-execution-records.jsonl"
     )
+
+    prompt_injection_records_path: str = "security/prompt-injection-records.jsonl"
 
 
 @lru_cache

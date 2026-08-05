@@ -259,6 +259,9 @@ from ai_api.security import (
     PromptInjectionDetectionService,
     BlockedToolCallTelemetryRecordsResponse,
     BlockedToolCallTelemetryService,
+    PromptInjectionTelemetryRecordsResponse,
+    PromptInjectionTelemetryRequest,
+    PromptInjectionTelemetryService,
 )
 
 logging.basicConfig(
@@ -1469,7 +1472,51 @@ def run_ci_evaluation_pipeline(
 def assess_prompt_injection(
     request: PromptInjectionAssessmentRequest,
 ) -> PromptInjectionAssessmentResponse:
-    return PromptInjectionDetectionService().assess(request)
+    assessment = PromptInjectionDetectionService().assess(request)
+
+    PromptInjectionTelemetryService.from_settings(
+        get_settings()
+    ).record_if_relevant(
+        PromptInjectionTelemetryRequest(
+            risk_level=assessment.risk_level,
+            recommended_action=assessment.recommended_action,
+            is_blocking_required=assessment.is_blocking_required,
+            detected_patterns=assessment.detected_patterns,
+            risk_reasons=assessment.risk_reasons,
+            input_source=assessment.input_source,
+            workflow=assessment.workflow,
+            inspected_character_count=assessment.inspected_character_count,
+            metadata={
+                "source": "prompt_injection_assessment_endpoint",
+                "raw_input_stored": False,
+                "input_text_echoed": False,
+            },
+        )
+    )
+
+    return assessment
+
+
+@app.get(
+    "/security/prompt-injection/records",
+    response_model=PromptInjectionTelemetryRecordsResponse,
+)
+def list_prompt_injection_telemetry_records(
+    limit: int = Query(default=100, ge=1, le=1000),
+    risk_level: str | None = None,
+    recommended_action: str | None = None,
+    input_source: str | None = None,
+    workflow: str | None = None,
+) -> PromptInjectionTelemetryRecordsResponse:
+    return PromptInjectionTelemetryService.from_settings(
+        get_settings()
+    ).list_records(
+        limit=limit,
+        risk_level=risk_level,
+        recommended_action=recommended_action,
+        input_source=input_source,
+        workflow=workflow,
+    )
 
 
 @app.post("/observability/usage/records", response_model=AIUsageRecord,)

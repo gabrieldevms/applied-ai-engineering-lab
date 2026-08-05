@@ -11,6 +11,12 @@ from ai_api.security.blocked_tool_call_telemetry import (
     BlockedToolCallTelemetryRequest,
     BlockedToolCallTelemetryService,
 )
+from ai_api.security.prompt_injection_telemetry import (
+    PromptInjectionTelemetryRecord,
+    PromptInjectionTelemetryRecordsResponse,
+    PromptInjectionTelemetryRequest,
+    PromptInjectionTelemetryService,
+)
 
 __all__ = [
     "PromptInjectionAssessmentRequest",
@@ -22,4 +28,8 @@ __all__ = [
     "BlockedToolCallTelemetryRecordsResponse",
     "BlockedToolCallTelemetryRequest",
     "BlockedToolCallTelemetryService",
+    "PromptInjectionTelemetryRecord",
+    "PromptInjectionTelemetryRecordsResponse",
+    "PromptInjectionTelemetryRequest",
+    "PromptInjectionTelemetryService",
 ]
