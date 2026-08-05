@@ -1,19 +1,46 @@
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field
-from ai_api.agents.schemas import ToolCallerType, ToolEnvironment, ToolRiskLevel
 from ai_api.storage import JsonlStore
+
+BlockedToolCallCallerType = Literal[
+    "frontend_console",
+    "backend_service",
+    "qa_agent",
+    "data_analyst_agent",
+    "multi_agent_copilot",
+    "mcp_client",
+    "evaluation_runner",
+    "ci_pipeline",
+    "future_authenticated_user",
+    "future_admin_user",
+]
+
+BlockedToolCallEnvironment = Literal[
+    "local",
+    "test",
+    "ci",
+    "staging",
+    "production",
+]
+
+BlockedToolCallRiskLevel = Literal[
+    "low",
+    "medium",
+    "high",
+    "critical",
+]
 
 
 class BlockedToolCallTelemetryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     tool_name: str = Field(min_length=1)
-    caller_type: ToolCallerType
-    environment: ToolEnvironment
-    risk_level: ToolRiskLevel
+    caller_type: BlockedToolCallCallerType
+    environment: BlockedToolCallEnvironment
+    risk_level: BlockedToolCallRiskLevel
     authorization_status: str = Field(default="blocked")
     authorization_policy: str = Field(min_length=1)
     reason: str = Field(min_length=1)
@@ -30,9 +57,9 @@ class BlockedToolCallTelemetryRecord(BaseModel):
 
     record_id: str
     tool_name: str
-    caller_type: ToolCallerType
-    environment: ToolEnvironment
-    risk_level: ToolRiskLevel
+    caller_type: BlockedToolCallCallerType
+    environment: BlockedToolCallEnvironment
+    risk_level: BlockedToolCallRiskLevel
     authorization_status: str
     authorization_policy: str
     reason: str
