@@ -4,6 +4,10 @@ A production-oriented Applied AI Engineering laboratory focused on software qual
 
 The project evolved into the **AI Quality Command Center**: a local-first platform that demonstrates how AI systems can be designed, tested, observed and governed in a software quality context.
 
+<p align="center">
+  <img src="docs/assets/demo/ai-quality-command-center-demo.gif" alt="AI Quality Command Center demo" width="100%" />
+</p>
+
 ## What This Project Is
 
 Most AI demos stop at a prompt, chatbot or notebook.
