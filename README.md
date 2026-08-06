@@ -678,6 +678,16 @@ The project demonstrates practical experience with:
 - production-oriented engineering practices;
 - portfolio-grade AI platform design.
 
+## License
+
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
+
+You may use, study, run, modify and share this project for non-commercial purposes, including learning, research, validation, portfolio review and feedback.
+
+Commercial use, resale, paid hosting, incorporation into paid products or services, or use as part of commercial offerings requires prior written permission from the author.
+
+See [LICENSE](LICENSE) for details.
+
 ## Project Nature
 
 This repository is an educational and portfolio project developed incrementally.
@@ -686,4 +696,4 @@ It is production-oriented, but it should not be considered a complete production
 
 ---
 
-Developed by Gabriel Moreira.
+Developed by Gabriel Moreira dos Santos.
