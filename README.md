@@ -686,7 +686,7 @@ You may use, study, run, modify and share this project for non-commercial purpos
 
 Commercial use, resale, paid hosting, incorporation into paid products or services, or use as part of commercial offerings requires prior written permission from the author.
 
-See [LICENSE](LICENSE) for details.
+See [LICENSE](LICENSE.md) for details.
 
 ## Project Nature
 
