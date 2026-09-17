@@ -4,11 +4,11 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-- **Current phase:** Post-launch Pack 1 — Cloud & Deployment Readiness
-- **Latest completed milestone:** M8 local portfolio launch
-- **Next focus:** Provider-neutral production-like execution, deployment readiness and CI validation
+- **Current phase:** Post-launch implementation packs — Pack 1 complete
+- **Latest completed milestone:** Pack 1 — Cloud & Deployment Readiness
+- **Next planned pack:** Pack 2 — Production Observability (not started)
 
-The **M8 local portfolio launch** is complete. Pack 1 is the current development focus; a cloud provider will be evaluated only after the production-like architecture is validated.
+The **M8 local portfolio launch** and Pack 1 are complete. Pack 1 established a production-like local path and provider-neutral deployment architecture; no cloud provider or public production hosting has been selected.
 
 The completed local launch progression was:
 
@@ -644,16 +644,18 @@ Potential future extensions after M8 include:
 
 ### Post-launch Implementation Packs
 
-Following the completed M8 local portfolio launch, the project is evolving through focused implementation packs designed to support both technical growth and public portfolio updates. Pack 1 is currently underway.
+Following the completed M8 local portfolio launch, the project is evolving through focused implementation packs designed to support both technical growth and public portfolio updates. Pack 1 is complete; Pack 2 has not started.
 
 #### Pack 1 — Cloud & Deployment Readiness
 
-- [ ] Provider-neutral deployment architecture
-- [ ] Production-like local application stack
-- [ ] Deployment-aware configuration
-- [ ] Application readiness checks
-- [ ] CI validation for backend, frontend and container builds
-- [ ] Deployment runbook
+**Status:** Completed for production-like local execution; public cloud hosting remains deferred.
+
+- [x] Provider-neutral deployment architecture
+- [x] Production-like local application stack
+- [x] Deployment-aware configuration
+- [x] Application readiness checks
+- [x] CI validation for backend, frontend and container builds
+- [x] Deployment runbook
 
 #### Pack 2 — Production Observability
 
