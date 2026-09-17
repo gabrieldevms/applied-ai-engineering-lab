@@ -1,6 +1,7 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -34,7 +35,11 @@ class Settings(BaseSettings):
     storage_backend: StorageBackendName = Field(default="local_jsonl")
     storage_base_dir: str = Field(default=".data")
 
-    agent_execution_log_path: str = ".data/agent-execution-logs.jsonl"
+    agent_execution_log_path: str = Field(
+        default_factory=lambda data: str(
+            Path(data["storage_base_dir"]) / "agent-execution-logs.jsonl"
+        )
+    )
     ai_usage_records_path: str = "observability/usage-records.jsonl"
     evaluation_telemetry_events_path: str = (
         "observability/evaluation-telemetry-events.jsonl"
@@ -52,6 +57,14 @@ class Settings(BaseSettings):
     blocked_tool_call_records_path: str = "security/blocked-tool-call-records.jsonl"
     prompt_injection_records_path: str = "security/prompt-injection-records.jsonl"
     audit_events_path: str = "security/audit-events.jsonl"
+
+    @field_validator("storage_base_dir", "agent_execution_log_path")
+    @classmethod
+    def require_nonblank_storage_path(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Storage paths must not be blank.")
+
+        return value
 
 
 @lru_cache
