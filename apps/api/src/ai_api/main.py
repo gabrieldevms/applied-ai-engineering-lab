@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
 from ai_api.config import Settings, get_settings
+from ai_api.readiness import ReadinessResponse, get_readiness_report
 from ai_api.llm import (
     LLMHealthResponse,
     LLMProvidersResponse,
@@ -543,6 +544,16 @@ async def unhandled_exception_handler(
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/ready", response_model=ReadinessResponse)
+def readiness_check(
+    report: Annotated[ReadinessResponse, Depends(get_readiness_report)],
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=200 if report.status == "ready" else 503,
+        content=report.model_dump(),
+    )
 
 
 @app.get("/llm/providers", response_model=LLMProvidersResponse)
