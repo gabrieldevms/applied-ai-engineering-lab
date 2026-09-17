@@ -3,9 +3,10 @@ import type {
   DashboardSectionStatus,
   DashboardStatus,
 } from "../../types/observability";
+import type { QualityStatus } from "../../types/productionObservability";
 
 type StatusBadgeProps = {
-  status: DashboardStatus | DashboardSectionStatus;
+  status: DashboardStatus | DashboardSectionStatus | QualityStatus;
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {

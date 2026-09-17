@@ -1,5 +1,6 @@
 import type { AppPage } from "../types/navigation";
 import type { DashboardStatus } from "../types/observability";
+import type { QualityStatus } from "../types/productionObservability";
 
 export type NavigationItem = {
   page: AppPage;
@@ -53,11 +54,12 @@ export const navigationItems: NavigationItem[] = [
   },
 ];
 
-const statusLabels: Record<DashboardStatus, string> = {
+const statusLabels: Record<DashboardStatus | QualityStatus, string> = {
   healthy: "Saudável",
   warning: "Atenção",
   critical: "Crítico",
   empty: "Sem dados",
+  no_data: "Sem dados recentes",
 };
 
 const sectionTitleLabels: Record<string, string> = {
@@ -71,6 +73,8 @@ const sectionTitleLabels: Record<string, string> = {
 const metricLabels: Record<string, string> = {
   record_count: "registros",
   event_count: "eventos",
+  completed_count: "concluídos",
+  artifact_count: "artefatos",
   total_events: "total de eventos",
   passed_count: "aprovados",
   warning_count: "alertas",
@@ -82,7 +86,13 @@ const metricLabels: Record<string, string> = {
   total_cost_usd: "custo total em USD",
   average_cost_usd: "custo médio em USD",
   average_quality_score: "qualidade média",
+  average_score: "score médio",
   average_duration_ms: "duração média em ms",
+  total_retries: "tentativas adicionais",
+  total_fallbacks: "fallbacks",
+  settings_ok: "configuração válida",
+  provider_ok: "provider disponível",
+  storage_ok: "armazenamento disponível",
   provider_coverage: "coverage por provider",
   model_coverage: "coverage por modelo",
   component_coverage: "coverage por componente",
@@ -132,7 +142,7 @@ const textTranslations: Record<string, string> = {
     "No AI usage risks detected.": "Nenhum risco de uso/custo detectado.",
 };
 
-export function translateStatus(status: DashboardStatus): string {
+export function translateStatus(status: DashboardStatus | QualityStatus): string {
   return statusLabels[status];
 }
 

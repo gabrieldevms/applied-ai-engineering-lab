@@ -1,13 +1,16 @@
 import { useMemo, useState } from "react";
 import { MetricCard } from "../components/ui/MetricCard";
+import { QualityScorecardCard } from "../components/ui/QualityScorecardCard";
 import { SectionPanel } from "../components/ui/SectionPanel";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { useObservabilityDashboard } from "../hooks/useObservabilityDashboard";
+import { useQualityScorecards } from "../hooks/useQualityScorecards";
 import { translateDashboardText, translateStatus } from "../i18n/ptBr";
 import type {
   DashboardSectionStatus,
   ObservabilityDashboardSection,
 } from "../types/observability";
+import { formatObservedAt } from "../utils/formatObservedAt";
 
 type StatusFilter = DashboardSectionStatus | "all";
 
@@ -107,6 +110,11 @@ export function ObservabilityCenterPage() {
     requestState,
     toggleAutoRefresh,
   } = useObservabilityDashboard();
+  const {
+    scorecards,
+    error: scorecardsError,
+    lastUpdatedAt: scorecardsUpdatedAt,
+  } = useQualityScorecards(lastUpdatedAt);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const filteredSections = useMemo(() => {
@@ -188,6 +196,36 @@ export function ObservabilityCenterPage() {
           <small>{errorMessage}</small>
         </section>
       ) : null}
+
+      <section className="quality-overview">
+        <div className="quality-overview-heading">
+          <div>
+            <span className="eyebrow">Qualidade de IA</span>
+            <h2>Scorecards de qualidade</h2>
+            <p>Estados atuais e tendências baseados na telemetria local.</p>
+          </div>
+          <small>Atualizado: {formatObservedAt(scorecardsUpdatedAt)}</small>
+        </div>
+        {scorecardsError ? (
+          <p role="alert">Não foi possível atualizar os scorecards. Tente atualizar o dashboard.</p>
+        ) : null}
+        {scorecards ? (
+          <>
+            <div className="quality-scorecard-grid">
+              {scorecards.sections.map((section) => (
+                <QualityScorecardCard key={section.name} section={section} />
+              ))}
+            </div>
+            <p className="quality-artifact-summary">
+              Último artefato de avaliação: {scorecards.latest_evaluation_artifact
+                ? `${formatObservedAt(scorecards.latest_evaluation_artifact.created_at)} · ${scorecards.latest_evaluation_artifact.stage_count} etapas`
+                : "nenhum registro persistido"}
+            </p>
+          </>
+        ) : (
+          <p className="muted">Aguardando os scorecards de qualidade.</p>
+        )}
+      </section>
 
       <section className="metrics-grid">
         <MetricCard
