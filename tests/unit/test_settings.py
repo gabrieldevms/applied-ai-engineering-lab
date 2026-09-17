@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 from ai_api.config import Settings
@@ -16,6 +18,7 @@ SETTINGS_ENV_VARS = [
     "EMBEDDING_DIMENSIONS",
     "STORAGE_BACKEND",
     "STORAGE_BASE_DIR",
+    "AGENT_EXECUTION_LOG_PATH",
     "AI_USAGE_RECORDS_PATH",
     "EVALUATION_TELEMETRY_EVENTS_PATH",
     "RETRIEVAL_QUALITY_RECORDS_PATH",
@@ -40,6 +43,9 @@ def test_settings_should_use_fake_provider_by_default() -> None:
     assert settings.embedding_dimensions == 32
     assert settings.storage_backend == "local_jsonl"
     assert settings.storage_base_dir == ".data"
+    assert settings.agent_execution_log_path == str(
+        Path(".data") / "agent-execution-logs.jsonl"
+    )
     assert settings.ai_usage_records_path == "observability/usage-records.jsonl"
     assert (
     settings.evaluation_telemetry_events_path
@@ -70,6 +76,38 @@ def test_settings_should_accept_openai_provider() -> None:
     assert settings.llm_provider == "openai"
     assert settings.openai_api_key == "fake-key"
     assert settings.openai_model == "fake-model"
+
+
+def test_agent_log_path_should_follow_configured_storage_root(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("STORAGE_BASE_DIR", str(tmp_path))
+
+    settings = Settings(_env_file=None)
+
+    assert settings.agent_execution_log_path == str(
+        tmp_path / "agent-execution-logs.jsonl"
+    )
+
+
+def test_agent_log_path_should_allow_explicit_override(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    custom_path = tmp_path / "custom" / "agent-log.jsonl"
+    monkeypatch.setenv("STORAGE_BASE_DIR", str(tmp_path))
+    monkeypatch.setenv("AGENT_EXECUTION_LOG_PATH", str(custom_path))
+
+    settings = Settings(_env_file=None)
+
+    assert settings.agent_execution_log_path == str(custom_path)
+
+
+@pytest.mark.parametrize("field_name", ["storage_base_dir", "agent_execution_log_path"])
+def test_settings_should_reject_blank_storage_paths(field_name: str) -> None:
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, **{field_name: " "})
 
 
 def test_settings_should_accept_ollama_provider() -> None:
