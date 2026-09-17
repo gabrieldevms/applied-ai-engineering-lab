@@ -86,3 +86,35 @@ jobs:
       - name: Stop stack
         if: always()
         run: docker compose --env-file .env.example -f docker-compose.production-like.yml down
+
+  observability-validation:
+    name: Observability stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Validate Compose and Prometheus configuration
+        run: |
+          docker compose --env-file .env.example -f docker-compose.production-like.yml --profile observability config --quiet
+          docker compose --env-file .env.example -f docker-compose.production-like.yml --profile observability run --rm --no-deps --entrypoint promtool prometheus check config /etc/prometheus/prometheus.yml
+
+      - name: Build and start observability stack
+        run: docker compose --env-file .env.example -f docker-compose.production-like.yml --profile observability up -d --build --wait
+
+      - name: Validate monitoring and public routing
+        run: python scripts/validate_observability_stack.py
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose --env-file .env.example -f docker-compose.production-like.yml --profile observability logs --no-color
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --env-file .env.example -f docker-compose.production-like.yml --profile observability down
