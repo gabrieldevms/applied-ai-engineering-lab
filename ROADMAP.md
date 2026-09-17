@@ -4,11 +4,11 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-- **Current phase:** Post-launch implementation packs — Pack 1 complete
+- **Current phase:** Pack 2 — Production Observability (in progress)
 - **Latest completed milestone:** Pack 1 — Cloud & Deployment Readiness
-- **Next planned pack:** Pack 2 — Production Observability (not started)
+- **Current focus:** Operational monitoring, persistent evaluation artifacts and AI quality scorecards
 
-The **M8 local portfolio launch** and Pack 1 are complete. Pack 1 established a production-like local path and provider-neutral deployment architecture; no cloud provider or public production hosting has been selected.
+The **M8 local portfolio launch** and Pack 1 are complete. Pack 2 is now the active implementation pack; no cloud provider or public production hosting has been selected.
 
 The completed local launch progression was:
 
@@ -644,7 +644,7 @@ Potential future extensions after M8 include:
 
 ### Post-launch Implementation Packs
 
-Following the completed M8 local portfolio launch, the project is evolving through focused implementation packs designed to support both technical growth and public portfolio updates. Pack 1 is complete; Pack 2 has not started.
+Following the completed M8 local portfolio launch, the project is evolving through focused implementation packs designed to support both technical growth and public portfolio updates. Pack 1 is complete and Pack 2 is in progress.
 
 #### Pack 1 — Cloud & Deployment Readiness
 
@@ -658,6 +658,8 @@ Following the completed M8 local portfolio launch, the project is evolving throu
 - [x] Deployment runbook
 
 #### Pack 2 — Production Observability
+
+**Status:** In progress. See the [production observability strategy](docs/architecture/production-observability-strategy.md).
 
 - [ ] Production monitoring
 - [ ] Persistent evaluation artifacts

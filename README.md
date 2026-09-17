@@ -27,11 +27,11 @@ The result is a local AI Quality Engineering platform built around explicit arch
 
 ## Current Status
 
-- **Current phase:** Post-launch implementation packs — Pack 1 complete
+- **Current phase:** Pack 2 — Production Observability (in progress)
 - **Latest completed milestone:** Pack 1 — Cloud & Deployment Readiness
-- **Next planned pack:** Pack 2 — Production Observability (not started)
+- **Current focus:** Operational monitoring, persistent evaluation artifacts and AI quality scorecards
 
-The initial local portfolio launch and Pack 1 are complete. The Command Center has a documented production-like local execution path and is prepared for future cloud evaluation without selecting a provider yet.
+The initial local portfolio launch and Pack 1 are complete. Pack 2 is extending the existing Command Center observability foundations; its monitoring, artifacts and scorecards are not complete yet. No cloud provider has been selected.
 
 The current version is suitable for:
 
@@ -581,6 +581,7 @@ Technical reference:
 - [Contributing Guide](CONTRIBUTING.md)
 - [Architecture](docs/architecture/initial-architecture.md)
 - [Cloud and Deployment Strategy](docs/architecture/deployment-strategy.md)
+- [Production Observability Strategy](docs/architecture/production-observability-strategy.md)
 - [Production-like Deployment Runbook](docs/deployment/runbook.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Launch Demo Script](docs/demos/launch-demo-script.md)
@@ -623,7 +624,7 @@ These limitations define the boundary between the implemented local AI engineeri
 
 ## Post-launch Roadmap
 
-Following the completed M8 local portfolio launch, development continues through focused implementation packs. Pack 1 is complete; Pack 2 has not started.
+Following the completed M8 local portfolio launch, development continues through focused implementation packs. Pack 1 is complete and Pack 2 is in progress.
 
 ### Pack 1 — Cloud & Deployment Readiness
 
@@ -636,6 +637,8 @@ Following the completed M8 local portfolio launch, development continues through
 - deployment runbook.
 
 ### Pack 2 — Production Observability
+
+**Status:** In progress. The [strategy](docs/architecture/production-observability-strategy.md) defines the implementation boundaries.
 
 - production monitoring;
 - persistent evaluation artifacts;
