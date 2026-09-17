@@ -170,19 +170,16 @@ The project has completed its initial local portfolio launch as the AI Quality C
 
 Post-launch development is organized into focused implementation packs.
 
-The completed implementation pack is:
+The completed implementation pack is **Pack 1 — Cloud & Deployment Readiness**.
 
-**Pack 1 — Cloud & Deployment Readiness**
+The current development focus is **Pack 2 — Production Observability**.
 
-The next planned development focus is **Pack 2 — Production Observability**. Pack 2 has not started yet.
+Later packs cover:
 
-Future packs cover:
-
-1. Production Observability
-2. Production Agent State
-3. Enterprise Security Layer
-4. MCP Production Layer
-5. Data Integrations
-6. Multi-provider AI Evaluation
+- Pack 3 — Production Agent State;
+- Pack 4 — Enterprise Security Layer;
+- Pack 5 — MCP Production Layer;
+- Pack 6 — Data Integrations;
+- Pack 7 — Multi-provider AI Evaluation.
 
 Changes should respect this staged roadmap and avoid prematurely implementing work assigned to later packs.

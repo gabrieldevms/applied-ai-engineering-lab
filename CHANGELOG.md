@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## Post-launch Pack 2 — Production Observability
+
+**Status:** In progress.
+
+### Documentation
+
+- Defined the distinction between operational monitoring and existing AI quality observability, with a Prometheus-based local monitoring strategy and safety boundaries for metrics, artifacts and scorecards.
+- Updated repository status to identify Pack 2 as active; no Pack 2 runtime capability is claimed yet.
+
+---
+
 ## Post-launch Pack 1 — Cloud & Deployment Readiness
 
 **Status:** Completed for production-like local execution. This is not public production hosting, and no cloud provider has been selected.
