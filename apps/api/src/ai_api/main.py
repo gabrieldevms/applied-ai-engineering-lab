@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
 from ai_api.config import Settings, get_settings
+from ai_api.operational_metrics import CONTENT_TYPE_LATEST, operational_metrics
 from ai_api.readiness import ReadinessResponse, get_readiness_report
 from ai_api.llm import (
     LLMHealthResponse,
@@ -294,20 +295,28 @@ async def log_requests(
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
     start_time = time.perf_counter()
+    status_code = 500
 
-    response = await call_next(request)
-
-    duration_ms = (time.perf_counter() - start_time) * 1000
-
-    logger.info(
-        "%s %s completed with status %s in %.2fms",
-        request.method,
-        request.url.path,
-        response.status_code,
-        duration_ms,
-    )
-
-    return response
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        return response
+    finally:
+        if request.url.path != "/metrics":
+            duration_seconds = time.perf_counter() - start_time
+            logger.info(
+                "%s %s completed with status %s in %.2fms",
+                operational_metrics.method_label(request.method),
+                operational_metrics.route_label(request),
+                status_code,
+                duration_seconds * 1000,
+            )
+            try:
+                operational_metrics.record_request(
+                    request, status_code, duration_seconds
+                )
+            except Exception:
+                logger.exception("Operational metric recording failed")
 
 
 @app.exception_handler(SQLGenerationError)
@@ -546,10 +555,19 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/metrics", include_in_schema=False)
+def get_operational_metrics() -> Response:
+    return Response(operational_metrics.render(), media_type=CONTENT_TYPE_LATEST)
+
+
 @app.get("/ready", response_model=ReadinessResponse)
 def readiness_check(
     report: Annotated[ReadinessResponse, Depends(get_readiness_report)],
 ) -> JSONResponse:
+    try:
+        operational_metrics.set_readiness(report.status == "ready")
+    except Exception:
+        logger.exception("Operational readiness metric recording failed")
     return JSONResponse(
         status_code=200 if report.status == "ready" else 503,
         content=report.model_dump(),
