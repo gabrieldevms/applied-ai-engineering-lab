@@ -1,8 +1,12 @@
 import { useMemo } from "react";
 import { MetricCard } from "../components/ui/MetricCard";
+import { EvaluationArtifactPanel } from "../components/ui/EvaluationArtifactPanel";
+import { QualityScorecardCard } from "../components/ui/QualityScorecardCard";
 import { SectionPanel } from "../components/ui/SectionPanel";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { useObservabilityDashboard } from "../hooks/useObservabilityDashboard";
+import { useEvaluationArtifacts } from "../hooks/useEvaluationArtifacts";
+import { useQualityScorecards } from "../hooks/useQualityScorecards";
 import {
   translateDashboardText,
   translateMetricKey,
@@ -12,6 +16,7 @@ import type {
   DashboardMetricValue,
   ObservabilityDashboardSection,
 } from "../types/observability";
+import { formatObservedAt } from "../utils/formatObservedAt";
 
 const evaluationSuites = [
   {
@@ -145,8 +150,22 @@ function getEvaluationSignal(
 }
 
 export function EvaluationCenterPage() {
-  const { dashboard, errorMessage, refreshDashboard, requestState } =
+  const { dashboard, errorMessage, lastUpdatedAt, refreshDashboard, requestState } =
     useObservabilityDashboard();
+  const { scorecards, error: scorecardsError, lastUpdatedAt: scorecardsUpdatedAt } =
+    useQualityScorecards(lastUpdatedAt);
+  const {
+    artifactList,
+    selectedId,
+    selectArtifact,
+    artifact,
+    listError,
+    detailError,
+    lastUpdatedAt: artifactsUpdatedAt,
+  } = useEvaluationArtifacts(lastUpdatedAt);
+  const qualitySection = scorecards?.sections.find(
+    (section) => section.name === "evaluation_quality",
+  );
 
   const evaluationSection = useMemo(() => {
     return findEvaluationSection(dashboard?.sections ?? []);
@@ -206,6 +225,35 @@ export function EvaluationCenterPage() {
           <small>{errorMessage}</small>
         </section>
       ) : null}
+
+      <section className="quality-overview">
+        <div className="quality-overview-heading">
+          <div>
+            <span className="eyebrow">Qualidade de IA</span>
+            <h2>Qualidade da avaliação</h2>
+            <p>Estado atual e tendência das avaliações registradas.</p>
+          </div>
+          <small>Atualizado: {formatObservedAt(scorecardsUpdatedAt)}</small>
+        </div>
+        {scorecardsError ? (
+          <p role="alert">Não foi possível atualizar o scorecard de avaliação.</p>
+        ) : null}
+        {qualitySection ? (
+          <QualityScorecardCard section={qualitySection} />
+        ) : (
+          <p className="muted">Aguardando o scorecard de avaliação.</p>
+        )}
+      </section>
+
+      <EvaluationArtifactPanel
+        artifact={artifact}
+        artifactList={artifactList}
+        detailError={detailError}
+        lastUpdatedAt={artifactsUpdatedAt}
+        listError={listError}
+        onSelect={selectArtifact}
+        selectedId={selectedId}
+      />
 
       <section className="metrics-grid">
         <MetricCard
