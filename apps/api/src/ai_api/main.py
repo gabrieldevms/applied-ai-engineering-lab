@@ -2,11 +2,17 @@ import logging
 import time
 from collections.abc import Awaitable, Callable
 from typing import Annotated, Any
-from fastapi import Depends, FastAPI, File, Query, Form, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Path, Query, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
 from ai_api.config import Settings, get_settings
+from ai_api.evals.artifacts import (
+    EvaluationArtifact,
+    EvaluationArtifactList,
+    EvaluationArtifactService,
+    get_evaluation_artifact_service,
+)
 from ai_api.operational_metrics import CONTENT_TYPE_LATEST, operational_metrics
 from ai_api.readiness import ReadinessResponse, get_readiness_report
 from ai_api.llm import (
@@ -1491,8 +1497,12 @@ def run_ci_evaluation_pipeline(
         EvaluationTelemetryInstrumentationService,
         Depends(get_evaluation_telemetry_instrumentation_service),
     ],
+    artifact_service: Annotated[
+        EvaluationArtifactService,
+        Depends(get_evaluation_artifact_service),
+    ],
 ) -> CIEvaluationPipelineRunResponse:
-    return instrumentation_service.instrument(
+    response = instrumentation_service.instrument(
         event_type="ci_evaluation_pipeline_run",
         component="evaluation",
         source="api:/evals/ci/pipeline/run",
@@ -1503,6 +1513,46 @@ def run_ci_evaluation_pipeline(
             **payload.metadata,
         },
     )
+    artifact_service.save_pipeline(response, source="api")
+    return response
+
+
+@app.get("/evals/artifacts", response_model=EvaluationArtifactList)
+def list_evaluation_artifacts(
+    artifact_service: Annotated[
+        EvaluationArtifactService,
+        Depends(get_evaluation_artifact_service),
+    ],
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+) -> EvaluationArtifactList:
+    return artifact_service.list_artifacts(limit=limit)
+
+
+@app.get("/evals/artifacts/latest", response_model=EvaluationArtifact)
+def get_latest_evaluation_artifact(
+    artifact_service: Annotated[
+        EvaluationArtifactService,
+        Depends(get_evaluation_artifact_service),
+    ],
+) -> EvaluationArtifact:
+    artifact = artifact_service.latest()
+    if artifact is None:
+        raise HTTPException(status_code=404, detail="Evaluation artifact not found.")
+    return artifact
+
+
+@app.get("/evals/artifacts/{artifact_id}", response_model=EvaluationArtifact)
+def get_evaluation_artifact(
+    artifact_id: Annotated[str, Path(pattern=r"^[0-9a-f]{32}$")],
+    artifact_service: Annotated[
+        EvaluationArtifactService,
+        Depends(get_evaluation_artifact_service),
+    ],
+) -> EvaluationArtifact:
+    artifact = artifact_service.get(artifact_id)
+    if artifact is None:
+        raise HTTPException(status_code=404, detail="Evaluation artifact not found.")
+    return artifact
 
 
 @app.post("/security/prompt-injection/assess", response_model=PromptInjectionAssessmentResponse,
