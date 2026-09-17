@@ -30,3 +30,59 @@ jobs:
 
       - name: Run tests
         run: uv run pytest
+
+  web-checks:
+    name: Web lint and build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
+  container-validation:
+    name: Production-like stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Compose configuration
+        run: docker compose --env-file .env.example -f docker-compose.production-like.yml config --quiet
+
+      - name: Build and start stack
+        run: docker compose --env-file .env.example -f docker-compose.production-like.yml up -d --build --wait
+
+      - name: Smoke-test frontend and API routing
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:8080/ > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/api/health | grep -F '"status":"ok"'
+          curl --fail --silent --show-error http://127.0.0.1:8080/api/ready | grep -F '"status":"ready"'
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose --env-file .env.example -f docker-compose.production-like.yml logs --no-color
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --env-file .env.example -f docker-compose.production-like.yml down
