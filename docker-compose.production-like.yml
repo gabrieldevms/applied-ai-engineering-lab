@@ -1,0 +1,34 @@
+name: ai-quality-command-center
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      APP_ENV: local
+      LLM_PROVIDER: ${LLM_PROVIDER:-fake}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.1}
+      STORAGE_BACKEND: local_jsonl
+      STORAGE_BASE_DIR: /app/.data
+    volumes:
+      - app_data:/app/.data
+    expose:
+      - "8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  web:
+    build:
+      context: apps/web
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:8080:80"
+
+volumes:
+  app_data:
