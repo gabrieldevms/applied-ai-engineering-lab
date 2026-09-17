@@ -578,6 +578,7 @@ Technical reference:
 - [Changelog](CHANGELOG.md)
 - [Contributing Guide](CONTRIBUTING.md)
 - [Architecture](docs/architecture/initial-architecture.md)
+- [Cloud and Deployment Strategy](docs/architecture/deployment-strategy.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Launch Demo Script](docs/demos/launch-demo-script.md)
 - [AI Quality Command Center Case Study](docs/case-study/ai-quality-command-center-case-study.md)
