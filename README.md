@@ -27,11 +27,11 @@ The result is a local AI Quality Engineering platform built around explicit arch
 
 ## Current Status
 
-- **Current phase:** Post-launch Pack 1 — Cloud & Deployment Readiness
-- **Latest completed milestone:** M8 local portfolio launch
-- **Next focus:** Provider-neutral production-like execution, deployment readiness and CI validation
+- **Current phase:** Post-launch implementation packs — Pack 1 complete
+- **Latest completed milestone:** Pack 1 — Cloud & Deployment Readiness
+- **Next planned pack:** Pack 2 — Production Observability (not started)
 
-The initial local portfolio launch is complete. Pack 1 prepares the Command Center for production-like local execution and future cloud deployment without selecting a cloud provider yet.
+The initial local portfolio launch and Pack 1 are complete. The Command Center has a documented production-like local execution path and is prepared for future cloud evaluation without selecting a provider yet.
 
 The current version is suitable for:
 
@@ -319,7 +319,7 @@ Main endpoint groups:
 
 | Group | Examples |
 | --- | --- |
-| Core and LLM | `/health`, `/llm/providers`, `/llm/health`, `/requirements/analyze` |
+| Core and LLM | `/health`, `/ready`, `/llm/providers`, `/llm/health`, `/requirements/analyze` |
 | RAG | `/rag/extract-text`, `/rag/extract-tables`, `/rag/retrieve`, `/rag/answer`, `/rag/evaluate` |
 | Agents | `/agents/run`, `/agents/tools`, `/agents/tools/execute`, `/agents/qa/run`, `/agents/execute` |
 | Data Analysis | `/data-analysis/sql/generate`, `/data-analysis/sql/execute`, `/data-analysis/agent/run` |
@@ -521,6 +521,8 @@ Do not commit API keys or local `.env` files.
 
 ## Running with Docker
 
+The default Compose file runs the development API with a source bind mount and reload. For the built frontend and backend behind a local reverse proxy, follow the [production-like deployment runbook](docs/deployment/runbook.md).
+
 ~~~bash
 docker compose up --build
 ~~~
@@ -579,6 +581,7 @@ Technical reference:
 - [Contributing Guide](CONTRIBUTING.md)
 - [Architecture](docs/architecture/initial-architecture.md)
 - [Cloud and Deployment Strategy](docs/architecture/deployment-strategy.md)
+- [Production-like Deployment Runbook](docs/deployment/runbook.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Launch Demo Script](docs/demos/launch-demo-script.md)
 - [AI Quality Command Center Case Study](docs/case-study/ai-quality-command-center-case-study.md)
@@ -614,15 +617,17 @@ Known limitations:
 - external SQL and NoSQL connectors are not implemented yet;
 - some specialized agents still use deterministic behavior instead of full LLM-backed reasoning;
 - frontend console execution results are currently kept in local React page state;
-- the project does not yet provide a deployed frontend.
+- the project does not yet provide a publicly deployed frontend.
 
 These limitations define the boundary between the implemented local AI engineering product and future production hardening.
 
 ## Post-launch Roadmap
 
-Following the completed M8 local portfolio launch, development continues through focused implementation packs. Pack 1 is currently underway.
+Following the completed M8 local portfolio launch, development continues through focused implementation packs. Pack 1 is complete; Pack 2 has not started.
 
 ### Pack 1 — Cloud & Deployment Readiness
+
+**Status:** Completed for production-like local execution; public cloud hosting remains deferred.
 
 - provider-neutral deployment architecture;
 - production-like local application stack;
