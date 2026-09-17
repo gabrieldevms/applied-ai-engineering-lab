@@ -4,12 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## Post-launch Pack 2 — Production Observability
 
-**Status:** In progress.
+**Status:** Completed for local, production-like observability; public production hosting remains deferred.
 
-### Documentation
+### Operational monitoring
 
-- Defined the distinction between operational monitoring and existing AI quality observability, with a Prometheus-based local monitoring strategy and safety boundaries for metrics, artifacts and scorecards.
-- Updated repository status to identify Pack 2 as active; no Pack 2 runtime capability is claimed yet.
+- Added bounded FastAPI request-count, latency and readiness metrics through an internal `/metrics` endpoint, with safe route/method/status-class labels and no raw AI content.
+- Added an optional, version-pinned Prometheus Compose service with internal API scraping, a loopback UI and a dedicated local data volume. Nginx denies public `/api/metrics` requests.
+
+### Evaluation and quality
+
+- Added atomic, sanitized evaluation artifacts under `STORAGE_BASE_DIR/evaluation-artifacts/`, safe ID-based list/latest/detail APIs and pipeline integration while preserving the separate GitHub Actions report upload.
+- Added deterministic scorecards for evaluation, retrieval, agent, multi-agent, usage/cost and local readiness, with explicit `no_data` and seven-day trend semantics.
+- Extended the existing Observability Center and Evaluation Center with scorecard states, freshness, artifact history and safe detail views. Execution History remains separate.
+
+### CI and documentation
+
+- Added a dedicated observability stack CI job validating configuration, Prometheus scraping, an application metric, frontend/API routing and the public metrics boundary with the Fake provider.
+- Added the [production observability runbook](docs/observability/production-observability.md) alongside the existing strategy, and updated repository status and roadmap to mark Pack 2 complete and Pack 3 as not started.
+
+### Limitations
+
+- Local JSONL/artifact storage and Prometheus volumes have no production backup or recovery policy. External alerting, log aggregation, distributed tracing, authentication, multi-user isolation and public deployment remain deferred.
 
 ---
 

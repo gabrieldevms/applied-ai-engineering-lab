@@ -4,11 +4,10 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-- **Current phase:** Pack 2 — Production Observability (in progress)
-- **Latest completed milestone:** Pack 1 — Cloud & Deployment Readiness
-- **Current focus:** Operational monitoring, persistent evaluation artifacts and AI quality scorecards
+- **Completed post-launch packs:** Pack 1 — Cloud & Deployment Readiness; Pack 2 — Production Observability
+- **Next planned pack:** Pack 3 — Production Agent State (not started)
 
-The **M8 local portfolio launch** and Pack 1 are complete. Pack 2 is now the active implementation pack; no cloud provider or public production hosting has been selected.
+The **M8 local portfolio launch** and Packs 1–2 are complete. Pack 2 provides local operational monitoring, persistent sanitized evaluation artifacts and deterministic AI quality scorecards; no cloud provider or public production hosting has been selected.
 
 The completed local launch progression was:
 
@@ -644,7 +643,7 @@ Potential future extensions after M8 include:
 
 ### Post-launch Implementation Packs
 
-Following the completed M8 local portfolio launch, the project is evolving through focused implementation packs designed to support both technical growth and public portfolio updates. Pack 1 is complete and Pack 2 is in progress.
+Following the completed M8 local portfolio launch, the project is evolving through focused implementation packs designed to support both technical growth and public portfolio updates. Packs 1 and 2 are complete; Pack 3 is next and has not started.
 
 #### Pack 1 — Cloud & Deployment Readiness
 
@@ -659,13 +658,16 @@ Following the completed M8 local portfolio launch, the project is evolving throu
 
 #### Pack 2 — Production Observability
 
-**Status:** In progress. See the [production observability strategy](docs/architecture/production-observability-strategy.md).
+**Status:** Completed for local, production-like observability. See the [strategy](docs/architecture/production-observability-strategy.md) and [runbook](docs/observability/production-observability.md).
 
-- [ ] Production monitoring
-- [ ] Persistent evaluation artifacts
-- [ ] More robust dashboards and scorecards
+- [x] Bounded operational metrics and optional local Prometheus monitoring
+- [x] Persistent sanitized evaluation artifacts
+- [x] Deterministic quality scorecards and enhanced existing dashboards
+- [x] Dedicated CI observability stack validation
 
 #### Pack 3 — Production Agent State
+
+**Status:** Not started; next planned pack.
 
 - [ ] Persistent vector storage
 - [ ] Persistent agent state

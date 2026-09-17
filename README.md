@@ -27,11 +27,10 @@ The result is a local AI Quality Engineering platform built around explicit arch
 
 ## Current Status
 
-- **Current phase:** Pack 2 — Production Observability (in progress)
-- **Latest completed milestone:** Pack 1 — Cloud & Deployment Readiness
-- **Current focus:** Operational monitoring, persistent evaluation artifacts and AI quality scorecards
+- **Completed post-launch packs:** Pack 1 — Cloud & Deployment Readiness; Pack 2 — Production Observability
+- **Next planned pack:** Pack 3 — Production Agent State (not started)
 
-The initial local portfolio launch and Pack 1 are complete. Pack 2 is extending the existing Command Center observability foundations; its monitoring, artifacts and scorecards are not complete yet. No cloud provider has been selected.
+The initial local portfolio launch and Packs 1–2 are complete. Pack 2 adds local Prometheus monitoring, persistent sanitized evaluation artifacts and AI quality scorecards to the existing Command Center. No cloud provider has been selected.
 
 The current version is suitable for:
 
@@ -291,6 +290,8 @@ The observability layer tracks:
 - dashboard risks;
 - recommendations.
 
+Pack 2 adds bounded HTTP request and readiness metrics for local Prometheus scraping, sanitized evaluation artifacts, and deterministic quality scorecards. See the [observability runbook](docs/observability/production-observability.md) for the operational boundary and commands.
+
 ### 8. Security and Governance
 
 The security and governance foundation includes:
@@ -324,8 +325,8 @@ Main endpoint groups:
 | Agents | `/agents/run`, `/agents/tools`, `/agents/tools/execute`, `/agents/qa/run`, `/agents/execute` |
 | Data Analysis | `/data-analysis/sql/generate`, `/data-analysis/sql/execute`, `/data-analysis/agent/run` |
 | Multi-Agent | `/multi-agent/qa-copilot/run`, `/multi-agent/qa-copilot/evaluate` |
-| Evaluation | `/evals/golden-dataset/run`, `/evals/prompt-regression/run`, `/evals/ci/pipeline/run` |
-| Observability | `/observability/dashboard`, `/observability/execution-history`, `/observability/usage/records` |
+| Evaluation | `/evals/golden-dataset/run`, `/evals/prompt-regression/run`, `/evals/ci/pipeline/run`, `/evals/artifacts` |
+| Observability | `/observability/dashboard`, `/observability/quality-scorecards`, `/observability/execution-history`, `/observability/usage/records` |
 | Security | `/security/prompt-injection/assess`, `/security/blocked-tool-calls`, `/security/audit/events` |
 
 For the full API contract, use the OpenAPI docs after starting the backend.
@@ -360,7 +361,7 @@ For the full API contract, use the OpenAPI docs after starting the backend.
 
 ### Storage
 
-Current local persistence uses JSONL files for observability and security records.
+Current local persistence uses JSONL files for observability and security records, plus sanitized JSON evaluation artifacts. The optional Prometheus service uses a separate named Docker volume.
 
 This is suitable for local development, demos and portfolio presentation, but not yet a production database strategy.
 
@@ -582,6 +583,7 @@ Technical reference:
 - [Architecture](docs/architecture/initial-architecture.md)
 - [Cloud and Deployment Strategy](docs/architecture/deployment-strategy.md)
 - [Production Observability Strategy](docs/architecture/production-observability-strategy.md)
+- [Production Observability Runbook](docs/observability/production-observability.md)
 - [Production-like Deployment Runbook](docs/deployment/runbook.md)
 - [Demonstration Scenarios](docs/demos/demonstration-scenarios.md)
 - [Launch Demo Script](docs/demos/launch-demo-script.md)
@@ -610,7 +612,7 @@ Known limitations:
 - local JSONL storage is not production-grade persistence;
 - persistent vector database storage is not implemented yet;
 - persistent agent state and session resume are not implemented yet;
-- production monitoring integrations are not implemented yet;
+- external monitoring, alert delivery and distributed tracing are not implemented yet;
 - production MCP hosting is not defined yet;
 - audit log UI and retention policy are not implemented yet;
 - prompt injection detection is currently a deterministic baseline, not complete adversarial protection;
@@ -624,7 +626,7 @@ These limitations define the boundary between the implemented local AI engineeri
 
 ## Post-launch Roadmap
 
-Following the completed M8 local portfolio launch, development continues through focused implementation packs. Pack 1 is complete and Pack 2 is in progress.
+Following the completed M8 local portfolio launch, development continues through focused implementation packs. Packs 1 and 2 are complete; Pack 3 is next and has not started.
 
 ### Pack 1 — Cloud & Deployment Readiness
 
@@ -638,13 +640,16 @@ Following the completed M8 local portfolio launch, development continues through
 
 ### Pack 2 — Production Observability
 
-**Status:** In progress. The [strategy](docs/architecture/production-observability-strategy.md) defines the implementation boundaries.
+**Status:** Completed for local, production-like observability. See the [strategy](docs/architecture/production-observability-strategy.md) and [runbook](docs/observability/production-observability.md).
 
-- production monitoring;
-- persistent evaluation artifacts;
-- more robust dashboards and scorecards.
+- optional Prometheus monitoring of bounded API metrics;
+- persistent, sanitized local evaluation artifacts;
+- deterministic quality scorecards and enhanced existing dashboards;
+- dedicated CI observability validation.
 
 ### Pack 3 — Production Agent State
+
+**Status:** Not started; next planned pack.
 
 - persistent vector storage;
 - persistent agent state;
