@@ -27,9 +27,11 @@ The result is a local AI Quality Engineering platform built around explicit arch
 
 ## Current Status
 
-- **Current module:** Cloud, Security and Portfolio in progress
-- **Latest completed milestone:** Final launch documentation status
-- **Next focus:** Local portfolio launch validation and post-launch implementation planning
+- **Current phase:** Post-launch Pack 1 — Cloud & Deployment Readiness
+- **Latest completed milestone:** M8 local portfolio launch
+- **Next focus:** Provider-neutral production-like execution, deployment readiness and CI validation
+
+The initial local portfolio launch is complete. Pack 1 prepares the Command Center for production-like local execution and future cloud deployment without selecting a cloud provider yet.
 
 The current version is suitable for:
 
@@ -617,13 +619,15 @@ These limitations define the boundary between the implemented local AI engineeri
 
 ## Post-launch Roadmap
 
-After the M8 local portfolio launch, the project will continue through focused implementation packs.
+Following the completed M8 local portfolio launch, development continues through focused implementation packs. Pack 1 is currently underway.
 
-### Pack 1 — Cloud & Deployment
+### Pack 1 — Cloud & Deployment Readiness
 
-- cloud deployment;
-- deployment pipeline;
-- production health checks.
+- provider-neutral deployment architecture;
+- production-like local application stack;
+- deployment-aware configuration and readiness checks;
+- CI validation for backend, frontend and container builds;
+- deployment runbook.
 
 ### Pack 2 — Production Observability
 

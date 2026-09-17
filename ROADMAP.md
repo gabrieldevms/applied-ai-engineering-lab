@@ -4,13 +4,13 @@ This roadmap tracks the incremental development of a production-oriented Applied
 
 ## Current Status
 
-- **Current module:** M8 — Cloud, Security and Portfolio in progress
-- **Latest completed milestone:** Final M8 roadmap synchronization and portfolio-ready public documentation
-- **Next focus:** Local portfolio launch validation and post-launch implementation planning
+- **Current phase:** Post-launch Pack 1 — Cloud & Deployment Readiness
+- **Latest completed milestone:** M8 local portfolio launch
+- **Next focus:** Provider-neutral production-like execution, deployment readiness and CI validation
 
-The project is currently in the final preparation stage for the **M8 local portfolio launch**.
+The **M8 local portfolio launch** is complete. Pack 1 is the current development focus; a cloud provider will be evaluated only after the production-like architecture is validated.
 
-The short-term launch order is:
+The completed local launch progression was:
 
 ```text
 M7 — Evaluation and LLMOps
@@ -38,7 +38,7 @@ Portfolio-ready public documentation
 | M5 — MCP QA Server                 | Completed   |
 | M6 — Multi-Agent QA Copilot        | Completed   |
 | M7 — Evaluation and LLMOps         | Completed   |
-| M8 — Cloud, Security and Portfolio | In Progress |
+| M8 — Cloud, Security and Portfolio | Completed   |
 
 ---
 
@@ -485,13 +485,13 @@ Current limitations:
 
 ## M8 — Cloud, Security and Portfolio
 
-**Status:** In Progress — final launch preparation
+**Status:** Completed — local portfolio launch
 
 **Goal:** Prepare the project for production-like deployment, governance, frontend experience and professional presentation.
 
-M8 transforms the backend platform foundation into a more demonstrable and portfolio-ready AI engineering product through the AI Quality Command Center, persistent local observability, execution history, security and governance controls, and portfolio documentation.
+M8 transformed the backend platform foundation into a more demonstrable and portfolio-ready AI engineering product through the AI Quality Command Center, persistent local observability, execution history, security and governance controls, and portfolio documentation.
 
-The current M8 scope is focused on a **local portfolio launch**, not a full production SaaS deployment.
+The M8 scope focused on a **local portfolio launch**, not a full production SaaS deployment.
 
 ### Local portfolio launch scope
 
@@ -634,7 +634,7 @@ Deferred or moved to post-launch:
 - [x] Portfolio-ready public documentation
 - [x] Local launch documentation
 
-> Current note: the AI Quality Command Center is ready for local demonstrations and portfolio presentation. The backend has persistent local JSONL storage for core observability telemetry, execution history read models, console telemetry integration and live dashboard behavior. Security and governance include safe provider configuration, prompt injection assessment, prompt injection telemetry, tool authorization enforcement, blocked tool-call telemetry and audit log events for blocked tool calls and high-risk prompt injection assessments. Production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting are intentionally moved to post-launch implementation packs.
+> M8 launch note: the AI Quality Command Center is ready for local demonstrations and portfolio presentation. The backend has persistent local JSONL storage for core observability telemetry, execution history read models, console telemetry integration and live dashboard behavior. Security and governance include safe provider configuration, prompt injection assessment, prompt injection telemetry, tool authorization enforcement, blocked tool-call telemetry and audit log events for blocked tool calls and high-risk prompt injection assessments. Production cloud deployment, authentication, multi-user isolation, persistent vector storage, persistent agent state, production monitoring and production MCP hosting were intentionally moved to post-launch implementation packs.
 
 ---
 
@@ -644,13 +644,16 @@ Potential future extensions after M8 include:
 
 ### Post-launch Implementation Packs
 
-After the M8 local portfolio launch, the project will continue evolving through focused implementation packs designed to support both technical growth and public portfolio updates.
+Following the completed M8 local portfolio launch, the project is evolving through focused implementation packs designed to support both technical growth and public portfolio updates. Pack 1 is currently underway.
 
-#### Pack 1 — Cloud & Deployment
+#### Pack 1 — Cloud & Deployment Readiness
 
-- [ ] Cloud deployment
-- [ ] Deployment pipeline
-- [ ] Production health checks
+- [ ] Provider-neutral deployment architecture
+- [ ] Production-like local application stack
+- [ ] Deployment-aware configuration
+- [ ] Application readiness checks
+- [ ] CI validation for backend, frontend and container builds
+- [ ] Deployment runbook
 
 #### Pack 2 — Production Observability
 
