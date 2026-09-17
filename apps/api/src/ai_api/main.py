@@ -13,6 +13,11 @@ from ai_api.evals.artifacts import (
     EvaluationArtifactService,
     get_evaluation_artifact_service,
 )
+from ai_api.evals.quality_scorecards import (
+    AIQualityScorecardService,
+    QualityScorecardsResponse,
+    get_quality_scorecard_service,
+)
 from ai_api.operational_metrics import CONTENT_TYPE_LATEST, operational_metrics
 from ai_api.readiness import ReadinessResponse, get_readiness_report
 from ai_api.llm import (
@@ -1829,6 +1834,16 @@ def get_ai_observability_dashboard(
     ],
 ) -> AIObservabilityDashboardResponse:
     return service.get_dashboard()
+
+
+@app.get("/observability/quality-scorecards", response_model=QualityScorecardsResponse)
+def get_ai_quality_scorecards(
+    service: Annotated[
+        AIQualityScorecardService,
+        Depends(get_quality_scorecard_service),
+    ],
+) -> QualityScorecardsResponse:
+    return service.get_scorecards()
 
 
 @app.get("/observability/execution-history", response_model=AIExecutionHistoryResponse,)
