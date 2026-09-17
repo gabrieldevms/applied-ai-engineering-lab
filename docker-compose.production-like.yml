@@ -20,15 +20,27 @@ services:
       - "8000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
 
   web:
     build:
       context: apps/web
       dockerfile: Dockerfile
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     ports:
       - "127.0.0.1:8080:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
 volumes:
   app_data:
