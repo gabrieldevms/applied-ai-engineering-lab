@@ -170,9 +170,11 @@ The project has completed its initial local portfolio launch as the AI Quality C
 
 Post-launch development is organized into focused implementation packs.
 
-The current development focus is:
+The completed implementation pack is:
 
 **Pack 1 — Cloud & Deployment Readiness**
+
+The next planned development focus is **Pack 2 — Production Observability**. Pack 2 has not started yet.
 
 Future packs cover:
 
