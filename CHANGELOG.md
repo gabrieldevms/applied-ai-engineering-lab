@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## Post-launch Pack 1 — Cloud & Deployment Readiness
+
+**Status:** Completed for production-like local execution. This is not public production hosting, and no cloud provider has been selected.
+
+### Deployment architecture and containers
+
+- Documented a provider-neutral deployment strategy with a same-origin frontend/API boundary and separate web and API workloads.
+- Added a production-like frontend container that builds React assets and serves them with Nginx.
+- Added an Nginx reverse proxy that forwards `/api/*` to FastAPI after removing the `/api` prefix, preserving the frontend's relative API requests.
+- Updated the backend container to run Uvicorn without development reload or a source-code bind mount.
+- Pinned the `uv` image version used by the backend Docker build and hardened the backend and frontend Docker build contexts with `.dockerignore` files.
+- Added a production-like Compose stack with a persistent Docker volume mounted at the API's `.data` storage root.
+
+### Configuration and readiness
+
+- Made the default agent execution log path follow `STORAGE_BASE_DIR` while preserving explicit path overrides, and rejected blank storage paths.
+- Kept provider credentials in the API environment; the frontend requires no provider secret or backend host setting.
+- Added `GET /ready` with deterministic settings, selected-provider configuration and local storage-path checks. It returns a structured 503 when a required check fails without calling external providers or exposing secrets.
+- Preserved the lightweight `GET /health` liveness endpoint and added separate API readiness and web health checks to the production-like stack.
+
+### CI and documentation
+
+- Extended the main CI workflow with reproducible frontend installation, lint and production build.
+- Added Compose configuration validation, backend and frontend image builds, healthy stack startup, and frontend/API routing smoke tests to CI using the Fake provider.
+- Added the deployment strategy and production-like deployment runbook; updated the README and roadmap to reflect Pack 1 completion.
+
+### Limitations
+
+- The stack is for production-like local execution, not unrestricted public production hosting; no cloud provider has been selected.
+- Authentication, access control, multi-user isolation, production secrets management, production monitoring, production databases, persistent vector storage and persistent agent state remain deferred.
+
+---
+
 ## M8 — Cloud, Security and Portfolio
 
 ### Added
@@ -159,7 +192,7 @@ All notable changes to this project will be documented in this file.
 
 - Personal launch communication materials, such as LinkedIn posts, GitHub profile snippets and private pitch notes, are intentionally kept outside the repository.
 - Public project documentation remains focused on helping visitors understand, run, study and demonstrate the project from their own experience.
-- M8 remains in progress and is now in final launch preparation.
+- M8 concluded with the initial local portfolio launch before post-launch Pack 1.
 - The local AI Quality Command Center, persistent local observability foundation, execution history, run details and security/governance baseline are implemented for portfolio demonstration.
 - The README is now optimized as a GitHub landing page, while the detailed technical inventory is preserved in `docs/reference/current-capabilities-reference.md`.
 - Console execution results are currently kept in local React state.
