@@ -13,6 +13,8 @@ from ai_api.evals import (  # noqa: E402
     CIEvaluationPipelineRunRequest,
     CIEvaluationPipelineService,
 )
+from ai_api.config import Settings  # noqa: E402
+from ai_api.evals.artifacts import EvaluationArtifactService  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -69,6 +71,14 @@ def main() -> int:
             indent=2,
         ),
         encoding="utf-8",
+    )
+
+    storage_dir = Path(Settings().storage_base_dir)
+    if not storage_dir.is_absolute():
+        storage_dir = PROJECT_ROOT / storage_dir
+    EvaluationArtifactService(storage_dir).save_pipeline(
+        response,
+        source="script",
     )
 
     print(
