@@ -42,5 +42,29 @@ services:
       timeout: 3s
       retries: 5
 
+  prometheus:
+    image: prom/prometheus:v3.14.0
+    profiles: ["observability"]
+    # Local retention only. The named volume survives `down` without `-v`; it is not a backup.
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9090/-/healthy"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
 volumes:
   app_data:
+  prometheus_data:
