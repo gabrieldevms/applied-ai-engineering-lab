@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app/apps/api/src
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.25 /uv /uvx /bin/
 
 COPY pyproject.toml uv.lock ./
 
@@ -16,4 +16,4 @@ COPY apps/api/src ./apps/api/src
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "ai_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "apps/api/src"]
+CMD ["uv", "run", "--no-sync", "uvicorn", "ai_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "apps/api/src"]

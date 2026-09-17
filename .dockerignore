@@ -6,4 +6,12 @@ __pycache__/
 *.pyc
 .env
 .env.local
+.env.*
 .vscode/
+.data/
+.cache/
+apps/web/node_modules/
+apps/web/dist/
+tests/
+datasets/
+docs/
